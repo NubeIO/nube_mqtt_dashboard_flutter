@@ -1,4 +1,4 @@
-package com.example.nube_mqtt_dashboard
+package com.nubeio.nube_mqtt_dashboard
 
 import io.flutter.embedding.android.FlutterActivity
 
