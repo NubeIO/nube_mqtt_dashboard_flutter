@@ -11,4 +11,10 @@
         "rxdart",
         "serializable"
     ],
+    "files.exclude": {
+        "**/*.config.dart": true,
+        "**/*.freezed.dart": true,
+        "**/*.g.dart": true,
+        "**/*.gr.dart": true,
+    },
 }
