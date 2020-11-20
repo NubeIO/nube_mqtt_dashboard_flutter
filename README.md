@@ -91,3 +91,33 @@ Various log levels and when to use them can be found [here](documents/LOG.md)
 
 ````
 ---
+
+## Plugins and Presets
+
+Some useful extensions for vscode. 
+
+- [Pubspec Asssist](https://marketplace.visualstudio.com/items?itemName=jeroen-meijer.pubspec-assist)
+- [Awesome Flutter Snippets](https://marketplace.visualstudio.com/items?itemName=Nash.awesome-flutter-snippets)
+- [Advanced New File](https://marketplace.visualstudio.com/items?itemName=patbenatar.advanced-new-file)
+- [Bracket Pair Colorizer 2](https://marketplace.visualstudio.com/items?itemName=CoenraadS.bracket-pair-colorizer-2)
+- [Bloc Extension](https://marketplace.visualstudio.com/items?itemName=FelixAngelov.bloc)
+- [Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments)
+- [Dart Import](https://marketplace.visualstudio.com/items?itemName=luanpotter.dart-import)
+- [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
+- [Git History](https://marketplace.visualstudio.com/items?itemName=donjayamanne.githistory)
+
+Some useful snippets 
+
+The project includes a bunch of useful snippets which can be found in the `dart.code-snippets` under `.vscode`
+
+1. Framy Model Class - `framym` - Creates a Framy Model Class
+1. Part Statement - `pts` - Creates a filled-in part statement
+1.  Part 'Freezed' statement - `ptf` - Creates a filled-in freezed part statement
+1. Freezed Data Class - `fdataclass` - Create a Freezed Data Class
+1. Freezed Json Factory - `fjson` - Create a json method in Freezed Data Class
+1. Freezed Union  - `funion` - Create a Freezed Union
+1. Freezed Union Case - `funioncase` - Create a Freezed Union Case inside a Freezed Union
+1. Get instance for Type - `getit` - GetIt instance for Type
+1. Mockito Test case - `mocktest` - Create a unit test 
+
+Any additional snippets can be added by creating a appropriate PR. For more info on snippets creation you can look at [this](https://code.visualstudio.com/docs/editor/userdefinedsnippets#_create-your-own-snippets).

@@ -1,0 +1,116 @@
+{
+	"Part statement": {
+		"prefix": "pts",
+		"body": [
+			"part '${TM_FILENAME_BASE}.g.dart';",
+		],
+		"description": "Creates a filled-in part statement"
+	},
+	"Part 'Freezed' statement": {
+		"prefix": "ptf",
+		"body": [
+			"part '${TM_FILENAME_BASE}.freezed.dart';",
+		],
+		"description": "Creates a filled-in freezed part statement"
+	},
+	"Freezed Data as Part": {
+		"prefix": "fdatapart",
+		"body": [
+			"part of ${2:library};",
+			"",
+			"@freezed",
+			"abstract class ${1:DataClass} with _$${1:DataClass}{",
+			"  const factory ${1:DataClass}(${2}) = _${1:DataClass};",
+			"}"
+		],
+		"description": "Freezed Data File with class"
+	},
+	"Freezed Data Class": {
+		"prefix": "fdataclass",
+		"body": [
+			"@freezed",
+			"abstract class ${1:DataClass} with _$${1:DataClass}{",
+			"  const factory ${1:DataClass}(${2}) = _${1:DataClass};",
+			"}"
+		],
+		"description": "Freezed Data Class"
+	},
+	"Framy Model Class": {
+		"prefix": "framym",
+		"body": [
+			"@FramyModel()",
+			"@immutable",
+			"class ${1:ModelClass}{",
+			"  const ${1:ModelClass}({${2}});",
+			"}"
+		],
+		"description": "Framy Model Class"
+	},
+	"Freezed Union": {
+		"prefix": "funion",
+		"body": [
+			"@freezed",
+			"abstract class ${1:Union} with _$${1:Union}{",
+			"  const factory ${1:Union}.${2}(${4}) = ${3};",
+			"}"
+		],
+		"description": "Freezed Union"
+	},
+	"Freezed Union Case": {
+		"prefix": "funioncase",
+		"body": [
+			"const factory ${1:Union}.${2}(${4}) = ${3};"
+		],
+		"description": "Freezed Union Case"
+	},
+	"Freezed Json Factory": {
+		"prefix": "fjson",
+		"body": [
+			"factory ${1:Union}.fromJson(Map<String, dynamic> json) => _$${1:Union}FromJson(json);"
+		],
+		"description": "Freezed Union Case"
+	},
+	"GetIt instance for Type": {
+		"prefix": "getit",
+		"body": [
+			"getIt<${1:Type}>()"
+		],
+		"description": "GetIt instance of Type"
+	},
+	"Repository Impl": {
+		"prefix": "repositoryimp",
+		"body": [
+			"@LazySingleton(as: I${1:Name}Repository)",
+			"class ${1:Name}RepositoryImpl extends I${1:Name}Repository{",
+			"    ${1:Name}RepositoryImpl({${3}});",
+			"}"
+		],
+		"description": "Creates a repository implementation"
+	},
+	"Repository Interface": {
+		"prefix": "repositoryi",
+		"body": [
+			"abstract class I${1:Name}Repository {",
+			"    ${2}",
+			"}"
+		],
+		"description": "Creates a repository interface"
+	},
+	"Mockito Test case": {
+		"prefix": "mocktest",
+		"body": [
+			"test(",
+			"'should ${1} when ${2}',",
+			"  () async {",
+			"    // arrange",
+			"    ",
+			"    // act",
+			"    ",
+			"    // assert",
+			"    ",
+			"  },",
+			");"
+		],
+		"description": "Create a unit test"
+	},
+}
