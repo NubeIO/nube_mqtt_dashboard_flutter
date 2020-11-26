@@ -65,6 +65,7 @@ You can see all the versions installed by FVM in VS Code by just providing path 
 }
 ````
 
+
 ---
 
 # Development
@@ -91,6 +92,46 @@ Various log levels and when to use them can be found [here](documents/LOG.md)
 
 ````
 ---
+## Internationalization and Localization
+
+The project uses this [extension](https://marketplace.visualstudio.com/items?itemName=esskar.vscode-flutter-i18n-json) to automatically generate translations for the application. 
+
+The default localization can be found [here](i18n/en-US.json). After any changes or additions to translations, run the following command. 
+
+```
+Flutter I18n Json: Update
+```
+
+This will update the auto generated file below.
+
+
+```
+lib/generated/i18n.dart
+```
+
+### Usage
+
+Use a simple key-value pair JSON format to define your translations.
+
+```json
+{
+    "hello": "World"
+}
+```
+
+In the above example `"hello"` is the key for the translation value `"World"`. This can inturn be used as `I18n.of(context).hello`
+
+Placeholders are automatically detected and are enclosed in curly brackets `{variable_here}`:
+
+```json
+{
+    "greetTo": "Hello {name}"
+}
+``` 
+
+Here, `{name}` is a placeholder within the translation value for `"greetTo"`. This can inturn be used as `I18n.of(context).greetTo("Ritesh")`
+
+> Nesting and arrays are also supported as can be seen in [file](i18n/en-US.json)
 
 ## Plugins and Presets
 
