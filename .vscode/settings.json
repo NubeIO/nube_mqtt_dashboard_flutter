@@ -5,6 +5,9 @@
     ],
     "dart.flutterSdkPath": ".fvm/flutter_sdk",
     "cSpell.words": [
-        "Nube"
+        "Nube",
+        "dartz",
+        "rxdart",
+        "serializable"
     ],
 }
