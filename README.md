@@ -32,6 +32,14 @@ This syntax works also for commands with parameters. The following command will 
 
 In other words, calling a `fvm flutter xxx` command is equivalent to `flutter xxx` if fvm is available in the directory tree.
 
+
+### Build Generated Files
+The generated files are not included in the repo because they cause a lot of conflicts during merge and rebase. This you'll have to run them before starting anything else. 
+
+```
+fvm flutter pub run build_runner build 
+```
+
 ---
 
 ### Configure Your IDE
