@@ -1,16 +1,60 @@
-# nube_mqtt_dashboard
+# Nube Mqtt Dashboard - Flutter
 
-A new Flutter project.
 
-## Getting Started
+## Installation and Usage
 
-This project is a starting point for a Flutter application.
+The project requires you to have [Flutter Version Management](https://github.com/leoafarias/fvm) installed. This tool allows you to manage multiple channels and releases, and caches these versions locally.
 
-A few resources to get you started if this is your first Flutter project:
+### Flutter Version Management
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+#### **Installation**
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+#### Activate Fvm:
+
+> pub global activate fvm
+
+#### Install Project SDK Version 
+
+Since project is already configured to use a specific version, running `install` without any arguments will install the proper version.
+
+> fvm install
+
+### Running Flutter SDK commands
+Flutter command within fvm proxies all calls to the CLI; just changing the SDK to be the local one.
+
+For instance, to run the flutter run with a given Flutter SDK version just call the following. FVM will recursively try for a version in a parent directory.
+
+> fvm flutter run
+
+This syntax works also for commands with parameters. The following command will call flutter build for a selected flavor and target.
+
+> fvm flutter build aab --release --flavor prod -t lib/main_prod.dart
+
+In other words, calling a `fvm flutter xxx` command is equivalent to `flutter xxx` if fvm is available in the directory tree.
+
+---
+
+### Configure Your IDE
+
+#### VSCode
+
+The project is configured to use a symlink for dynamic switch. You'll have to run the following command to install it though. 
+
+```
+fvm install
+```
+
+Another option is to add the following to your settings.json. This will list list all Flutter SDKs installed when using VSCode when using Flutter: Change SDK.
+
+You can see all the versions installed by FVM in VS Code by just providing path to versions directory:
+
+````json
+{
+    "dart.flutterSdkPaths": [
+        ".fvm/flutter_sdk"
+    ],
+    "dart.flutterSdkPath": ".fvm/flutter_sdk",
+}
+````
+
+---

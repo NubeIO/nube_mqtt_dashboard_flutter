@@ -1,3 +1,10 @@
 {
-    "dart.flutterSdkPath": "/Users/riteshakya037/Projects/wocketship/prowdly_flutter/.fvm/flutter_sdk"
+    "dartImport.fixOnSave": true,
+    "dart.flutterSdkPaths": [
+        ".fvm/flutter_sdk"
+    ],
+    "dart.flutterSdkPath": ".fvm/flutter_sdk",
+    "cSpell.words": [
+        "Nube"
+    ],
 }
