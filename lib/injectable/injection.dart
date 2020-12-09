@@ -11,5 +11,5 @@ final getIt = GetIt.instance;
   preferRelativeImports: true, // default
   asExtension: false, // default
 )
-void configureDependencies() => $initGetIt(getIt,
+Future<void> configureDependencies() => $initGetIt(getIt,
     environment: kReleaseMode ? Environment.prod : Environment.dev);
