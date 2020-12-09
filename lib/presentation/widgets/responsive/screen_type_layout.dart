@@ -23,14 +23,25 @@ class ScreenTypeLayout extends StatelessWidget {
     return ResponsiveBuilder(builder: (context, sizingInformation) {
       // If sizing indicates Tablet and we have a tablet widget then return
       if (sizingInformation.deviceScreenType == DeviceScreenType.Tablet) {
+        // SystemChrome.setPreferredOrientations([
+        //   DeviceOrientation.landscapeLeft,
+        //   DeviceOrientation.landscapeRight,
+        // ]);
         return tablet ?? mobile;
       }
 
       // If sizing indicates desktop and we have a desktop widget then return
       if (sizingInformation.deviceScreenType == DeviceScreenType.Desktop) {
-        return desktop ?? mobile;
+        // SystemChrome.setPreferredOrientations([
+        //   DeviceOrientation.landscapeLeft,
+        //   DeviceOrientation.landscapeRight,
+        // ]);
+        return desktop ?? tablet ?? mobile;
       }
-
+      // SystemChrome.setPreferredOrientations([
+      //   DeviceOrientation.portraitUp,
+      //   DeviceOrientation.portraitDown,
+      // ]);
       // Return mobile layout if nothing else is supplied
       return mobile;
     });

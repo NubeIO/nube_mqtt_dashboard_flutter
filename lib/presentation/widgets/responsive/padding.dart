@@ -6,6 +6,7 @@ import '../../extensions/device_screen_type.dart';
 import '../../models/device_screen_type.dart';
 
 const GOLDEN_RATIO = 0.61;
+const GOLDEN_RATIO_SMALL = 0.244;
 
 class ResponsiveSize {
   static double padding(
@@ -30,6 +31,20 @@ class ResponsiveSize {
         break;
       default:
         return min(MediaQuery.of(context).size.width * GOLDEN_RATIO, 500);
+    }
+  }
+
+  static double twoWidth(BuildContext context) {
+    final deviceType = MediaQuery.of(context).getDeviceType();
+    switch (deviceType) {
+      case DeviceScreenType.Mobile:
+        return MediaQuery.of(context).size.width;
+        break;
+      default:
+        return min(
+            MediaQuery.of(context).size.width *
+                (GOLDEN_RATIO + GOLDEN_RATIO_SMALL),
+            800);
     }
   }
 
