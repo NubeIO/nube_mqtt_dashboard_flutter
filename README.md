@@ -66,3 +66,28 @@ You can see all the versions installed by FVM in VS Code by just providing path 
 ````
 
 ---
+
+# Development
+
+## Logging and Debugging 
+
+The project has a centralized logging available. See the example below for how to use. Start using it with static methods: 
+
+The log grabs a TAG from stacktrace if it isn't provided into the static method. Its a bit costly so try avoiding extensive use without a TAG, specially for info levels. 
+
+Various log levels and when to use them can be found [here](documents/LOG.md)
+
+````dart
+
+  Log.i("Test message $argument");
+  
+  
+  // other log levels
+  Log.d("DEBUG");
+  Log.e("Extra error message", , ex: Exception("Test thorwable"));
+  Log.v("VERBOSE");
+  Log.w("WARN");
+
+
+````
+---
