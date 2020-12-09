@@ -1,8 +1,12 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../constants/app_constants.dart';
 import 'nube_theme.dart';
+import 'rotue_guards/auth_route_guard.dart';
+import 'routes/route_log_observer.dart';
+import 'routes/router.dart';
 import 'widgets/locale/locale_builder.dart';
 
 class NubeApp extends StatelessWidget {
@@ -15,7 +19,6 @@ class NubeApp extends StatelessWidget {
         return MaterialApp(
           title: AppConstants.APP_NAME,
           theme: NubeTheme.lightTheme,
-          home: const Placeholder(),
           localizationsDelegates: [
             i18n,
             GlobalMaterialLocalizations.delegate,
@@ -23,6 +26,10 @@ class NubeApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate
           ],
           supportedLocales: i18n.supportedLocales,
+          builder: ExtendedNavigator.builder<AppRouter>(
+              router: AppRouter(),
+              guards: [AuthGuard()],
+              observers: [LoggerNavigatorObserver()]),
         );
       },
     );
