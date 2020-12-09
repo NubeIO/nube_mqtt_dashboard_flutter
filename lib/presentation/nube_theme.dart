@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:framy_annotation/framy_annotation.dart';
 
 // ignore: avoid_classes_with_only_static_members
+@FramyTheme()
 class NubeTheme {
   static ThemeData get lightTheme => ThemeData(
         scaffoldBackgroundColor: lightScaffoldBackgroundColor,
