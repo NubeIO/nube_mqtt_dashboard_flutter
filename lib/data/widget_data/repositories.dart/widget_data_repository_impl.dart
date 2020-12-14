@@ -5,7 +5,6 @@ import 'package:injectable/injectable.dart';
 
 import '../../../domain/mqtt/mqtt_repository.dart';
 import '../../../domain/widget_data/widget_data_repository_interface.dart';
-import '../../../utils/logger/log.dart';
 import '../mappers/data.dart';
 import '../models/widget_dto.dart';
 
@@ -51,6 +50,23 @@ class WidgetDataRepositoryImpl extends IWidgetDataRepository {
         _mapToWidgetData(message).catchError(_onCatchDataException));
   }
 
+  @override
+  Future<Either<WidgetSetFailure, Unit>> setData(
+    String topic,
+    WidgetData value,
+  ) async {
+    try {
+      await _mqttRepository.write(
+          topic,
+          jsonEncode(
+            dataMapper.mapToWidgetDataDto(value).toJson(),
+          ));
+      return const Right(unit);
+    } catch (e) {
+      return const Left(WidgetSetFailure.unexpected());
+    }
+  }
+
   Future<Either<WidgetDataSubscribeFailure, WidgetData>> _mapToWidgetData(
     TopicMessage message,
   ) async {
@@ -61,7 +77,6 @@ class WidgetDataRepositoryImpl extends IWidgetDataRepository {
   Future<Either<WidgetDataSubscribeFailure, WidgetData>> _onCatchDataException(
     Object error,
   ) async {
-    Log.e(error.toString(), ex: error);
     return left(const WidgetDataSubscribeFailure.unexpected());
   }
 }

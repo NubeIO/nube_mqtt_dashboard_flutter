@@ -7,6 +7,7 @@ import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
 import '../../widgets/responsive/drawer_detail_layout.dart';
 import '../../widgets/responsive/snackbar.dart';
+import 'widgets/page_screen.dart';
 
 class DashboardPage extends StatelessWidget {
   final cubit = getIt<LayoutCubit>();
@@ -52,7 +53,10 @@ class DashboardPage extends StatelessWidget {
               );
             },
             detailBuilder: (context, selectedIndex) {
-              return Container();
+              return WidgetsScreen(
+                key: ValueKey(list[selectedIndex].id),
+                page: list[selectedIndex],
+              );
             },
             itemBuilder: (context, index, selected, onTapCallback) {
               return ListTile(

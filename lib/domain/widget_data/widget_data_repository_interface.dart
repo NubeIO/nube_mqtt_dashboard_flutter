@@ -15,4 +15,7 @@ abstract class IWidgetDataRepository {
 
   Stream<Either<WidgetDataSubscribeFailure, WidgetData>> getWidgetUpdates(
       String topic);
+
+  Future<Either<WidgetSetFailure, Unit>> setData(
+      String topic, WidgetData value);
 }
