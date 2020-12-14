@@ -9,7 +9,9 @@ const GOLDEN_RATIO = 0.61;
 const GOLDEN_RATIO_SMALL = 0.244;
 const _MASTER_PANEL_WIDTH = 300.0;
 
+// ignore: avoid_classes_with_only_static_members
 class ResponsiveSize {
+  // ignore: non_constant_identifier_names
   static double MASTER_PANEL_WIDTH = _MASTER_PANEL_WIDTH;
 
   static double padding(
@@ -85,6 +87,27 @@ class ResponsiveSize {
         return 78.0;
     }
     return 16.0;
+  }
+
+  static int widgetsCrossAxisCount(
+    BuildContext context,
+    DeviceScreenType screenType,
+  ) {
+    int count = 1;
+    switch (screenType) {
+      case DeviceScreenType.Mobile:
+        count = 1;
+        break;
+      default:
+        final totalWidth = MediaQuery.of(context).size.width;
+        final availableWidth = totalWidth - MASTER_PANEL_WIDTH;
+        count = availableWidth ~/ MASTER_PANEL_WIDTH;
+    }
+    if (count <= 0) {
+      return 1;
+    } else {
+      return count;
+    }
   }
 }
 
