@@ -7,8 +7,11 @@ import '../../models/device_screen_type.dart';
 
 const GOLDEN_RATIO = 0.61;
 const GOLDEN_RATIO_SMALL = 0.244;
+const _MASTER_PANEL_WIDTH = 300.0;
 
 class ResponsiveSize {
+  static double MASTER_PANEL_WIDTH = _MASTER_PANEL_WIDTH;
+
   static double padding(
     BuildContext context, {
     PaddingSize size = PaddingSize.regular,
