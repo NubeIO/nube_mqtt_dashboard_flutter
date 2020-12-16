@@ -25,6 +25,23 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
+enum BuildType {
+
+    DEBUG,
+    RELEASE,
+
+}
+
+static def String getAppName(BuildType buildType) {
+    String APP_NAME = 'Nube MQQT'
+    switch (buildType) {
+    case BuildType.DEBUG:
+            return APP_NAME + ' - ' + BuildType.DEBUG.name()
+    case BuildType.RELEASE:
+            return APP_NAME
+    }
+}
+
 android {
     compileSdkVersion 29
 
@@ -45,11 +62,38 @@ android {
         versionName flutterVersionName
     }
 
+    signingConfigs {
+        release {
+            def keystorePropertiesFile = file('keystore/release.keystore.properties')
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            storeFile file(keystoreProperties['store.file'])
+            storePassword keystoreProperties['key.store.password']
+            keyAlias keystoreProperties['key.alias']
+            keyPassword keystoreProperties['key.alias.password']
+        }
+        debug {
+            def keystorePropertiesFile = file('keystore/debug.keystore.properties')
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            storeFile file(keystoreProperties['store.file'])
+            storePassword keystoreProperties['key.store.password']
+            keyAlias keystoreProperties['key.alias']
+            keyPassword keystoreProperties['key.alias.password']
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.release
+            resValue 'string', 'app_name', getAppName(BuildType.RELEASE)
+        }
+        debug {
             signingConfig signingConfigs.debug
+            applicationIdSuffix '.debug'
+            resValue 'string', 'app_name', getAppName(BuildType.DEBUG)
         }
     }
 }
