@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'entities.dart';
 import 'failures.dart';
@@ -13,9 +14,22 @@ abstract class ISessionRepository {
 
   Future<SessionType> getSessionType();
 
-  Future<Either<CreatePinFailure, Unit>> createPin(String pin);
+  Future<bool> isUserPinSet();
 
-  Future<Either<ValidatePinFailure, Unit>> validatePin(String pin);
+  Future<bool> isAdminPinSet();
+
+  Future<Option<PinConfiguration>> getPinConfiguration();
+
+  Future<Either<CreatePinFailure, Unit>> createPins({
+    @required String adminPin,
+    @required String userPin,
+  });
+
+  Future<Either<CreatePinFailure, Unit>> createUserPin(Option<String> pin);
+
+  Future<Either<CreatePinFailure, Unit>> createAdminPin(String pin);
+
+  Future<Either<ValidatePinFailure, UserType>> validatePin(String pin);
 
   Future<Either<LogoutFailure, Unit>> logout();
 }

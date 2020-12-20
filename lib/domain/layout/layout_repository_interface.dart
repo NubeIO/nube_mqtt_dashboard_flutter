@@ -7,5 +7,7 @@ export 'entities.dart';
 export 'failures.dart';
 
 abstract class ILayoutRepository {
+  Future<Either<LayoutSubscribeFailure, Unit>> subscribe();
+
   Stream<Either<LayoutFailure, LayoutBuilder>> get layoutStream;
 }

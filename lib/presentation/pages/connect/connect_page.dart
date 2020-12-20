@@ -4,14 +4,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/configuration/configuration_cubit.dart';
-import '../../../domain/configuration/configuration_repository_interface.dart';
+import '../../../application/validation/value_object.dart';
+import '../../../application/validation/value_validation_state.dart';
+import '../../../constants/app_constants.dart';
+import '../../../domain/core/validation_interface.dart';
+import '../../../domain/forms/layout_topic_validation.dart';
+import '../../../domain/forms/length_validation.dart';
 import '../../../domain/forms/non_empty_validation.dart';
 import '../../../domain/forms/port_validation.dart';
 import '../../../domain/forms/url_validation.dart';
+import '../../../domain/mqtt/mqtt_repository.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
 import '../../routes/router.dart';
 import '../../widgets/form_elements/builder/form_text_builder.dart';
+import '../../widgets/form_elements/checkbox_input.dart';
 import '../../widgets/form_elements/text_input.dart';
 import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/master_layout.dart';
@@ -21,7 +28,11 @@ import '../../widgets/responsive/snackbar.dart';
 
 @FramyWidget(isPage: true)
 class ConnectPage extends StatefulWidget {
-  const ConnectPage({Key key}) : super(key: key);
+  final bool isInitalConfig;
+  const ConnectPage({
+    Key key,
+    this.isInitalConfig = false,
+  }) : super(key: key);
 
   @override
   _ConnectPageState createState() => _ConnectPageState();
@@ -29,6 +40,7 @@ class ConnectPage extends StatefulWidget {
 
 class _ConnectPageState extends State<ConnectPage> {
   ConfigurationCubit cubit;
+  final FocusScopeNode _node = FocusScopeNode();
 
   @override
   void initState() {
@@ -38,7 +50,7 @@ class _ConnectPageState extends State<ConnectPage> {
 
   void _onConnectionFailure(
     BuildContext context,
-    SaveAndConnectFailure failure,
+    ConnectFailure failure,
   ) {
     final snackbar = ResponsiveSnackbar.build(
       context,
@@ -57,8 +69,16 @@ class _ConnectPageState extends State<ConnectPage> {
     Scaffold.of(context).showSnackBar(snackbar);
   }
 
-  void _onConnectionSuccess(BuildContext context) {
-    _navigateToDashboardScreen(context);
+  void _onConnectionSuccess(BuildContext context, bool shouldReconnect) {
+    if (widget.isInitalConfig) {
+      _navigateToDashboardScreen(context);
+    } else {
+      _navigationPop(context, shouldReconnect);
+    }
+  }
+
+  void _navigationPop(BuildContext context, bool shouldReconnect) {
+    ExtendedNavigator.of(context).pop(shouldReconnect);
   }
 
   void _navigateToDashboardScreen(BuildContext context) {
@@ -66,50 +86,47 @@ class _ConnectPageState extends State<ConnectPage> {
         .pushAndRemoveUntil(Routes.dashboardPage, (route) => false);
   }
 
+  Future<String> _onGetAdminPin(BuildContext context) async {
+    final result = await ExtendedNavigator.of(context).pushCreatePinPage(
+      subtitle:
+          "Please enter a admin pin which will be used to lock down the settings",
+    );
+    return result;
+  }
+
+  Future<String> _onGetUserPin(BuildContext context) async {
+    final result = await ExtendedNavigator.of(context).pushCreatePinPage(
+      subtitle:
+          "Please enter a user pin which will be used to lock down the application for users.",
+    );
+    return result;
+  }
+
   Widget _buildMobile(BuildContext context) {
     return SingleChildScrollView(
-      child: Form(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: ResponsiveSize.padding(
-              context,
-              size: PaddingSize.medium,
+      child: _buildForm(
+          context: context,
+          child: FocusScope(
+            node: _node,
+            child: Column(
+              children: [
+                _buildMainInputs(context),
+                const SizedBox(height: 16),
+                _buildSecurityInputs(context),
+                const SizedBox(height: 16),
+                _buildCredentialInputs(context),
+              ],
             ),
-            vertical: ResponsiveSize.padding(
-              context,
-              size: PaddingSize.small,
-            ),
-          ),
-          child: Theme(
-              data:
-                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: Column(
-                children: [
-                  _buildMainInputs(context),
-                  const SizedBox(height: 16),
-                  _buildCredentialInputs(context)
-                ],
-              )),
-        ),
-      ),
+          )),
     );
   }
 
   Widget _buildTablet(BuildContext context) {
     return Form(
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: ResponsiveSize.padding(
-            context,
-            size: PaddingSize.medium,
-          ),
-          vertical: ResponsiveSize.padding(
-            context,
-            size: PaddingSize.small,
-          ),
-        ),
-        child: Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: _buildForm(
+        context: context,
+        child: FocusScope(
+          node: _node,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -123,7 +140,20 @@ class _ConnectPageState extends State<ConnectPage> {
                 ),
               ),
               Expanded(
-                child: _buildCredentialInputs(context),
+                child: Column(
+                  children: [
+                    _buildCredentialInputs(context),
+                    SizedBox(
+                      height: ResponsiveSize.padding(
+                        context,
+                        size: PaddingSize.large,
+                      ),
+                    ),
+                    _buildAdminPin(context),
+                    const SizedBox(height: 16),
+                    _buildUserPin(context),
+                  ],
+                ),
               )
             ],
           ),
@@ -132,61 +162,60 @@ class _ConnectPageState extends State<ConnectPage> {
     );
   }
 
-  ExpansionTile _buildCredentialInputs(BuildContext context) {
-    return ExpansionTile(
-      title: Text(
-        "Credentials",
-        style: Theme.of(context).textTheme.headline3,
-      ),
-      maintainState: true,
-      initiallyExpanded: true,
-      tilePadding: EdgeInsets.zero,
-      children: [_formUsernameInput(context), _formPasswordInput(context)],
-    );
-  }
-
-  ExpansionTile _buildMainInputs(BuildContext context) {
-    return ExpansionTile(
-      title: Text(
-        "MQTT Broker",
-        style: Theme.of(context).textTheme.headline3,
-      ),
-      maintainState: true,
-      initiallyExpanded: true,
-      tilePadding: EdgeInsets.zero,
+  Widget _buildCredentialInputs(BuildContext context) {
+    return _buildExpansionTile(
+      context: context,
+      label: "Credentials",
       children: [
-        _formHostInput(context),
-        _formPortInput(context),
-        _formClientIdInput(context)
+        _formUsernameInput(context),
+        _formPasswordInput(context),
       ],
     );
   }
 
-  FormTextBuilder<String> _formHostInput(BuildContext context) {
-    return FormTextBuilder<String>(
+  Widget _buildSecurityInputs(BuildContext context) {
+    return _buildExpansionTile(
+      context: context,
+      label: "Security",
+      children: [
+        _buildAdminPin(context),
+        const SizedBox(height: 16),
+        _buildUserPin(context),
+      ],
+    );
+  }
+
+  Widget _buildMainInputs(BuildContext context) {
+    return _buildExpansionTile(
+      context: context,
+      label: "MQTT Broker",
+      children: [
+        _formHostInput(context),
+        _formPortInput(context),
+        _formClientIdInput(context),
+        _formLayoutTopicInput(context),
+      ],
+    );
+  }
+
+  Widget _formHostInput(BuildContext context) {
+    return _buildStringInput(
       validation: UrlValidation(
         mapper: (failure) => failure.when(
           invalidUrl: () => "Please provide a valid url.",
           unexpected: () => I18n.of(context).failureGeneric,
         ),
       ),
-      builder: (context, state, onValueChanged) {
-        return TextInput(
-          initialValue: cubit.state.host.getOrElse(""),
-          validationState: state,
-          onValueChanged: onValueChanged,
-          label: "Host",
-          keyboardType: TextInputType.url,
-        );
-      },
-      validityListener: (value, valid) {
-        cubit.setHost(value);
-      },
+      label: "Host",
+      keyboardType: TextInputType.url,
+      initialValue: cubit.state.host,
+      onChanged: cubit.setHost,
+      onEditingComplete: _node.nextFocus,
     );
   }
 
   Widget _formPortInput(BuildContext context) {
-    return FormTextBuilder<int>(
+    return _buildIntInput(
       validation: PortValidation(
         mapper: (failure) => failure.when(
           invalidPort: () => "Please provide a valid port number",
@@ -194,85 +223,89 @@ class _ConnectPageState extends State<ConnectPage> {
           unexpected: () => I18n.of(context).failureGeneric,
         ),
       ),
-      builder: (context, state, onValueChanged) {
-        return TextInput(
-          initialValue: cubit.state.port.getOrElse(1883).toString(),
-          validationState: state,
-          onValueChanged: onValueChanged,
-          label: "Port",
-          keyboardType: TextInputType.number,
-        );
-      },
-      validityListener: (value, valid) {
-        cubit.setPort(value);
-      },
+      label: "Port",
+      initialValue: cubit.state.port,
+      fallbackValue: 1883,
+      onChanged: cubit.setPort,
+      onEditingComplete: _node.nextFocus,
     );
   }
 
   Widget _formClientIdInput(BuildContext context) {
-    return FormTextBuilder<String>(
+    return _buildStringInput(
       validation: NonEmptyValidation(
         mapper: (failure) => failure.when(
           empty: () => "Client id is required and can't be empty",
         ),
       ),
-      builder: (context, state, onValueChanged) {
-        return TextInput(
-          initialValue: cubit.state.clientId.getOrElse(""),
-          validationState: state,
-          onValueChanged: onValueChanged,
-          label: "Client Id",
-          keyboardType: TextInputType.text,
-        );
-      },
-      validityListener: (value, valid) {
-        cubit.setClientId(value);
-      },
+      label: "Client Id",
+      initialValue: cubit.state.clientId,
+      onChanged: cubit.setClientId,
+      onEditingComplete: _node.nextFocus,
+    );
+  }
+
+  Widget _formLayoutTopicInput(BuildContext context) {
+    return _buildStringInput(
+      validation: LayoutTopicValidation(
+        mapper: (failure) => failure.when(
+          empty: () => "Client id is required and can't be empty",
+        ),
+      ),
+      label: "Layout Topic",
+      initialValue: cubit.state.layoutTopic,
+      onChanged: cubit.setLayoutTopic,
+      onEditingComplete: _node.nextFocus,
     );
   }
 
   Widget _formUsernameInput(BuildContext context) {
-    return FormTextBuilder<String>(
+    return _buildStringInput(
       validation: NonEmptyValidation(
         mapper: (failure) => failure.when(
           empty: () => "Username is required and can't be empty",
         ),
       ),
-      builder: (context, state, onValueChanged) {
-        return TextInput(
-          initialValue: cubit.state.username.getOrElse(""),
-          validationState: state,
-          onValueChanged: onValueChanged,
-          label: "Username",
-          keyboardType: TextInputType.text,
-        );
-      },
-      validityListener: (value, valid) {
-        cubit.setUsername(value);
-      },
+      label: "Username",
+      initialValue: cubit.state.username,
+      onChanged: cubit.setUsername,
+      onEditingComplete: _node.nextFocus,
+      required: false,
     );
   }
 
   Widget _formPasswordInput(BuildContext context) {
-    return FormTextBuilder<String>(
+    return _buildStringInput(
       validation: NonEmptyValidation(
         mapper: (failure) => failure.when(
           empty: () => "Password is required and can't be empty",
         ),
       ),
-      builder: (context, state, onValueChanged) {
-        return TextInput(
-          initialValue: cubit.state.password.getOrElse(""),
-          validationState: state,
-          onValueChanged: onValueChanged,
-          label: "Password",
-          keyboardType: TextInputType.text,
-        );
-      },
-      validityListener: (value, valid) {
-        cubit.setPassword(value);
-      },
+      label: "Password",
+      initialValue: cubit.state.password,
+      onChanged: cubit.setPassword,
+      onEditingComplete: _node.nextFocus,
+      textInputAction: TextInputAction.done,
+      required: false,
     );
+  }
+
+  Widget _buildAdminPin(BuildContext context) {
+    return _buildPinInput(
+      label: "Admin Pin",
+      getPin: () => _onGetAdminPin(context),
+      initialValue: cubit.state.adminPin,
+      onChanged: cubit.setAdminPin,
+      required: true,
+    );
+  }
+
+  Widget _buildUserPin(BuildContext context) {
+    return _buildPinInput(
+        label: "User Pin",
+        getPin: () => _onGetUserPin(context),
+        initialValue: cubit.state.userPin,
+        onChanged: cubit.setUserPin);
   }
 
   Widget _buildFab(BuildContext context) {
@@ -299,7 +332,9 @@ class _ConnectPageState extends State<ConnectPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Configuration"),
+        title: Text(
+          widget.isInitalConfig ? "Configuration" : "Change Configuration",
+        ),
       ),
       body: isMobile ? _buildMobile(context) : _buildTablet(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -310,37 +345,191 @@ class _ConnectPageState extends State<ConnectPage> {
   @override
   Widget build(BuildContext context) {
     final overlay = LoadingOverlay.of(context);
-
     return Scaffold(
-      body: BlocConsumer<ConfigurationCubit, ConfigurationState>(
-        cubit: cubit,
-        listener: (context, state) {
-          state.connectState.maybeWhen(
-            loading: () => overlay.showText("Connecting..."),
-            failure: (failure) {
-              overlay.hide();
-              _onConnectionFailure(context, failure);
-            },
-            success: () {
-              overlay.hide();
-              _onConnectionSuccess(context);
-            },
-            orElse: () => overlay.hide(),
-          );
-        },
-        builder: (context, state) {
-          if (!state.dataReady) {
-            return Container();
-          }
-          return ScreenTypeLayout(
-            mobile: _buildScaffold(context, true),
-            tablet: MasterLayout(
-              width: ResponsiveSize.twoWidth(context),
-              master: _buildScaffold(context, false),
-            ),
-          );
-        },
+      body: BlocProvider(
+        create: (context) => cubit,
+        child: BlocConsumer<ConfigurationCubit, ConfigurationState>(
+          cubit: cubit,
+          listener: (context, state) {
+            state.connectState.maybeWhen(
+              loading: () => overlay.showText("Connecting..."),
+              failure: (failure) {
+                overlay.hide();
+                _onConnectionFailure(context, failure);
+              },
+              success: () {
+                overlay.hide();
+                _onConnectionSuccess(context, state.shouldReconnect);
+              },
+              orElse: () => overlay.hide(),
+            );
+          },
+          builder: (context, state) {
+            if (!state.dataReady) {
+              return Container();
+            }
+            return ScreenTypeLayout(
+              mobile: _buildScaffold(context, true),
+              tablet: MasterLayout(
+                width: ResponsiveSize.twoWidth(context),
+                master: _buildScaffold(context, false),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
+}
+
+Widget _buildStringInput({
+  @required IValidation<Object, String> validation,
+  @required String label,
+  @required ValueObject<String> initialValue,
+  @required void Function(ValueObject<String> value) onChanged,
+  @required VoidCallback onEditingComplete,
+  TextInputAction textInputAction = TextInputAction.next,
+  TextInputType keyboardType = TextInputType.text,
+  bool required = true,
+}) {
+  return FormTextBuilder<String>(
+    validation: validation,
+    builder: (context, state, onValueChanged) {
+      return TextInput(
+        initialValue: initialValue.getOrElse(""),
+        validationState: state,
+        onValueChanged: onValueChanged,
+        textInputAction: textInputAction,
+        label: label,
+        keyboardType: keyboardType,
+        onEditingComplete: onEditingComplete,
+        helperText: required
+            ? state.isValid
+                ? null
+                : "Required"
+            : null,
+      );
+    },
+    initialValue: required ? initialValue : null,
+    validityListener: (value, valid) {
+      onChanged(value);
+    },
+  );
+}
+
+Widget _buildIntInput({
+  @required IValidation<Object, int> validation,
+  @required String label,
+  @required ValueObject<int> initialValue,
+  @required void Function(ValueObject<int> value) onChanged,
+  @required VoidCallback onEditingComplete,
+  TextInputAction textInputAction = TextInputAction.next,
+  int fallbackValue = 0,
+}) {
+  final defaultValue = initialValue.getOrElse(fallbackValue);
+
+  return FormTextBuilder<int>(
+    validation: validation,
+    builder: (context, state, onValueChanged) {
+      return TextInput(
+        initialValue: defaultValue.toString(),
+        validationState: state,
+        onValueChanged: onValueChanged,
+        textInputAction: textInputAction,
+        label: label,
+        keyboardType: TextInputType.number,
+        onEditingComplete: onEditingComplete,
+        helperText: "Required",
+      );
+    },
+    initialValue: ValueObject.emptyString(defaultValue.toString()),
+    validityListener: (value, valid) {
+      onChanged(value);
+    },
+  );
+}
+
+Widget _buildForm({
+  @required BuildContext context,
+  @required Widget child,
+}) {
+  return Form(
+    child: Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveSize.padding(
+          context,
+          size: PaddingSize.medium,
+        ),
+        vertical: ResponsiveSize.padding(
+          context,
+          size: PaddingSize.small,
+        ),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: child,
+      ),
+    ),
+  );
+}
+
+Widget _buildExpansionTile({
+  @required BuildContext context,
+  @required String label,
+  @required List<Widget> children,
+}) {
+  return ExpansionTile(
+    title: Text(
+      label,
+      style: Theme.of(context).textTheme.headline3,
+    ),
+    maintainState: true,
+    initiallyExpanded: true,
+    tilePadding: EdgeInsets.zero,
+    children: children,
+  );
+}
+
+Widget _buildPinInput({
+  @required String label,
+  @required Future<String> Function() getPin,
+  @required ValueObject<String> initialValue,
+  @required void Function(ValueObject<String> value) onChanged,
+  bool required = false,
+}) {
+  return FormTextBuilder<String>(
+    validation: LengthValidation(
+      length: AppConstants.PIN_LENGTH,
+      mapper: (failure) => failure.when(
+        invalidLength: () => "Invalid Length",
+      ),
+    ),
+    builder: (context, state, onValueChanged) {
+      return SwitchInput(
+        label: label,
+        onValueChanged: (value) async {
+          if (value) {
+            final pin = await getPin();
+            onValueChanged(pin ?? "");
+          } else {
+            onValueChanged("");
+          }
+        },
+        isError: state.maybeWhen(
+          error: (_) => true,
+          orElse: () => false,
+        ),
+        helperText: required
+            ? state.isValid
+                ? null
+                : "Required"
+            : null,
+        isCheck: state.isValid,
+      );
+    },
+    initialValue: initialValue,
+    validityListener: (value, valid) {
+      onChanged(value);
+    },
+  );
 }

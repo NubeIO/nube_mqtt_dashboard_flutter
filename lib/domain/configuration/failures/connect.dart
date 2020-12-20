@@ -1,7 +1,6 @@
 part of failures;
 
 @freezed
-abstract class SaveAndConnectFailure extends Failure
-    with _$SaveAndConnectFailure {
-  const factory SaveAndConnectFailure.unexpected() = _UnexpectedConnect;
+abstract class SaveFailure extends Failure with _$SaveFailure {
+  const factory SaveFailure.unexpected() = _UnexpectedSaveFailure;
 }

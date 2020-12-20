@@ -8,6 +8,7 @@ abstract class ConnectionConfig with _$ConnectionConfig {
     @Default("") String clientId,
     @Default("") String username,
     @Default("") String password,
+    @Default("") String layoutTopic,
   }) = _ConnectionConfig;
 
   factory ConnectionConfig.fromJson(Map<String, dynamic> json) =>
