@@ -10,11 +10,12 @@ export 'failures.dart';
 abstract class IConfigurationRepository {
   Future<Option<Configuration>> getConfiguration();
 
-  Future<Either<SaveAndConnectFailure, Unit>> connect({
+  Future<Either<SaveFailure, bool>> save({
     @required String host,
     @required int port,
     @required String clientId,
     @required String username,
     @required String password,
+    @required String layoutTopic,
   });
 }

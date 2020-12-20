@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
+import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
@@ -14,12 +17,39 @@ part 'layout_state.dart';
 class LayoutCubit extends Cubit<LayoutState> {
   final ILayoutRepository _layoutRepository;
 
+  StreamSubscription<Either<LayoutFailure, LayoutBuilder>> subscription;
+
   LayoutCubit(this._layoutRepository) : super(LayoutState.initial()) {
-    init();
+    init(shouldReconnect: true);
   }
 
-  Future<void> init() async {
-    _layoutRepository.layoutStream.listen((event) {
+  Future<void> init({bool shouldReconnect = false}) async {
+    emit(state.copyWith(layoutConnection: const InternalState.loading()));
+    final result = await _layoutRepository.subscribe();
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          layoutConnection: InternalState.failure(failure),
+        ),
+      ),
+      (r) {
+        if (shouldReconnect) {
+          _listen();
+        }
+        emit(
+          state.copyWith(layoutConnection: const InternalState.success()),
+        );
+      },
+    );
+  }
+
+  void _listen() {
+    if (subscription != null) {
+      subscription.cancel();
+      subscription = null;
+    }
+    subscription = _layoutRepository.layoutStream.listen((event) {
       event.fold(
         (failure) => emit(
           state.copyWith(layoutState: InternalState.failure(failure)),
@@ -30,5 +60,11 @@ class LayoutCubit extends Cubit<LayoutState> {
         )),
       );
     });
+  }
+
+  @override
+  Future<void> close() {
+    subscription?.cancel();
+    return super.close();
   }
 }

@@ -6,6 +6,7 @@ import 'package:framy_annotation/framy_annotation.dart';
 import '../constants/app_constants.dart';
 import 'nube_theme.dart';
 import 'rotue_guards/auth_route_guard.dart';
+import 'rotue_guards/config_guard.dart';
 import 'routes/route_log_observer.dart';
 import 'routes/router.dart';
 import 'widgets/locale/locale_builder.dart';
@@ -30,7 +31,7 @@ class NubeApp extends StatelessWidget {
           supportedLocales: i18n.supportedLocales,
           builder: ExtendedNavigator.builder<AppRouter>(
               router: AppRouter(),
-              guards: [AuthGuard()],
+              guards: [AuthGuard(), ConfigGuard()],
               observers: [LoggerNavigatorObserver()]),
         );
       },

@@ -16,15 +16,15 @@ class ValidatePinCubit extends Cubit<ValidatePinState> {
   ValidatePinCubit(this._sessionRepository) : super(ValidatePinState.initial());
 
   Future<void> validatePin(ValueObject<String> value) async {
-    emit(state.copyWith(validateState: const InternalState.loading()));
+    emit(state.copyWith(validateState: const InternalStateValue.loading()));
 
     final pin = value.getOrCrash();
     final result = await _sessionRepository.validatePin(pin);
 
     result.fold((failure) {
-      emit(state.copyWith(validateState: InternalState.failure(failure)));
-    }, (_) {
-      emit(state.copyWith(validateState: const InternalState.success()));
+      emit(state.copyWith(validateState: InternalStateValue.failure(failure)));
+    }, (value) {
+      emit(state.copyWith(validateState: InternalStateValue.success(value)));
     });
   }
 }

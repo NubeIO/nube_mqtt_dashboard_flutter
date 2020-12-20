@@ -18,10 +18,19 @@ class SessionCubit extends Cubit<SessionState> {
     final sessionType = await _sessionRepository.getSessionType();
     switch (sessionType) {
       case SessionType.REQUIRES_PIN:
-        emit(const SessionState.validatePin());
+        final isUserPinSet = await _sessionRepository.isUserPinSet();
+        final isAdminPinSet = await _sessionRepository.isAdminPinSet();
+
+        if (!isAdminPinSet) {
+          emit(const SessionState.createConfig());
+        } else if (isUserPinSet) {
+          emit(const SessionState.validatePin());
+        } else {
+          emit(const SessionState.authenticated());
+        }
         break;
       case SessionType.CREATE_PIN:
-        emit(const SessionState.createPin());
+        emit(const SessionState.createConfig());
         break;
     }
   }

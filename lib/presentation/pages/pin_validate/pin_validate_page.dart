@@ -5,22 +5,27 @@ import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/session/validate_pin/validate_pin_cubit.dart';
 import '../../../domain/core/internal_state.dart';
+import '../../../domain/session/entities.dart';
 import '../../../domain/session/failures.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
-import '../../routes/router.dart';
 import '../../widgets/responsive/snackbar.dart';
 import '../../widgets/screens/pin_screen.dart';
 
 @FramyWidget(isPage: true)
 class ValidatePinPage extends StatelessWidget {
   final cubit = getIt<ValidatePinCubit>();
+  final String title;
+  final String subtitle;
 
-  ValidatePinPage({Key key}) : super(key: key);
+  ValidatePinPage({
+    Key key,
+    this.title = "Enter Pin Code",
+    this.subtitle = "Please enter your pin so you can access the application. ",
+  }) : super(key: key);
 
-  void _navigateToConnectScreen(BuildContext context) {
-    ExtendedNavigator.of(context)
-        .pushAndRemoveUntil(Routes.connectPage, (route) => false);
+  void _navigateOnSuccess(BuildContext context, UserType type) {
+    ExtendedNavigator.of(context).pop(type);
   }
 
   void _onValidateFailure(BuildContext context, ValidatePinFailure failure) {
@@ -43,11 +48,11 @@ class ValidatePinPage extends StatelessWidget {
 
   void _onValidateState(
     BuildContext context,
-    InternalState<ValidatePinFailure> validateState,
+    InternalStateValue<ValidatePinFailure, UserType> validateState,
   ) {
     validateState.maybeWhen(
-        success: () {
-          _navigateToConnectScreen(context);
+        success: (type) {
+          _navigateOnSuccess(context, type);
         },
         failure: (failure) {
           _onValidateFailure(context, failure);
@@ -66,9 +71,8 @@ class ValidatePinPage extends StatelessWidget {
             _onValidateState(context, state.validateState);
           },
           child: PinScreen(
-            title: "Enter Pin Code",
-            subtitle:
-                "Please enter your pin so you can access the application. ",
+            title: title,
+            subtitle: subtitle,
             onComplete: (value) => cubit.validatePin(value),
           ),
         ),

@@ -9,31 +9,39 @@ import '../../routes/router.dart';
 class SplashPage extends StatelessWidget {
   const SplashPage({Key key}) : super(key: key);
 
+  void _navigateToHomeScreen(BuildContext context) {
+    ExtendedNavigator.of(context)
+        .pushAndRemoveUntil(Routes.dashboardPage, (route) => false);
+  }
+
   void _navigateToConnectScreen(BuildContext context) {
-    ExtendedNavigator.of(context)
-        .pushAndRemoveUntil(Routes.connectPage, (route) => false);
+    ExtendedNavigator.of(context).pushAndRemoveUntil(
+      Routes.connectPage,
+      (route) => false,
+      arguments: ConnectPageArguments(isInitalConfig: true),
+    );
   }
 
-  void _navigateToEnterPinScreen(BuildContext context) {
-    ExtendedNavigator.of(context)
-        .pushAndRemoveUntil(Routes.validatePinPage, (route) => false);
-  }
+  Future<void> _navigateToEnterPinScreen(BuildContext context) async {
+    final result = await ExtendedNavigator.of(context).pushValidatePinPage();
 
-  void _navigateToCreatePinScreen(BuildContext context) {
-    ExtendedNavigator.of(context)
-        .pushAndRemoveUntil(Routes.createPinPage, (route) => false);
+    if (result == null) {
+      ExtendedNavigator.of(context).pop();
+    } else {
+      _navigateToHomeScreen(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SessionCubit, SessionState>(
       cubit: getIt<SessionCubit>(),
-      listener: (context, state) {
+      listener: (_, state) {
         state.when(
           initial: () {},
-          createPin: () => _navigateToCreatePinScreen(context),
+          createConfig: () => _navigateToConnectScreen(context),
           validatePin: () => _navigateToEnterPinScreen(context),
-          authenticated: () => _navigateToConnectScreen(context),
+          authenticated: () => _navigateToHomeScreen(context),
         );
       },
       builder: (context, state) => const _SplashWidget(),

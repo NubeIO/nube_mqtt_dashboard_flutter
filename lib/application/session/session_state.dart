@@ -5,5 +5,5 @@ abstract class SessionState with _$SessionState {
   const factory SessionState.initial() = _Initial;
   const factory SessionState.authenticated() = _Authenticated;
   const factory SessionState.validatePin() = _ValidatePin;
-  const factory SessionState.createPin() = _CreatePin;
+  const factory SessionState.createConfig() = _CreateConfig;
 }
