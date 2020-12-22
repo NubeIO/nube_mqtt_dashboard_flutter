@@ -39,7 +39,7 @@ class ValidatePinPage extends StatelessWidget {
         style: Theme.of(context)
             .textTheme
             .bodyText1
-            .copyWith(color: Theme.of(context).errorColor),
+            .copyWith(color: Theme.of(context).colorScheme.error),
       ),
       direction: Direction.left,
     );

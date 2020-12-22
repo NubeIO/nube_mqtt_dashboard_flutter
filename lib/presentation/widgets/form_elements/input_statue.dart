@@ -28,7 +28,8 @@ class InputStateWidget extends StatelessWidget {
           success: (_) => SuccessIcon(
             color: Theme.of(context).colorScheme.secondary,
           ),
-          error: (error) => CloseIcon(color: Theme.of(context).errorColor),
+          error: (error) =>
+              CloseIcon(color: Theme.of(context).colorScheme.error),
         ),
       ),
     );

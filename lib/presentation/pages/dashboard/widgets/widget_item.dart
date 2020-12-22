@@ -6,6 +6,7 @@ import '../../../../domain/layout/entities.dart';
 import '../../../../domain/mqtt/mqtt_repository.dart';
 import '../../../../domain/widget_data/entities.dart';
 import '../../../../domain/widget_data/failures.dart';
+import '../../../themes/nube_theme.dart';
 import '../../../widgets/page_widgets/gauge_widget.dart';
 import '../../../widgets/page_widgets/slider_widget.dart';
 import '../../../widgets/page_widgets/switch_widget.dart';
@@ -97,7 +98,7 @@ class WidgetItem extends StatelessWidget {
             size: PaddingSize.xsmall,
           )),
         ),
-        color: Theme.of(context).colorScheme.secondary,
+        color: Theme.of(context).colorScheme.primary,
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -109,7 +110,7 @@ class WidgetItem extends StatelessWidget {
           style: Theme.of(context)
               .textTheme
               .headline6
-              .copyWith(color: Theme.of(context).colorScheme.onSecondary),
+              .copyWith(color: Theme.of(context).colorScheme.onPrimary),
         ),
       ),
     );
@@ -165,7 +166,9 @@ class WidgetItem extends StatelessWidget {
       child: Text(
         "No Data Loaded",
         style: Theme.of(context).textTheme.bodyText1.copyWith(
-            fontSize: 20, color: Theme.of(context).colorScheme.secondary),
+              fontSize: 20,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
       ),
     );
   }
@@ -174,7 +177,8 @@ class WidgetItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<WidgetCubit>(
       create: (context) => WidgetCubit.create(widgetEntity),
-      child: Card(
+      child: Material(
+        color: NubeTheme.surfaceOverlay(context, 2),
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(ResponsiveSize.padding(

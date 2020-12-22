@@ -30,7 +30,7 @@ class LoadingOverlay {
         style: Theme.of(_context)
             .textTheme
             .headline3
-            .copyWith(color: Theme.of(_context).accentColor),
+            .copyWith(color: Theme.of(_context).colorScheme.secondary),
       ),
     );
   }
@@ -49,8 +49,11 @@ class _FullScreenLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
-        decoration: const BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.5)),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.background.withOpacity(.01),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

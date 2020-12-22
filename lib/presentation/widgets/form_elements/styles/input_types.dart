@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../nube_theme.dart';
+import '../../../themes/nube_theme.dart';
 
 class InputStyles {
   static TextStyle labelStyle(BuildContext context, {bool hasFocus}) {
@@ -9,14 +9,18 @@ class InputStyles {
 
   static TextStyle regularLabel(BuildContext context) {
     return Theme.of(context).textTheme.bodyText1.copyWith(
-        fontSize: 16,
-        fontFamily: "Poppins",
-        color: NubeTheme.lightColorText300);
+          fontSize: 16,
+          fontFamily: "Poppins",
+          color: NubeTheme.colorText300(context),
+        );
   }
 
   static TextStyle smallLabel(BuildContext context) {
     return Theme.of(context).textTheme.bodyText1.copyWith(
-        fontSize: 12, height: 1.2, color: NubeTheme.lightColorText200);
+          fontSize: 12,
+          height: 1.2,
+          color: NubeTheme.colorText300(context),
+        );
   }
 
   static TextStyle textStyle(BuildContext context) {
@@ -30,6 +34,6 @@ class InputStyles {
     return Theme.of(context)
         .textTheme
         .headline3
-        .copyWith(color: Theme.of(context).primaryColor);
+        .copyWith(color: Theme.of(context).colorScheme.primary);
   }
 }
