@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../themes/nube_theme.dart';
 import 'padding.dart';
 import 'screen_type_layout.dart';
 
@@ -85,8 +86,8 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
   Widget _buildDrawer(BuildContext context, bool isMobile) {
     final theme = Theme.of(context).copyWith(
       textTheme: Theme.of(context).textTheme.apply(
-            bodyColor: Colors.white,
-            displayColor: Colors.white,
+            bodyColor: Theme.of(context).colorScheme.onSurface,
+            displayColor: Theme.of(context).colorScheme.onSurface,
           ),
       iconTheme: IconTheme.of(context).copyWith(
         color: Colors.white,
@@ -148,7 +149,10 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
     if (widget.itemCount > 0) {
       return widget._appBarBuilder(context, selectedIndex);
     } else {
-      return AppBar();
+      return AppBar(
+        elevation: 4,
+        backgroundColor: NubeTheme.backgroundOverlay(context),
+      );
     }
   }
 
@@ -160,7 +164,6 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
         appBar: _appBarBuilder(context, selectedIndex),
         drawer: Drawer(
           child: Container(
-            color: Theme.of(context).colorScheme.primary,
             child: _buildDrawer(context, true),
           ),
         ),
@@ -182,18 +185,14 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
               ),
             ),
           ]),
-          Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 8,
-                    color: Theme.of(context).colorScheme.primary,
-                  )
-                ],
-              ),
-              width: ResponsiveSize.MASTER_PANEL_WIDTH,
-              child: _buildDrawer(context, false))
+          SizedBox(
+            width: ResponsiveSize.MASTER_PANEL_WIDTH,
+            child: Material(
+              elevation: 16,
+              shape: const RoundedRectangleBorder(),
+              child: _buildDrawer(context, false),
+            ),
+          )
         ],
       ),
     );

@@ -25,7 +25,7 @@ class MasterLayout extends StatelessWidget {
         Expanded(
           child: detail ??
               Container(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.primary,
               ),
         )
       ],

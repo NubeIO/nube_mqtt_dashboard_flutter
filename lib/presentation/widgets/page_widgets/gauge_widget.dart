@@ -27,7 +27,7 @@ class GaugeWidget extends StatelessWidget {
       secondsMarker: SecondsMarker.none,
       circleColor: Theme.of(context).colorScheme.secondary,
       handColor: Theme.of(context).colorScheme.primary,
-      indicatorColor: Theme.of(context).colorScheme.primary,
+      indicatorColor: Colors.transparent,
       counterStyle: Theme.of(context).textTheme.headline3.copyWith(
             fontSize: 20,
             color: Theme.of(context).colorScheme.secondary,

@@ -8,6 +8,7 @@ import '../../../domain/session/entities.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
 import '../../routes/router.dart';
+import '../../themes/nube_theme.dart';
 import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/drawer_detail_layout.dart';
 import '../../widgets/responsive/snackbar.dart';
@@ -104,7 +105,7 @@ class _DashboardPageState extends State<DashboardPage>
         style: Theme.of(context)
             .textTheme
             .bodyText1
-            .copyWith(color: Theme.of(context).errorColor),
+            .copyWith(color: Theme.of(context).colorScheme.error),
       ),
     );
     Scaffold.of(context).showSnackBar(snackbar);
@@ -151,7 +152,8 @@ class _DashboardPageState extends State<DashboardPage>
             return DrawerDetailLayout(
               appBarBuilder: (context, index) {
                 return AppBar(
-                  elevation: 8,
+                  elevation: 4,
+                  backgroundColor: NubeTheme.backgroundOverlay(context),
                   title: Text(list[index].name),
                 );
               },

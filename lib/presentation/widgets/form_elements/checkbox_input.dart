@@ -27,7 +27,8 @@ class SwitchInput extends StatelessWidget {
   Widget build(BuildContext context) {
     var smallLabel = InputStyles.smallLabel(context);
     if (isError) {
-      smallLabel = smallLabel.copyWith(color: Theme.of(context).errorColor);
+      smallLabel =
+          smallLabel.copyWith(color: Theme.of(context).colorScheme.error);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

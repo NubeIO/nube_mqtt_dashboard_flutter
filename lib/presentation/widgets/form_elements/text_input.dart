@@ -50,7 +50,7 @@ class TextInput extends StatelessWidget {
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(
               width: 2,
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).colorScheme.secondary,
             ),
           ),
         ),

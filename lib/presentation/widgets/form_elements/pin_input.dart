@@ -5,7 +5,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../constants/app_constants.dart';
 import '../../../constants/framy_constants.dart';
-import '../../nube_theme.dart';
+import '../../themes/nube_theme.dart';
 
 @FramyWidget(groupName: FramyConstants.FORM_INPUTS)
 class PinInput extends StatelessWidget {
@@ -25,7 +25,7 @@ class PinInput extends StatelessWidget {
     return PinCodeTextField(
       appContext: context,
       pastedTextStyle: TextStyle(
-        color: Theme.of(context).accentColor,
+        color: Theme.of(context).colorScheme.secondary,
         fontWeight: FontWeight.bold,
       ),
       length: AppConstants.PIN_LENGTH,
@@ -33,12 +33,12 @@ class PinInput extends StatelessWidget {
       pinTheme: PinTheme(
         shape: PinCodeFieldShape.underline,
         borderRadius: BorderRadius.circular(5),
-        inactiveColor: NubeTheme.lightColorText200,
-        activeColor: NubeTheme.lightColorText200,
-        selectedColor: Theme.of(context).accentColor,
-        activeFillColor: Theme.of(context).scaffoldBackgroundColor,
-        selectedFillColor: Theme.of(context).scaffoldBackgroundColor,
-        inactiveFillColor: Theme.of(context).scaffoldBackgroundColor,
+        inactiveColor: NubeTheme.colorText200(context),
+        activeColor: NubeTheme.colorText200(context),
+        selectedColor: Theme.of(context).colorScheme.secondary,
+        activeFillColor: Theme.of(context).colorScheme.background,
+        selectedFillColor: Theme.of(context).colorScheme.background,
+        inactiveFillColor: Theme.of(context).colorScheme.background,
         fieldHeight: 60,
         fieldWidth: 50,
       ),
