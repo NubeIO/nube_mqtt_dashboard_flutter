@@ -16,11 +16,12 @@ typedef FormValidatorBuilder = Widget Function(
 class FormOptionBuilder<T extends FormOption> extends StatefulWidget {
   final FormValidatorBuilder builder;
   final ValueListener<T> _validityListener;
-
+  final T initialValue;
   const FormOptionBuilder({
     Key key,
     @required this.builder,
     ValueListener<T> validityListener,
+    this.initialValue,
   })  : _validityListener = validityListener,
         super(key: key);
 
@@ -38,7 +39,12 @@ class _FormTextBuilderState<T extends FormOption>
   @override
   void initState() {
     super.initState();
-    widget._validityListener(dartz.none(), false);
+    bool validity = false;
+    if (widget.initialValue != null) {
+      _selectedValue = dartz.some(widget.initialValue);
+      validity = true;
+    }
+    widget._validityListener(_selectedValue, validity);
   }
 
   @override
