@@ -17,7 +17,7 @@ part 'layout_state.dart';
 class LayoutCubit extends Cubit<LayoutState> {
   final ILayoutRepository _layoutRepository;
 
-  StreamSubscription<Either<LayoutFailure, LayoutBuilder>> subscription;
+  StreamSubscription<Either<LayoutFailure, LayoutEntity>> subscription;
 
   LayoutCubit(this._layoutRepository) : super(LayoutState.initial()) {
     init(shouldReconnect: true);
@@ -55,7 +55,7 @@ class LayoutCubit extends Cubit<LayoutState> {
           state.copyWith(layoutState: InternalState.failure(failure)),
         ),
         (layout) => emit(state.copyWith(
-          layoutBuilder: layout,
+          layout: layout,
           layoutState: const InternalState.success(),
         )),
       );
