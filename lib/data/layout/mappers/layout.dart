@@ -4,7 +4,7 @@ import '../../../domain/layout/entities.dart';
 import '../models/layout.dart';
 
 class LayoutMapper {
-  LayoutBuilder mapToBuilder(Layout layout) => LayoutBuilder(
+  LayoutEntity mapToBuilder(Layout layout) => LayoutEntity(
         pages: layout.pages.map(mapToPage).toImmutableList(),
       );
 

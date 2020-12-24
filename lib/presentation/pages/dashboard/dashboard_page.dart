@@ -148,7 +148,7 @@ class _DashboardPageState extends State<DashboardPage>
             );
           },
           builder: (context, state) {
-            final list = state.layoutBuilder.pages;
+            final list = state.layout.pages;
             return DrawerDetailLayout(
               appBarBuilder: (context, index) {
                 return AppBar(

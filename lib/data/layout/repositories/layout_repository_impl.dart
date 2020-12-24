@@ -50,14 +50,14 @@ class LayoutRepositoryImpl extends ILayoutRepository {
   }
 
   @override
-  Stream<Either<LayoutFailure, LayoutBuilder>> get layoutStream async* {
+  Stream<Either<LayoutFailure, LayoutEntity>> get layoutStream async* {
     final result = await _configurationRepository.getConfiguration();
     if (result.isSome()) {
       final config = result.getOrCrash();
       if (config.layoutTopic.isEmpty) {
         yield const Left(LayoutFailure.noLayoutConfig());
       } else {
-        yield Right(LayoutBuilder.empty());
+        yield Right(LayoutEntity.empty());
         yield* _mqttRepository.getTopicMessage(config.layoutTopic).asyncMap(
             (message) =>
                 _mapToLayoutBuilder(message).catchError(_onErrorCatch));
@@ -67,7 +67,7 @@ class LayoutRepositoryImpl extends ILayoutRepository {
     }
   }
 
-  Future<Either<LayoutFailure, LayoutBuilder>> _onErrorCatch(
+  Future<Either<LayoutFailure, LayoutEntity>> _onErrorCatch(
     Object error,
   ) async {
     if (error is FormatException) {
@@ -77,7 +77,7 @@ class LayoutRepositoryImpl extends ILayoutRepository {
     }
   }
 
-  Future<Either<LayoutFailure, LayoutBuilder>> _mapToLayoutBuilder(
+  Future<Either<LayoutFailure, LayoutEntity>> _mapToLayoutBuilder(
     TopicMessage message,
   ) async {
     final layout = jsonDecode(message.message) as Map<String, dynamic>;
