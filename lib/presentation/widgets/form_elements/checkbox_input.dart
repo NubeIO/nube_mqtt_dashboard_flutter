@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:framy_annotation/framy_annotation.dart';
+import 'package:nube_mqtt_dashboard/presentation/themes/nube_theme.dart';
 
 import '../../../constants/framy_constants.dart';
 import 'styles/input_types.dart';
@@ -11,6 +12,7 @@ class SwitchInput extends StatelessWidget {
   final String label;
   final String helperText;
   final bool isError;
+  final bool isEnabled;
   final ValueChanged<bool> _onValueChanged;
 
   const SwitchInput({
@@ -20,6 +22,7 @@ class SwitchInput extends StatelessWidget {
     this.label,
     this.helperText = '',
     this.isError = false,
+    this.isEnabled = true,
   })  : _onValueChanged = onValueChanged,
         super(key: key);
 
@@ -35,10 +38,18 @@ class SwitchInput extends StatelessWidget {
       children: [
         Row(
           children: [
-            Expanded(child: Text(label, style: InputStyles.textStyle(context))),
+            Expanded(
+                child: Text(
+              label,
+              style: InputStyles.textStyle(context).copyWith(
+                color: isEnabled
+                    ? Theme.of(context).colorScheme.onBackground
+                    : NubeTheme.colorText300(context),
+              ),
+            )),
             CupertinoSwitch(
               value: isCheck,
-              onChanged: (value) => _onValueChanged(value),
+              onChanged: isEnabled ? (value) => _onValueChanged(value) : null,
               activeColor: Theme.of(context).colorScheme.secondary,
             ),
           ],
