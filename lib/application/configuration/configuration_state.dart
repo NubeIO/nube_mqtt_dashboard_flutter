@@ -5,6 +5,7 @@ abstract class ConfigurationState with _$ConfigurationState {
   const factory ConfigurationState({
     @required bool dataReady,
     @required bool shouldReconnect,
+    @required SupportedTheme currentTheme,
     @required ValueObject<String> host,
     @required ValueObject<int> port,
     @required ValueObject<String> clientId,
@@ -21,6 +22,7 @@ abstract class ConfigurationState with _$ConfigurationState {
   factory ConfigurationState.initial() => ConfigurationState(
         dataReady: false,
         shouldReconnect: false,
+        currentTheme: const SupportedTheme.defaultTheme(),
         host: ValueObject.none(),
         port: ValueObject.none(),
         clientId: ValueObject.none(),

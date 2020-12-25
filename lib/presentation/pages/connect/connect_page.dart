@@ -17,9 +17,12 @@ import '../../../domain/mqtt/mqtt_repository.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
 import '../../routes/router.dart';
+import '../../themes/nube_theme.dart';
+import '../../themes/theme_interface.dart';
 import '../../widgets/form_elements/builder/form_text_builder.dart';
 import '../../widgets/form_elements/checkbox_input.dart';
 import '../../widgets/form_elements/text_input.dart';
+import '../../widgets/form_elements/theme_input.dart';
 import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/master_layout.dart';
 import '../../widgets/responsive/padding.dart';
@@ -86,6 +89,10 @@ class _ConnectPageState extends State<ConnectPage> {
         .pushAndRemoveUntil(Routes.dashboardPage, (route) => false);
   }
 
+  void _onNavigateChangeTheme(BuildContext context) {
+    ExtendedNavigator.of(context).pushPreviewPage();
+  }
+
   Future<String> _onGetAdminPin(BuildContext context) async {
     final result = await ExtendedNavigator.of(context).pushCreatePinPage(
       subtitle:
@@ -112,9 +119,10 @@ class _ConnectPageState extends State<ConnectPage> {
               children: [
                 _buildMainInputs(context),
                 const SizedBox(height: 16),
-                _buildSecurityInputs(context),
+                _buildApplicationInputs(context),
                 const SizedBox(height: 16),
                 _buildCredentialInputs(context),
+                const SizedBox(height: 72),
               ],
             ),
           )),
@@ -149,9 +157,7 @@ class _ConnectPageState extends State<ConnectPage> {
                         size: PaddingSize.large,
                       ),
                     ),
-                    _buildAdminPin(context),
-                    const SizedBox(height: 16),
-                    _buildUserPin(context),
+                    _buildApplicationInputs(context)
                   ],
                 ),
               )
@@ -173,15 +179,32 @@ class _ConnectPageState extends State<ConnectPage> {
     );
   }
 
-  Widget _buildSecurityInputs(BuildContext context) {
+  Widget _buildApplicationInputs(BuildContext context) {
     return _buildExpansionTile(
       context: context,
-      label: "Security",
+      label: "Application",
       children: [
+        _themeInput(context),
         _buildAdminPin(context),
         const SizedBox(height: 16),
         _buildUserPin(context),
       ],
+    );
+  }
+
+  Widget _themeInput(BuildContext context) {
+    return ThemeInput(
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveSize.padding(
+          context,
+          size: PaddingSize.medium,
+        ),
+        vertical: 16,
+      ),
+      currentTheme: context.select<ConfigurationCubit, ITheme>(
+        (cubit) => NubeTheme.map(cubit.state.currentTheme),
+      ),
+      onTap: () => _onNavigateChangeTheme(context),
     );
   }
 
@@ -395,19 +418,27 @@ Widget _buildStringInput({
   return FormTextBuilder<String>(
     validation: validation,
     builder: (context, state, onValueChanged) {
-      return TextInput(
-        initialValue: initialValue.getOrElse(""),
-        validationState: state,
-        onValueChanged: onValueChanged,
-        textInputAction: textInputAction,
-        label: label,
-        keyboardType: keyboardType,
-        onEditingComplete: onEditingComplete,
-        helperText: required
-            ? state.isValid
-                ? null
-                : "Required"
-            : null,
+      return Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: ResponsiveSize.padding(
+            context,
+            size: PaddingSize.medium,
+          ),
+        ),
+        child: TextInput(
+          initialValue: initialValue.getOrElse(""),
+          validationState: state,
+          onValueChanged: onValueChanged,
+          textInputAction: textInputAction,
+          label: label,
+          keyboardType: keyboardType,
+          onEditingComplete: onEditingComplete,
+          helperText: required
+              ? state.isValid
+                  ? null
+                  : "Required"
+              : null,
+        ),
       );
     },
     initialValue: required ? initialValue : null,
@@ -431,15 +462,23 @@ Widget _buildIntInput({
   return FormTextBuilder<int>(
     validation: validation,
     builder: (context, state, onValueChanged) {
-      return TextInput(
-        initialValue: defaultValue.toString(),
-        validationState: state,
-        onValueChanged: onValueChanged,
-        textInputAction: textInputAction,
-        label: label,
-        keyboardType: TextInputType.number,
-        onEditingComplete: onEditingComplete,
-        helperText: "Required",
+      return Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: ResponsiveSize.padding(
+            context,
+            size: PaddingSize.medium,
+          ),
+        ),
+        child: TextInput(
+          initialValue: defaultValue.toString(),
+          validationState: state,
+          onValueChanged: onValueChanged,
+          textInputAction: textInputAction,
+          label: label,
+          keyboardType: TextInputType.number,
+          onEditingComplete: onEditingComplete,
+          helperText: "Required",
+        ),
       );
     },
     initialValue: ValueObject.emptyString(defaultValue.toString()),
@@ -454,21 +493,9 @@ Widget _buildForm({
   @required Widget child,
 }) {
   return Form(
-    child: Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: ResponsiveSize.padding(
-          context,
-          size: PaddingSize.medium,
-        ),
-        vertical: ResponsiveSize.padding(
-          context,
-          size: PaddingSize.small,
-        ),
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: child,
-      ),
+    child: Theme(
+      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      child: child,
     ),
   );
 }
@@ -485,7 +512,12 @@ Widget _buildExpansionTile({
     ),
     maintainState: true,
     initiallyExpanded: true,
-    tilePadding: EdgeInsets.zero,
+    tilePadding: EdgeInsets.symmetric(
+      horizontal: ResponsiveSize.padding(
+        context,
+        size: PaddingSize.medium,
+      ),
+    ),
     children: children,
   );
 }
@@ -505,26 +537,34 @@ Widget _buildPinInput({
       ),
     ),
     builder: (context, state, onValueChanged) {
-      return SwitchInput(
-        label: label,
-        onValueChanged: (value) async {
-          if (value) {
-            final pin = await getPin();
-            onValueChanged(pin ?? "");
-          } else {
-            onValueChanged("");
-          }
-        },
-        isError: state.maybeWhen(
-          error: (_) => true,
-          orElse: () => false,
+      return Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: ResponsiveSize.padding(
+            context,
+            size: PaddingSize.medium,
+          ),
         ),
-        helperText: required
-            ? state.isValid
-                ? null
-                : "Required"
-            : null,
-        isCheck: state.isValid,
+        child: SwitchInput(
+          label: label,
+          onValueChanged: (value) async {
+            if (value) {
+              final pin = await getPin();
+              onValueChanged(pin ?? "");
+            } else {
+              onValueChanged("");
+            }
+          },
+          isError: state.maybeWhen(
+            error: (_) => true,
+            orElse: () => false,
+          ),
+          helperText: required
+              ? state.isValid
+                  ? null
+                  : "Required"
+              : null,
+          isCheck: state.isValid,
+        ),
       );
     },
     initialValue: initialValue,
