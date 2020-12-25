@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -9,6 +11,7 @@ import '../../domain/core/internal_state.dart';
 import '../../domain/mqtt/failures.dart';
 import '../../domain/mqtt/mqtt_repository.dart';
 import '../../domain/session/session_repository_interface.dart';
+import '../../domain/theme/theme_repository_interface.dart';
 import '../validation/value_object.dart';
 
 part 'configuration_cubit.freezed.dart';
@@ -19,11 +22,15 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
   final IConfigurationRepository _configurationRepository;
   final ISessionRepository _sessionRepository;
   final IMqttRepository _mqttRepository;
+  final IThemeRepository _themeRepository;
+
+  StreamSubscription subscription;
 
   ConfigurationCubit(
     this._configurationRepository,
     this._sessionRepository,
     this._mqttRepository,
+    this._themeRepository,
   ) : super(ConfigurationState.initial()) {
     _prefillData();
   }
@@ -201,5 +208,15 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
         state.copyWith(dataReady: true),
       );
     }
+
+    subscription = _themeRepository.getThemeStream().listen((event) {
+      event.fold((_) {}, (theme) => emit(state.copyWith(currentTheme: theme)));
+    });
+  }
+
+  @override
+  Future<void> close() {
+    subscription?.cancel();
+    return super.close();
   }
 }
