@@ -83,6 +83,7 @@ class WidgetItem extends StatelessWidget {
           ),
           valueWidget: (widget) => ValueWidget(
             value: value,
+            unit: widget.config.unit,
           ),
         ),
       ),

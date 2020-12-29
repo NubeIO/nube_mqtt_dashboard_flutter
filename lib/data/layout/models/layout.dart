@@ -31,28 +31,28 @@ abstract class Widget with _$Widget {
     @required String id,
     @required String topic,
     @required String name,
-    @JsonKey(defaultValue: {}) GaugeConfigDto config,
+    GaugeConfigDto config,
   }) = _GaugeWidget;
 
   const factory Widget.SWITCH({
     @required String id,
     @required String topic,
     @required String name,
-    @JsonKey(defaultValue: {}) SwitchConfigDto config,
+    SwitchConfigDto config,
   }) = _SwitchWidget;
 
   const factory Widget.SLIDER({
     @required String id,
     @required String topic,
     @required String name,
-    @JsonKey(defaultValue: {}) SliderConfigDto config,
+    SliderConfigDto config,
   }) = _SliderWidget;
 
   const factory Widget.VALUE({
     @required String id,
     @required String topic,
     @required String name,
-    @JsonKey(defaultValue: {}) EmptyConfigDto config,
+    ValueConfigDto config,
   }) = _ValueWidget;
 
   factory Widget.fromJson(Map<String, dynamic> json) => _$WidgetFromJson(json);
@@ -74,6 +74,10 @@ abstract class WidgetConfig with _$WidgetConfig {
   const factory WidgetConfig.switchConfig({
     @JsonKey(name: 'default', defaultValue: false) bool defaultValue,
   }) = SwitchConfigDto;
+
+  const factory WidgetConfig.valueConfig({
+    @JsonKey(defaultValue: "") String unit,
+  }) = ValueConfigDto;
 
   const factory WidgetConfig.emptyConfig() = EmptyConfigDto;
 

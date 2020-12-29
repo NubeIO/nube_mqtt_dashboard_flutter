@@ -32,7 +32,7 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required String id,
     @required String topic,
     @required String name,
-    @required EmptyConfig config,
+    @required ValueConfig config,
   }) = _ValueWidget;
 }
 
@@ -60,6 +60,10 @@ abstract class WidgetConfig with _$WidgetConfig {
   const factory WidgetConfig.switchWidget({
     @required bool defaultValue,
   }) = SwitchConfig;
+
+  const factory WidgetConfig.valueWidget({
+    @required String unit,
+  }) = ValueConfig;
 
   const factory WidgetConfig.emptyConfig() = EmptyConfig;
 }

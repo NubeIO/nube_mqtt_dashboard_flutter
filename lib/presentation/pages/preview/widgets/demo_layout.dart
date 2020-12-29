@@ -35,7 +35,7 @@ class DemoWidget extends StatelessWidget {
         id: "4",
         topic: "testTopic",
         name: "Value Widget",
-        config: EmptyConfig())
+        config: ValueConfig(unit: "C"))
   ];
 
   @override

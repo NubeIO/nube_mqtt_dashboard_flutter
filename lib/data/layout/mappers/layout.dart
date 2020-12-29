@@ -19,25 +19,33 @@ class LayoutMapper {
             id: widget.id,
             topic: widget.topic,
             name: widget.name,
-            config: mapToGaugeConfig(widget.config),
+            config: mapToGaugeConfig(
+              widget.config ?? GaugeConfigDto.fromJson({}),
+            ),
           ),
       SWITCH: (widget) => WidgetEntity.switchWidget(
             id: widget.id,
             topic: widget.topic,
             name: widget.name,
-            config: mapToSwitchConfig(widget.config),
+            config: mapToSwitchConfig(
+              widget.config ?? SwitchConfigDto.fromJson({}),
+            ),
           ),
       SLIDER: (widget) => WidgetEntity.sliderWidget(
             id: widget.id,
             topic: widget.topic,
             name: widget.name,
-            config: mapToSliderConfig(widget.config),
+            config: mapToSliderConfig(
+              widget.config ?? SliderConfigDto.fromJson({}),
+            ),
           ),
-      VALUE: (value) => WidgetEntity.valueWidget(
+      VALUE: (widget) => WidgetEntity.valueWidget(
             id: widget.id,
             topic: widget.topic,
             name: widget.name,
-            config: const EmptyConfig(),
+            config: mapToValueConfig(
+              widget.config ?? ValueConfigDto.fromJson({}),
+            ),
           ));
 
   GaugeConfig mapToGaugeConfig(GaugeConfigDto config) {
@@ -58,6 +66,12 @@ class LayoutMapper {
       min: config.min,
       max: config.max,
       defaultValue: config.defaultValue,
+    );
+  }
+
+  ValueConfig mapToValueConfig(ValueConfigDto config) {
+    return ValueConfig(
+      unit: config.unit,
     );
   }
 }
