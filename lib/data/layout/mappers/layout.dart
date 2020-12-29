@@ -46,7 +46,17 @@ class LayoutMapper {
             config: mapToValueConfig(
               widget.config ?? ValueConfigDto.fromJson({}),
             ),
-          ));
+          ),
+      SWITCH_GROUP: (widget) {
+        return WidgetEntity.switchGroupWidget(
+          id: widget.id,
+          topic: widget.topic,
+          name: widget.name,
+          config: mapToSwitchGroupConfig(
+            widget.config ?? SwitchGroupConfigDto.fromJson({}),
+          ),
+        );
+      });
 
   GaugeConfig mapToGaugeConfig(GaugeConfigDto config) {
     return GaugeConfig(
@@ -72,6 +82,21 @@ class LayoutMapper {
   ValueConfig mapToValueConfig(ValueConfigDto config) {
     return ValueConfig(
       unit: config.unit,
+    );
+  }
+
+  SwitchGroupConfig mapToSwitchGroupConfig(SwitchGroupConfigDto config) {
+    return SwitchGroupConfig(
+      items: config.items.map(mapToButtonGroupItem).toImmutableList(),
+      defaultValue: config.defaultValue,
+    );
+  }
+
+  SwitchGroupItem mapToButtonGroupItem(SwitchGroupItemDto item) {
+    return SwitchGroupItem(
+      id: item.id,
+      name: item.name,
+      value: item.value,
     );
   }
 }

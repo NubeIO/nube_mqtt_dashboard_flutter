@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nube_mqtt_dashboard/presentation/widgets/page_widgets/button_group_widget.dart';
 
 import '../../../../application/layout/widget/widget_cubit.dart';
 import '../../../../domain/layout/entities.dart';
@@ -85,6 +86,16 @@ class WidgetItem extends StatelessWidget {
             value: value,
             unit: widget.config.unit,
           ),
+          switchGroupWidget: (widget) {
+            return SwitchGroupWidget(
+              value: isDefault ? widget.defaultValue : value,
+              config: widget.config,
+              onChange: (value) => _onChange(
+                context,
+                value,
+              ),
+            );
+          },
         ),
       ),
     );
