@@ -1,0 +1,151 @@
+{
+   "pages":[
+      {
+         "id":"1",
+         "name":"Page 1",
+         "widgets":[
+            {
+               "id":"widget1",
+               "type":"VALUE",
+               "name":"My Value",
+               "topic":"value1",
+               "config":{
+                  "unit":"m/s"
+               },
+               "position":1
+            },
+            {
+               "id":"widget12",
+               "type":"SWITCH_GROUP",
+               "name":"Button Groups",
+               "topic":"button_groups",
+               "config":{
+                  "items":[
+                     {
+                        "id":"1",
+                        "name":"Schedule",
+                        "value":0
+                     },
+                     {
+                        "id":"2",
+                        "name":"On",
+                        "value":1
+                     },
+                     {
+                        "id":"3",
+                        "name":"Off",
+                        "value":2
+                     }
+                  ],
+                  "default":0
+               },
+               "position":2
+            },
+            {
+               "id":"widget2",
+               "type":"SWITCH",
+               "name":"My Switch Value",
+               "config":{
+                  "onText":"ON",
+                  "offText":"OFF"
+               },
+               "topic":"value2",
+               "position":2
+            },
+            {
+               "id":"widget3",
+               "type":"SLIDER",
+               "name":"My Slider",
+               "config":{
+                  "min":0,
+                  "max":100
+               },
+               "topic":"slider1",
+               "position":3
+            },
+            {
+               "id":"widget4",
+               "type":"GAUGE",
+               "name":"My Gauge Value",
+               "config":{
+                  "min":0,
+                  "max":100
+               },
+               "topic":"gauge1",
+               "position":4
+            },
+            {
+               "id":"widget5",
+               "type":"SLIDER",
+               "name":"My Slider",
+               "config":{
+                  "min":0,
+                  "max":100
+               },
+               "topic":"gauge1",
+               "position":5
+            },
+            {
+               "id":"widget6",
+               "type":"VALUE",
+               "name":"My Value 2",
+               "topic":"gauge1",
+               "position":6
+            },
+            {
+               "id":"widget7",
+               "type":"SLIDER",
+               "name":"My Slider 3",
+               "config":{
+                  "min":0,
+                  "max":100
+               },
+               "topic":"slider3",
+               "position":7
+            }
+         ]
+      },
+      {
+         "id":"2",
+         "name":"Page 2",
+         "widgets":[
+            {
+               "id":"widget8",
+               "type":"SLIDER",
+               "name":"My Slider",
+               "config":{
+                  "min":0,
+                  "max":100
+               },
+               "topic":"gauge1",
+               "position":5
+            },
+            {
+               "id":"widget9",
+               "type":"VALUE",
+               "name":"My Value 2",
+               "topic":"gauge1",
+               "position":6
+            },
+            {
+               "id":"widget10",
+               "type":"SLIDER",
+               "name":"My Sluder 3",
+               "config":{
+                  "min":0,
+                  "max":100
+               },
+               "topic":"slider1",
+               "position":7
+            }
+         ]
+      },
+      {
+         "id":"3",
+         "name":"Page 3",
+         "widgets":[
+            
+         ]
+      }
+   ]
+}
