@@ -19,26 +19,44 @@ class LayoutMapper {
             id: widget.id,
             topic: widget.topic,
             name: widget.name,
-            config: mapToGaugeConfig(widget.config),
+            config: mapToGaugeConfig(
+              widget.config ?? GaugeConfigDto.fromJson({}),
+            ),
           ),
       SWITCH: (widget) => WidgetEntity.switchWidget(
             id: widget.id,
             topic: widget.topic,
             name: widget.name,
-            config: mapToSwitchConfig(widget.config),
+            config: mapToSwitchConfig(
+              widget.config ?? SwitchConfigDto.fromJson({}),
+            ),
           ),
       SLIDER: (widget) => WidgetEntity.sliderWidget(
             id: widget.id,
             topic: widget.topic,
             name: widget.name,
-            config: mapToSliderConfig(widget.config),
+            config: mapToSliderConfig(
+              widget.config ?? SliderConfigDto.fromJson({}),
+            ),
           ),
-      VALUE: (value) => WidgetEntity.valueWidget(
+      VALUE: (widget) => WidgetEntity.valueWidget(
             id: widget.id,
             topic: widget.topic,
             name: widget.name,
-            config: const EmptyConfig(),
-          ));
+            config: mapToValueConfig(
+              widget.config ?? ValueConfigDto.fromJson({}),
+            ),
+          ),
+      SWITCH_GROUP: (widget) {
+        return WidgetEntity.switchGroupWidget(
+          id: widget.id,
+          topic: widget.topic,
+          name: widget.name,
+          config: mapToSwitchGroupConfig(
+            widget.config ?? SwitchGroupConfigDto.fromJson({}),
+          ),
+        );
+      });
 
   GaugeConfig mapToGaugeConfig(GaugeConfigDto config) {
     return GaugeConfig(
@@ -58,6 +76,27 @@ class LayoutMapper {
       min: config.min,
       max: config.max,
       defaultValue: config.defaultValue,
+    );
+  }
+
+  ValueConfig mapToValueConfig(ValueConfigDto config) {
+    return ValueConfig(
+      unit: config.unit,
+    );
+  }
+
+  SwitchGroupConfig mapToSwitchGroupConfig(SwitchGroupConfigDto config) {
+    return SwitchGroupConfig(
+      items: config.items.map(mapToButtonGroupItem).toImmutableList(),
+      defaultValue: config.defaultValue,
+    );
+  }
+
+  SwitchGroupItem mapToButtonGroupItem(SwitchGroupItemDto item) {
+    return SwitchGroupItem(
+      id: item.id,
+      name: item.name,
+      value: item.value,
     );
   }
 }

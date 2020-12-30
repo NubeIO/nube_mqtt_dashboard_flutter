@@ -31,29 +31,36 @@ abstract class Widget with _$Widget {
     @required String id,
     @required String topic,
     @required String name,
-    @JsonKey(defaultValue: {}) GaugeConfigDto config,
+    GaugeConfigDto config,
   }) = _GaugeWidget;
 
   const factory Widget.SWITCH({
     @required String id,
     @required String topic,
     @required String name,
-    @JsonKey(defaultValue: {}) SwitchConfigDto config,
+    SwitchConfigDto config,
   }) = _SwitchWidget;
 
   const factory Widget.SLIDER({
     @required String id,
     @required String topic,
     @required String name,
-    @JsonKey(defaultValue: {}) SliderConfigDto config,
+    SliderConfigDto config,
   }) = _SliderWidget;
 
   const factory Widget.VALUE({
     @required String id,
     @required String topic,
     @required String name,
-    @JsonKey(defaultValue: {}) EmptyConfigDto config,
+    ValueConfigDto config,
   }) = _ValueWidget;
+
+  const factory Widget.SWITCH_GROUP({
+    @required String id,
+    @required String topic,
+    @required String name,
+    SwitchGroupConfigDto config,
+  }) = _SwitchGroupWidget;
 
   factory Widget.fromJson(Map<String, dynamic> json) => _$WidgetFromJson(json);
 }
@@ -75,8 +82,29 @@ abstract class WidgetConfig with _$WidgetConfig {
     @JsonKey(name: 'default', defaultValue: false) bool defaultValue,
   }) = SwitchConfigDto;
 
+  const factory WidgetConfig.valueConfig({
+    @JsonKey(defaultValue: "") String unit,
+  }) = ValueConfigDto;
+
+  const factory WidgetConfig.switchGroupConfig({
+    @JsonKey(defaultValue: []) List<SwitchGroupItemDto> items,
+    @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
+  }) = SwitchGroupConfigDto;
+
   const factory WidgetConfig.emptyConfig() = EmptyConfigDto;
 
   factory WidgetConfig.fromJson(Map<String, dynamic> json) =>
       _$WidgetConfigFromJson(json);
+}
+
+@freezed
+abstract class SwitchGroupItemDto with _$SwitchGroupItemDto {
+  const factory SwitchGroupItemDto({
+    @required String id,
+    @required String name,
+    @required double value,
+  }) = _SwitchGroupItemDto;
+
+  factory SwitchGroupItemDto.fromJson(Map<String, dynamic> json) =>
+      _$SwitchGroupItemDtoFromJson(json);
 }

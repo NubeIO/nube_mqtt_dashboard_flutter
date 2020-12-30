@@ -32,8 +32,15 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required String id,
     @required String topic,
     @required String name,
-    @required EmptyConfig config,
+    @required ValueConfig config,
   }) = _ValueWidget;
+  @Implements(EditableWidget)
+  const factory WidgetEntity.switchGroupWidget({
+    @required String id,
+    @required String topic,
+    @required String name,
+    @required SwitchGroupConfig config,
+  }) = _SwitchGroupWidget;
 }
 
 extension SliderWidgetExt on _SliderWidget {
@@ -42,6 +49,10 @@ extension SliderWidgetExt on _SliderWidget {
 
 extension SwitchWidgetExt on _SwitchWidget {
   WidgetData get defaultValue => WidgetData(value: config.defaultValue ? 1 : 0);
+}
+
+extension SwitchGroupWidgetExt on _SwitchGroupWidget {
+  WidgetData get defaultValue => WidgetData(value: config.defaultValue);
 }
 
 @freezed
@@ -61,5 +72,23 @@ abstract class WidgetConfig with _$WidgetConfig {
     @required bool defaultValue,
   }) = SwitchConfig;
 
+  const factory WidgetConfig.valueWidget({
+    @required String unit,
+  }) = ValueConfig;
+
+  const factory WidgetConfig.buttonSwitchWidget({
+    @required KtList<SwitchGroupItem> items,
+    @required double defaultValue,
+  }) = SwitchGroupConfig;
+
   const factory WidgetConfig.emptyConfig() = EmptyConfig;
+}
+
+@freezed
+abstract class SwitchGroupItem with _$SwitchGroupItem {
+  const factory SwitchGroupItem({
+    @required String id,
+    @required String name,
+    @required double value,
+  }) = _SwitchGroupItem;
 }

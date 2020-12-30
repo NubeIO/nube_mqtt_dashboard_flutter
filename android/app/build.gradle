@@ -33,7 +33,7 @@ enum BuildType {
 }
 
 static def String getAppName(BuildType buildType) {
-    String APP_NAME = 'Nube MQQT'
+    String APP_NAME = 'DASH iO'
     switch (buildType) {
     case BuildType.DEBUG:
             return APP_NAME + ' - ' + BuildType.DEBUG.name()
