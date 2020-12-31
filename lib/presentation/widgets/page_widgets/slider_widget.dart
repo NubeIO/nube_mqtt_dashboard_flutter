@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -47,7 +49,6 @@ class SliderWidget extends StatelessWidget {
             value: value.value,
             min: config.min.toDouble(),
             max: config.max.toDouble(),
-            divisions: (config.max - config.min) ~/ 10,
             label: '${value.value}',
             onChanged: (value) {
               onChange(WidgetData(value: value));
