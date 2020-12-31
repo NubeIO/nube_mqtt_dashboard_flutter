@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nube_mqtt_dashboard/presentation/widgets/page_widgets/button_group_widget.dart';
 
 import '../../../../application/layout/widget/widget_cubit.dart';
 import '../../../../domain/layout/entities.dart';
 import '../../../../domain/mqtt/mqtt_repository.dart';
 import '../../../../domain/widget_data/entities.dart';
 import '../../../../domain/widget_data/failures.dart';
+import '../../../../generated/i18n.dart';
 import '../../../themes/nube_theme.dart';
+import '../../../widgets/page_widgets/button_group_widget.dart';
 import '../../../widgets/page_widgets/gauge_widget.dart';
 import '../../../widgets/page_widgets/slider_widget.dart';
 import '../../../widgets/page_widgets/switch_widget.dart';
 import '../../../widgets/page_widgets/value_widget.dart';
 import '../../../widgets/responsive/padding.dart';
+import '../../../widgets/responsive/snackbar.dart';
 
 class WidgetItem extends StatelessWidget {
   final WidgetEntity widgetEntity;
@@ -24,6 +26,27 @@ class WidgetItem extends StatelessWidget {
 
   void _onChange(BuildContext context, WidgetData value) {
     context.read<WidgetCubit>().setData(value);
+  }
+
+  void _onSetFailure(
+    BuildContext context,
+    WidgetSetFailure failure,
+  ) {
+    final snackbar = ResponsiveSnackbar.build(
+      context,
+      content: Text(
+        failure.when(
+          unexpected: () => I18n.of(context).failureGeneric,
+        ),
+        style: Theme.of(context)
+            .textTheme
+            .bodyText1
+            .copyWith(color: Theme.of(context).colorScheme.error),
+      ),
+      direction: Direction.left,
+      width: ResponsiveSize.twoWidth(context),
+    );
+    Scaffold.of(context).showSnackBar(snackbar);
   }
 
   Color _subscriptionColor(
@@ -201,13 +224,21 @@ class WidgetItem extends StatelessWidget {
         child: GridTile(
           header: _buildTitle(context),
           footer: _buildFooter(context),
-          child: BlocBuilder<WidgetCubit, WidgetState>(
+          child: BlocConsumer<WidgetCubit, WidgetState>(
+            listener: (context, state) {
+              state.widgetSetState.maybeWhen(
+                failure: (failure) {
+                  _onSetFailure(context, failure);
+                },
+                orElse: () {},
+              );
+            },
             builder: (context, state) {
               return state.loadState.when(
                   failure: (failure) => _buildWidgetError(context, failure),
                   loading: () => _buildWidgetLoading(context),
                   initial: () => _buildInitialWidget(context),
-                  success: (value) => _buildWidgets(context, value: value));
+                  success: () => _buildWidgets(context, value: state.data));
             },
           ),
         ),
