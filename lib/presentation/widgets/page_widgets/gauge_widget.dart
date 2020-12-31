@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_gauge/flutter_gauge.dart';
+import 'package:nube_mqtt_dashboard/presentation/widgets/form_elements/styles/input_types.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../../domain/layout/entities.dart';
 import '../../../domain/widget_data/entities.dart';
@@ -19,23 +20,66 @@ class GaugeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterGauge(
-      index: value.value,
-      start: config.min,
-      end: config.max,
-      number: Number.endAndCenterAndStart,
-      secondsMarker: SecondsMarker.none,
-      circleColor: Theme.of(context).colorScheme.secondary,
-      handColor: Theme.of(context).colorScheme.primary,
-      indicatorColor: Colors.transparent,
-      counterStyle: Theme.of(context).textTheme.headline3.copyWith(
-            fontSize: 20,
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-      textStyle: Theme.of(context).textTheme.bodyText1.copyWith(
-            fontSize: 20,
-            color: Theme.of(context).colorScheme.secondary,
-          ),
+    final theme = Theme.of(context);
+    final min = config.min.toDouble();
+    final max = config.max.toDouble();
+    final labelStyle = InputStyles.regularLabel(context);
+    return Padding(
+      padding: const EdgeInsets.all(32.0),
+      child: SfRadialGauge(
+        axes: <RadialAxis>[
+          RadialAxis(
+            minimum: min,
+            maximum: max,
+            canScaleToFit: true,
+            showTicks: false,
+            startAngle: 150,
+            endAngle: 30,
+            maximumLabels: 1,
+            labelOffset: 32,
+            axisLabelStyle: GaugeTextStyle(
+              fontFamily: labelStyle.fontFamily,
+              fontStyle: labelStyle.fontStyle,
+              fontSize: labelStyle.fontSize,
+              fontWeight: labelStyle.fontWeight,
+              color: theme.colorScheme.secondary,
+            ),
+            ranges: <GaugeRange>[
+              GaugeRange(
+                startWidth: 20,
+                endWidth: 20,
+                startValue: min,
+                endValue: max,
+                color: theme.colorScheme.secondary,
+              ),
+            ],
+            pointers: <GaugePointer>[
+              NeedlePointer(
+                enableAnimation: true,
+                needleLength: .9,
+                value: value.value,
+                needleColor: theme.colorScheme.primary,
+                knobStyle: KnobStyle(
+                  color: theme.colorScheme.primary,
+                ),
+              )
+            ],
+            annotations: <GaugeAnnotation>[
+              GaugeAnnotation(
+                widget: Text(
+                  value.value.toString(),
+                  style: theme.textTheme.headline3.copyWith(
+                    fontSize: theme.textTheme.headline1.fontSize,
+                    color: theme.colorScheme.secondary,
+                  ),
+                ),
+                angle: 90,
+                positionFactor: 0.5,
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 }
