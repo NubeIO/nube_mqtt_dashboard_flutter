@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 [Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v0.0-alpha.3...HEAD)
 
+## [0.0-alpha.4] - 2021-01-10
+[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v0.0-alpha.3...v0.0-alpha.4)
+
+### Added
+- Add Fine Control Buttons to Slider
+- Add Support for Widget Parse Failure
+
 ## [0.0-alpha.3] - 2020-12-31
 [Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v0.0-alpha.2...v0.0-alpha.3)
 
@@ -33,6 +40,7 @@ All notable changes to this project will be documented in this file.
 [Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/0f8e9bba816df883be8f32522e0679567f87f0ed...v0.0-alpha.1)
 
 [Unreleased]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/tree/HEAD
+[0.0-alpha.4]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v0.0-alpha.4
 [0.0-alpha.3]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v0.0-alpha.3
 [0.0-alpha.2]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v0.0-alpha.2
 [0.0-alpha.1]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v0.0-alpha.1
