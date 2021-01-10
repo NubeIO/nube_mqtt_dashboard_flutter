@@ -1,6 +1,7 @@
 import 'package:kt_dart/kt.dart';
 
 import '../../../domain/layout/entities.dart';
+import '../../../domain/layout/layout_repository_interface.dart';
 import '../models/layout.dart';
 
 class LayoutMapper {
@@ -15,48 +16,61 @@ class LayoutMapper {
       );
 
   WidgetEntity mapToWidget(Widget widget) => widget.map(
-      GAUGE: (widget) => WidgetEntity.gaugeWidget(
-            id: widget.id,
-            topic: widget.topic,
-            name: widget.name,
-            config: mapToGaugeConfig(
-              widget.config ?? GaugeConfigDto.fromJson({}),
-            ),
-          ),
-      SWITCH: (widget) => WidgetEntity.switchWidget(
-            id: widget.id,
-            topic: widget.topic,
-            name: widget.name,
-            config: mapToSwitchConfig(
-              widget.config ?? SwitchConfigDto.fromJson({}),
-            ),
-          ),
-      SLIDER: (widget) => WidgetEntity.sliderWidget(
-            id: widget.id,
-            topic: widget.topic,
-            name: widget.name,
-            config: mapToSliderConfig(
-              widget.config ?? SliderConfigDto.fromJson({}),
-            ),
-          ),
-      VALUE: (widget) => WidgetEntity.valueWidget(
-            id: widget.id,
-            topic: widget.topic,
-            name: widget.name,
-            config: mapToValueConfig(
-              widget.config ?? ValueConfigDto.fromJson({}),
-            ),
-          ),
-      SWITCH_GROUP: (widget) {
-        return WidgetEntity.switchGroupWidget(
+        GAUGE: (widget) => WidgetEntity.gaugeWidget(
           id: widget.id,
           topic: widget.topic,
           name: widget.name,
-          config: mapToSwitchGroupConfig(
-            widget.config ?? SwitchGroupConfigDto.fromJson({}),
+          config: mapToGaugeConfig(
+            widget.config ?? GaugeConfigDto.fromJson({}),
           ),
-        );
-      });
+        ),
+        SWITCH: (widget) => WidgetEntity.switchWidget(
+          id: widget.id,
+          topic: widget.topic,
+          name: widget.name,
+          config: mapToSwitchConfig(
+            widget.config ?? SwitchConfigDto.fromJson({}),
+          ),
+        ),
+        SLIDER: (widget) => WidgetEntity.sliderWidget(
+          id: widget.id,
+          topic: widget.topic,
+          name: widget.name,
+          config: mapToSliderConfig(
+            widget.config ?? SliderConfigDto.fromJson({}),
+          ),
+        ),
+        VALUE: (widget) => WidgetEntity.valueWidget(
+          id: widget.id,
+          topic: widget.topic,
+          name: widget.name,
+          config: mapToValueConfig(
+            widget.config ?? ValueConfigDto.fromJson({}),
+          ),
+        ),
+        SWITCH_GROUP: (widget) {
+          return WidgetEntity.switchGroupWidget(
+            id: widget.id,
+            topic: widget.topic,
+            name: widget.name,
+            config: mapToSwitchGroupConfig(
+              widget.config ?? SwitchGroupConfigDto.fromJson({}),
+            ),
+          );
+        },
+        invalidParse: (value) => WidgetEntity.failure(
+          id: widget.id,
+          topic: widget.topic,
+          name: widget.name,
+          failure: const LayoutParseFailure.parse(),
+        ),
+        unknownWidget: (value) => WidgetEntity.failure(
+          id: widget.id,
+          topic: widget.topic,
+          name: widget.name,
+          failure: const LayoutParseFailure.unknown(),
+        ),
+      );
 
   GaugeConfig mapToGaugeConfig(GaugeConfigDto config) {
     return GaugeConfig(

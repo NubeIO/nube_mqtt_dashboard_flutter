@@ -41,6 +41,12 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required String name,
     @required SwitchGroupConfig config,
   }) = _SwitchGroupWidget;
+  const factory WidgetEntity.failure({
+    @required String id,
+    @required String topic,
+    @required String name,
+    @required LayoutParseFailure failure,
+  }) = _FailureWidget;
 }
 
 extension SliderWidgetExt on _SliderWidget {

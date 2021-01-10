@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 part 'layout.freezed.dart';
 part 'layout.g.dart';
@@ -19,7 +20,7 @@ abstract class Page with _$Page {
   const factory Page({
     @required String id,
     @required String name,
-    @required List<Widget> widgets,
+    @WidgetResponseConverter() @required List<Widget> widgets,
   }) = _Page;
 
   factory Page.fromJson(Map<String, dynamic> json) => _$PageFromJson(json);
@@ -62,7 +63,81 @@ abstract class Widget with _$Widget {
     SwitchGroupConfigDto config,
   }) = _SwitchGroupWidget;
 
+  const factory Widget.unknownWidget({
+    @required String id,
+    @required String topic,
+    @required String name,
+  }) = _UnknownFailureWidget;
+
+  const factory Widget.invalidParse({
+    @required String id,
+    @required String topic,
+    @required String name,
+  }) = _InvalidParseWidget;
+
   factory Widget.fromJson(Map<String, dynamic> json) => _$WidgetFromJson(json);
+}
+
+class WidgetResponseConverter
+    implements JsonConverter<Widget, Map<String, dynamic>> {
+  const WidgetResponseConverter();
+
+  @override
+  Widget fromJson(Map<String, dynamic> json) {
+    if (json == null) {
+      return null;
+    }
+    final id = json["id"] as String;
+    final topic = json["topic"] as String;
+    final name = json["name"] as String;
+    try {
+      // type data was already set (e.g. because we serialized it ourselves)
+      final type = json['type'] as String;
+      if (type != null && isValidType(type)) {
+        return Widget.fromJson(json);
+      } else {
+        Log.e("Unknown Widget type: $type");
+        return Widget.unknownWidget(
+          id: id,
+          topic: topic,
+          name: name,
+        );
+      }
+    } catch (e) {
+      Log.e("Error Parsing Widget", ex: e);
+      return Widget.invalidParse(
+        id: id ?? "unknown_id",
+        topic: topic ?? "",
+        name: name ?? "",
+      );
+    }
+  }
+
+  @override
+  Map<String, dynamic> toJson(Widget data) => data.toJson();
+}
+
+bool isValidType(String type) {
+  return getType(type) != WidgetType.UNKNOWN;
+}
+
+enum WidgetType { GAUGE, SWITCH, SLIDER, VALUE, SWITCH_GROUP, UNKNOWN }
+
+WidgetType getType(String type) {
+  switch (type) {
+    case 'GAUGE':
+      return WidgetType.GAUGE;
+    case 'SWITCH':
+      return WidgetType.SWITCH;
+    case 'SLIDER':
+      return WidgetType.SLIDER;
+    case 'VALUE':
+      return WidgetType.VALUE;
+    case 'SWITCH_GROUP':
+      return WidgetType.SWITCH_GROUP;
+    default:
+      return WidgetType.UNKNOWN;
+  }
 }
 
 @freezed
