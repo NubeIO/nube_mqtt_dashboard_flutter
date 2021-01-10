@@ -18,10 +18,20 @@ class SliderWidget extends StatelessWidget {
     this.onChange,
   }) : super(key: key);
 
+  void _onDecrease() {
+    onChange(WidgetData(value: value.value - .1));
+  }
+
+  void _onIncrease() {
+    onChange(WidgetData(value: value.value + .1));
+  }
+
   @override
   Widget build(BuildContext context) {
     final sliderColor = Theme.of(context).colorScheme.secondary;
     final sliderInactiveColor = Theme.of(context).colorScheme.secondaryVariant;
+    final min = config.min.toDouble();
+    final max = config.max;
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
         activeTrackColor: sliderColor,
@@ -45,14 +55,30 @@ class SliderWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Slider(
-            value: value.value,
-            min: config.min.toDouble(),
-            max: config.max.toDouble(),
-            label: '${value.value}',
-            onChanged: (value) {
-              onChange(WidgetData(value: value));
-            },
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove_circle),
+                color: Theme.of(context).colorScheme.secondary,
+                onPressed: value.value <= min ? null : _onDecrease,
+              ),
+              Expanded(
+                child: Slider(
+                  value: value.value,
+                  min: min,
+                  max: max.toDouble(),
+                  label: '${value.value}',
+                  onChanged: (value) {
+                    onChange(WidgetData(value: value));
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_circle),
+                color: Theme.of(context).colorScheme.secondary,
+                onPressed: value.value >= max ? null : _onIncrease,
+              ),
+            ],
           ),
           Text(
             value.value.toString(),
