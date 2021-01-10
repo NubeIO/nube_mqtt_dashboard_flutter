@@ -32,7 +32,7 @@ class NubeTheme {
       onSecondary: theme.onSecondary,
       background: theme.background,
       onBackground: theme.onBackground,
-      error: theme.onError,
+      error: theme.error,
       onError: theme.onError,
       surface: theme.surface,
       onSurface: theme.onSurface,

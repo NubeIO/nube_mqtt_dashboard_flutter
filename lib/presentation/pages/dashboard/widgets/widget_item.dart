@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../application/layout/widget/widget_cubit.dart';
 import '../../../../domain/layout/entities.dart';
+import '../../../../domain/layout/layout_repository_interface.dart';
 import '../../../../domain/mqtt/mqtt_repository.dart';
 import '../../../../domain/widget_data/entities.dart';
 import '../../../../domain/widget_data/failures.dart';
@@ -10,6 +11,7 @@ import '../../../../generated/i18n.dart';
 import '../../../themes/nube_theme.dart';
 import '../../../widgets/page_widgets/button_group_widget.dart';
 import '../../../widgets/page_widgets/gauge_widget.dart';
+import '../../../widgets/page_widgets/invalid_widget.dart' ;
 import '../../../widgets/page_widgets/slider_widget.dart';
 import '../../../widgets/page_widgets/switch_widget.dart';
 import '../../../widgets/page_widgets/value_widget.dart';
@@ -117,6 +119,11 @@ class WidgetItem extends StatelessWidget {
                 context,
                 value,
               ),
+            );
+          },
+          failure: (value) {
+            return ErrorTypeWidget(
+              failure: value.failure,
             );
           },
         ),
