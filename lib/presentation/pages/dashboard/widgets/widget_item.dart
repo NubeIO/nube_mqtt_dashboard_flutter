@@ -11,7 +11,7 @@ import '../../../../generated/i18n.dart';
 import '../../../themes/nube_theme.dart';
 import '../../../widgets/page_widgets/button_group_widget.dart';
 import '../../../widgets/page_widgets/gauge_widget.dart';
-import '../../../widgets/page_widgets/invalid_widget.dart' ;
+import '../../../widgets/page_widgets/invalid_widget.dart';
 import '../../../widgets/page_widgets/slider_widget.dart';
 import '../../../widgets/page_widgets/switch_widget.dart';
 import '../../../widgets/page_widgets/value_widget.dart';
@@ -71,108 +71,90 @@ class WidgetItem extends StatelessWidget {
     @required WidgetData value,
     bool isDefault = false,
   }) {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: ResponsiveSize.padding(
+    return widgetEntity.map(
+      gaugeWidget: (widget) => GaugeWidget(
+        value: value,
+        config: widget.config,
+        onChange: (value) => _onChange(
           context,
-          size: PaddingSize.medium,
-        ),
-        bottom: ResponsiveSize.padding(context),
-        left: ResponsiveSize.padding(context),
-        right: ResponsiveSize.padding(context),
-      ),
-      child: Center(
-        child: widgetEntity.map(
-          gaugeWidget: (widget) => GaugeWidget(
-            value: value,
-            config: widget.config,
-            onChange: (value) => _onChange(
-              context,
-              value,
-            ),
-          ),
-          sliderWidget: (widget) => SliderWidget(
-            value: isDefault ? widget.defaultValue : value,
-            config: widget.config,
-            onChange: (value) => _onChange(
-              context,
-              value,
-            ),
-          ),
-          switchWidget: (widget) => SwitchWidget(
-            value: isDefault ? widget.defaultValue : value,
-            config: widget.config,
-            onChange: (value) => _onChange(
-              context,
-              value,
-            ),
-          ),
-          valueWidget: (widget) => ValueWidget(
-            value: value,
-            unit: widget.config.unit,
-          ),
-          switchGroupWidget: (widget) {
-            return SwitchGroupWidget(
-              value: isDefault ? widget.defaultValue : value,
-              config: widget.config,
-              onChange: (value) => _onChange(
-                context,
-                value,
-              ),
-            );
-          },
-          failure: (value) {
-            return ErrorTypeWidget(
-              failure: value.failure,
-            );
-          },
+          value,
         ),
       ),
+      sliderWidget: (widget) => SliderWidget(
+        value: isDefault ? widget.defaultValue : value,
+        config: widget.config,
+        onChange: (value) => _onChange(
+          context,
+          value,
+        ),
+      ),
+      switchWidget: (widget) => SwitchWidget(
+        value: isDefault ? widget.defaultValue : value,
+        config: widget.config,
+        onChange: (value) => _onChange(
+          context,
+          value,
+        ),
+      ),
+      valueWidget: (widget) => ValueWidget(
+        value: value,
+        unit: widget.config.unit,
+      ),
+      switchGroupWidget: (widget) {
+        return SwitchGroupWidget(
+          value: isDefault ? widget.defaultValue : value,
+          config: widget.config,
+          onChange: (value) => _onChange(
+            context,
+            value,
+          ),
+        );
+      },
+      failure: (value) => _buildParseFailureWidget(value.failure),
     );
   }
 
   Widget _buildTitle(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(ResponsiveSize.padding(
-            context,
-            size: PaddingSize.xsmall,
-          )),
-        ),
-        color: Theme.of(context).colorScheme.primary,
+    final normalColor = Theme.of(context).colorScheme.onSurface;
+    final errorColor = Theme.of(context).colorScheme.onError;
+    final textColor = _buildErrorState<Color>(
+      context,
+      normal: normalColor,
+      error: errorColor,
+    ).withOpacity(.6);
+    return GridTileBar(
+      title: Text(
+        widgetEntity.name,
+        style: Theme.of(context).textTheme.bodyText1.copyWith(
+              color: textColor,
+            ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-          vertical: 8.0,
-        ),
-        child: Text(
-          widgetEntity.name,
-          style: Theme.of(context)
-              .textTheme
-              .headline6
-              .copyWith(color: Theme.of(context).colorScheme.onPrimary),
+      trailing: _buildErrorState<Widget>(
+        context,
+        normal: const SizedBox.shrink(),
+        error: Icon(
+          Icons.error,
+          color: errorColor,
         ),
       ),
     );
   }
 
   Widget _buildFooter(BuildContext context) {
+    final normalColor = Theme.of(context).colorScheme.onSurface;
+    final errorColor = Theme.of(context).colorScheme.onError;
+    final textColor = _buildErrorState<Color>(
+      context,
+      normal: normalColor,
+      error: errorColor,
+    ).withOpacity(.6);
     return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Row(
-        children: [
-          Text(widgetEntity.topic, style: Theme.of(context).textTheme.caption),
-          const Spacer(),
-          BlocBuilder<WidgetCubit, WidgetState>(builder: (context, state) {
-            return Icon(
-              Icons.circle,
-              size: 12,
-              color: _subscriptionColor(context, state.subscriptionState),
-            );
-          }),
-        ],
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+      child: Text(
+        widgetEntity.topic,
+        style: Theme.of(context).textTheme.caption.copyWith(
+              color: textColor,
+            ),
       ),
     );
   }
@@ -181,14 +163,9 @@ class WidgetItem extends StatelessWidget {
     BuildContext context,
     WidgetDataSubscribeFailure failure,
   ) {
-    return Center(
-      child: Text(
-        failure.when(unexpected: () => "Something went wrong."),
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(fontSize: 20, color: Theme.of(context).colorScheme.error),
-      ),
+    return ErrorTypeWidget(
+      title: failure.map(unexpected: (_) => "Unexpected Error"),
+      subtitle: "Please try again later.",
     );
   }
 
@@ -204,14 +181,60 @@ class WidgetItem extends StatelessWidget {
     if (widgetEntity is EditableWidget) {
       return _buildWidgets(context, value: null, isDefault: true);
     }
-    return Center(
-      child: Text(
-        "No Data Loaded",
-        style: Theme.of(context).textTheme.bodyText1.copyWith(
-              fontSize: 20,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
+    return widgetEntity.maybeMap(
+      failure: (value) => _buildParseFailureWidget(value.failure),
+      orElse: () => const ErrorTypeWidget(
+        title: "N/A",
+        subtitle: "No data available",
       ),
+    );
+  }
+
+  Widget _buildParseFailureWidget(LayoutParseFailure failure) {
+    return _buildFailureWidget(
+      title: failure.when(
+        unknown: () => "Error",
+        parse: () => "Error Parsing Widget",
+      ),
+      subtitle: failure.when(
+        unknown: () => "Unknown Widget Type.",
+        parse: () => "Something went wrong when trying to parse widget data.",
+      ),
+    );
+  }
+
+  Widget _buildFailureWidget({
+    @required String title,
+    @required String subtitle,
+  }) {
+    return ErrorTypeWidget(
+      title: title,
+      subtitle: subtitle,
+    );
+  }
+
+  T _buildErrorState<T>(
+    BuildContext context, {
+    @required T normal,
+    @required T error,
+  }) {
+    final state = BlocProvider.of<WidgetCubit>(context).state;
+    return state.loadState.maybeWhen(
+      failure: (_) => error,
+      success: () {
+        return widgetEntity.maybeMap(
+          failure: (_) => error,
+          orElse: () => normal,
+        );
+      },
+      initial: () {
+        if (widgetEntity is EditableWidget) {
+          return normal;
+        } else {
+          return error;
+        }
+      },
+      orElse: () => normal,
     );
   }
 
@@ -219,37 +242,65 @@ class WidgetItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<WidgetCubit>(
       create: (context) => WidgetCubit.create(widgetEntity),
-      child: Material(
-        color: NubeTheme.surfaceOverlay(context, 2),
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(ResponsiveSize.padding(
-            context,
-            size: PaddingSize.xsmall,
-          )),
-        ),
-        child: GridTile(
-          header: _buildTitle(context),
-          footer: _buildFooter(context),
-          child: BlocConsumer<WidgetCubit, WidgetState>(
-            listener: (context, state) {
-              state.widgetSetState.maybeWhen(
-                failure: (failure) {
-                  _onSetFailure(context, failure);
-                },
-                orElse: () {},
-              );
+      child: BlocConsumer<WidgetCubit, WidgetState>(
+        listener: (context, state) {
+          state.widgetSetState.maybeWhen(
+            failure: (failure) {
+              _onSetFailure(context, failure);
             },
-            builder: (context, state) {
-              return state.loadState.when(
-                  failure: (failure) => _buildWidgetError(context, failure),
-                  loading: () => _buildWidgetLoading(context),
-                  initial: () => _buildInitialWidget(context),
-                  success: () => _buildWidgets(context, value: state.data));
-            },
-          ),
-        ),
+            orElse: () {},
+          );
+        },
+        builder: (context, state) {
+          return Material(
+              color: _buildErrorState<Color>(
+                context,
+                error: Theme.of(context).colorScheme.error,
+                normal: NubeTheme.surfaceOverlay(context, 2),
+              ),
+              borderRadius: BorderRadius.circular(8.0),
+              elevation: 2,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildTitle(context),
+                  Expanded(
+                    child: GridBody(
+                      child: state.loadState.when(
+                          failure: (failure) =>
+                              _buildWidgetError(context, failure),
+                          loading: () => _buildWidgetLoading(context),
+                          initial: () => _buildInitialWidget(context),
+                          success: () =>
+                              _buildWidgets(context, value: state.data)),
+                    ),
+                  ),
+                  _buildErrorState(
+                    context,
+                    normal: _buildFooter(
+                      context,
+                    ),
+                    error: const SizedBox.shrink(),
+                  ),
+                ],
+              ));
+        },
       ),
+    );
+  }
+}
+
+class GridBody extends StatelessWidget {
+  final Widget child;
+  const GridBody({Key key, @required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+      ),
+      child: child,
     );
   }
 }

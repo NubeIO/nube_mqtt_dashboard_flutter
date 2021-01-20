@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../themes/nube_theme.dart';
-import 'padding.dart';
-import 'screen_type_layout.dart';
 
 typedef IndexedWidgetBuilder = Widget Function(BuildContext context, int index,
     bool selected, void Function(int index) onTapCallback);
@@ -83,7 +81,7 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
     }
   }
 
-  Widget _buildDrawer(BuildContext context, bool isMobile) {
+  Widget _buildDrawer(BuildContext context) {
     final theme = Theme.of(context).copyWith(
       textTheme: Theme.of(context).textTheme.apply(
             bodyColor: Theme.of(context).colorScheme.onSurface,
@@ -118,9 +116,7 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
                     selectedIndex == position,
                     (index) {
                       _onSelected(index);
-                      if (isMobile) {
-                        Navigator.pop(context);
-                      }
+                      Navigator.pop(context);
                     },
                   );
                 },
@@ -158,43 +154,15 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenTypeLayout(
-      mobile: Scaffold(
-        key: _scaffoldKey,
-        appBar: _appBarBuilder(context, selectedIndex),
-        drawer: Drawer(
-          child: Container(
-            child: _buildDrawer(context, true),
-          ),
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: _appBarBuilder(context, selectedIndex),
+      drawer: Drawer(
+        child: Container(
+          child: _buildDrawer(context),
         ),
-        body: _builder(context, selectedIndex),
       ),
-      tablet: Stack(
-        children: [
-          Row(children: [
-            SizedBox(
-              width: ResponsiveSize.MASTER_PANEL_WIDTH,
-            ),
-            Expanded(
-              child: Scaffold(
-                key: _scaffoldKey,
-                appBar: widget._appBarBuilder != null
-                    ? _appBarBuilder(context, selectedIndex)
-                    : AppBar(),
-                body: _builder(context, selectedIndex),
-              ),
-            ),
-          ]),
-          SizedBox(
-            width: ResponsiveSize.MASTER_PANEL_WIDTH,
-            child: Material(
-              elevation: 16,
-              shape: const RoundedRectangleBorder(),
-              child: _buildDrawer(context, false),
-            ),
-          )
-        ],
-      ),
+      body: _builder(context, selectedIndex),
     );
   }
 }

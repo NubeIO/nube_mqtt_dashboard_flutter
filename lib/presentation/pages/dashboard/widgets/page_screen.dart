@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kt_dart/collection.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../../../application/layout/pages/pages_cubit.dart';
 import '../../../../domain/layout/entities.dart';
@@ -8,6 +8,8 @@ import '../../../models/device_screen_type.dart';
 import '../../../widgets/responsive/padding.dart';
 import '../../../widgets/responsive/screen_type_layout.dart';
 import 'widget_item.dart';
+
+const widthCount = 2;
 
 class WidgetsScreen extends StatelessWidget {
   final PageEntity page;
@@ -21,21 +23,38 @@ class WidgetsScreen extends StatelessWidget {
     BuildContext context,
     DeviceScreenType deviceScreenType,
   ) {
-    return GridView.count(
-      crossAxisCount: ResponsiveSize.widgetsCrossAxisCount(
-        context,
-        deviceScreenType,
-      ),
+    final heightCalc = widthCount * ResponsiveSize.widgetHeight(context);
+
+    return StaggeredGridView.countBuilder(
+      crossAxisCount:
+          ResponsiveSize.widgetsCrossAxisCount(context, deviceScreenType),
       padding: EdgeInsets.all(ResponsiveSize.padding(context)),
       crossAxisSpacing:
           ResponsiveSize.padding(context, size: PaddingSize.small),
       mainAxisSpacing: ResponsiveSize.padding(context, size: PaddingSize.small),
-      children: page.widgets
-          .map((widget) => WidgetItem(
-                key: ValueKey(widget.id),
-                widgetEntity: widget,
-              ))
-          .asList(),
+      itemBuilder: (context, index) {
+        final widget = page.widgets[index];
+        return WidgetItem(
+          key: ValueKey(widget.id),
+          widgetEntity: widget,
+        );
+      },
+      itemCount: page.widgets.size,
+      staggeredTileBuilder: (index) {
+        final widget = page.widgets[index];
+        return widget.map(
+          gaugeWidget: (_) =>
+              StaggeredTile.count(widthCount * 2, heightCalc * 2),
+          sliderWidget: (_) {
+            return StaggeredTile.count(widthCount * 2, heightCalc);
+          },
+          switchWidget: (_) => StaggeredTile.count(widthCount, heightCalc),
+          valueWidget: (_) => StaggeredTile.count(widthCount, heightCalc),
+          switchGroupWidget: (_) =>
+              StaggeredTile.count(widthCount * 2, heightCalc),
+          failure: (_) => StaggeredTile.count(widthCount, heightCalc),
+        );
+      },
     );
   }
 

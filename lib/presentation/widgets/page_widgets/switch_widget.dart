@@ -19,12 +19,14 @@ class SwitchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoSwitch(
-      activeColor: Theme.of(context).colorScheme.secondary,
-      onChanged: (bool value) {
-        onChange(WidgetData(value: fromValue(value: value)));
-      },
-      value: value.value == 1,
+    return Center(
+      child: CupertinoSwitch(
+        activeColor: Theme.of(context).colorScheme.secondary,
+        onChanged: (bool value) {
+          onChange(WidgetData(value: fromValue(value: value)));
+        },
+        value: value.value == 1,
+      ),
     );
   }
 
