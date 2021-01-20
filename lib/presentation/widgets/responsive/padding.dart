@@ -93,22 +93,51 @@ class ResponsiveSize {
     BuildContext context,
     DeviceScreenType screenType,
   ) {
-    int count = 1;
-    switch (screenType) {
-      case DeviceScreenType.Mobile:
-        count = 1;
-        break;
-      default:
-        final totalWidth = MediaQuery.of(context).size.width;
-        final availableWidth = totalWidth - MASTER_PANEL_WIDTH;
-        count = availableWidth ~/ MASTER_PANEL_WIDTH;
+    final size = MediaQuery.of(context).size.width;
+    if (size < 600) {
+      return MediaQuery.of(context).orientation == Orientation.portrait ? 4 : 6;
+    } else if (size < 800) {
+      return MediaQuery.of(context).orientation == Orientation.portrait ? 6 : 8;
     }
-    if (count <= 0) {
+    return MediaQuery.of(context).orientation == Orientation.portrait ? 8 : 10;
+  }
+
+  static ScreenSize deviceScreenSize(
+    BuildContext context,
+  ) {
+    final size = MediaQuery.of(context).size.shortestSide;
+    final deviceType = MediaQuery.of(context).getDeviceType();
+    if (deviceType == DeviceScreenType.Mobile) {
+      if (size <= 360) {
+        return ScreenSize.small;
+      } else if (size <= 400) {
+        return ScreenSize.medium;
+      } else {
+        return ScreenSize.large;
+      }
+    } else if (deviceType == DeviceScreenType.Tablet) {
+      if (size <= 720) {
+        return ScreenSize.small;
+      } else {
+        return ScreenSize.large;
+      }
+    }
+    return ScreenSize.medium;
+  }
+
+  static double widgetHeight(BuildContext context) {
+    final screenSize = deviceScreenSize(context);
+
+    if (screenSize == ScreenSize.small) {
       return 1;
+    } else if (screenSize == ScreenSize.medium) {
+      return .9;
     } else {
-      return count;
+      return .85;
     }
   }
 }
 
 enum PaddingSize { xsmall, small, regular, medium, large, xlarge }
+
+enum ScreenSize { small, medium, large }

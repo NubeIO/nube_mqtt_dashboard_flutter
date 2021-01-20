@@ -28,8 +28,9 @@ class SliderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sliderColor = Theme.of(context).colorScheme.secondary;
-    final sliderInactiveColor = Theme.of(context).colorScheme.secondaryVariant;
+    final sliderColor = Theme.of(context).colorScheme.primary;
+    final sliderInactiveColor =
+        Theme.of(context).colorScheme.primary.withOpacity(.6);
     final min = config.min.toDouble();
     final max = config.max;
     return SliderTheme(
@@ -50,44 +51,65 @@ class SliderWidget extends StatelessWidget {
         valueIndicatorTextStyle: Theme.of(context)
             .textTheme
             .bodyText1
-            .copyWith(color: Theme.of(context).colorScheme.onSecondary),
+            .copyWith(color: Theme.of(context).colorScheme.onPrimary),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.remove_circle),
-                color: Theme.of(context).colorScheme.secondary,
-                onPressed: value.value <= min ? null : _onDecrease,
-              ),
-              Expanded(
-                child: Slider(
-                  value: value.value,
-                  min: min,
-                  max: max.toDouble(),
-                  label: '${value.value}',
-                  onChanged: (value) {
-                    onChange(WidgetData(value: value));
-                  },
+      child: Transform.translate(
+        offset: const Offset(0, -12),
+        child: Stack(
+          children: [
+            Stack(
+              children: [
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.remove_circle),
+                    color: Theme.of(context).colorScheme.secondary,
+                    onPressed: value.value <= min ? null : _onDecrease,
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  bottom: 0,
+                  left: 32,
+                  right: 32,
+                  child: Slider(
+                    value: value.value,
+                    min: min,
+                    max: max.toDouble(),
+                    label: '${value.value}',
+                    onChanged: (value) {
+                      onChange(WidgetData(value: value));
+                    },
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.add_circle),
+                    color: Theme.of(context).colorScheme.secondary,
+                    onPressed: value.value >= max ? null : _onIncrease,
+                  ),
+                ),
+              ],
+            ),
+            Center(
+              child: Transform.translate(
+                offset: const Offset(0, 24),
+                child: Text(
+                  value.value.toString(),
+                  style: Theme.of(context).textTheme.headline3.copyWith(
+                        fontSize: 20,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.add_circle),
-                color: Theme.of(context).colorScheme.secondary,
-                onPressed: value.value >= max ? null : _onIncrease,
-              ),
-            ],
-          ),
-          Text(
-            value.value.toString(),
-            style: Theme.of(context).textTheme.headline3.copyWith(
-                  fontSize: 20,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

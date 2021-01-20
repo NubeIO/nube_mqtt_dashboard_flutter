@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/layout/layout_cubit.dart';
 import '../../../domain/layout/failures.dart';
@@ -14,6 +15,7 @@ import '../../widgets/responsive/drawer_detail_layout.dart';
 import '../../widgets/responsive/snackbar.dart';
 import 'widgets/page_screen.dart';
 
+@FramyWidget(isPage: true)
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key key}) : super(key: key);
 

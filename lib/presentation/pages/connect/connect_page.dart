@@ -359,7 +359,9 @@ class _ConnectPageState extends State<ConnectPage> {
           widget.isInitalConfig ? "Configuration" : "Change Configuration",
         ),
       ),
-      body: isMobile ? _buildMobile(context) : _buildTablet(context),
+      body: isMobile
+          ? _buildMobile(context)
+          : SingleChildScrollView(child: _buildTablet(context)),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: _buildFab(context),
     );

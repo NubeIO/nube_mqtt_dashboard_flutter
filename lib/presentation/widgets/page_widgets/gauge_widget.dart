@@ -24,62 +24,68 @@ class GaugeWidget extends StatelessWidget {
     final min = config.min.toDouble();
     final max = config.max.toDouble();
     final labelStyle = InputStyles.regularLabel(context);
-    return Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: SfRadialGauge(
-        axes: <RadialAxis>[
-          RadialAxis(
-            minimum: min,
-            maximum: max,
-            canScaleToFit: true,
-            showTicks: false,
-            startAngle: 150,
-            endAngle: 30,
-            maximumLabels: 1,
-            labelOffset: 32,
-            axisLabelStyle: GaugeTextStyle(
-              fontFamily: labelStyle.fontFamily,
-              fontStyle: labelStyle.fontStyle,
-              fontSize: labelStyle.fontSize,
-              fontWeight: labelStyle.fontWeight,
-              color: theme.colorScheme.secondary,
-            ),
-            ranges: <GaugeRange>[
-              GaugeRange(
-                startWidth: 20,
-                endWidth: 20,
-                startValue: min,
-                endValue: max,
-                color: theme.colorScheme.secondary,
-              ),
-            ],
-            pointers: <GaugePointer>[
-              NeedlePointer(
-                enableAnimation: true,
-                needleLength: .9,
-                value: value.value,
-                needleColor: theme.colorScheme.primary,
-                knobStyle: KnobStyle(
-                  color: theme.colorScheme.primary,
+    return Column(
+      children: [
+        Expanded(
+          child: SfRadialGauge(
+            axes: <RadialAxis>[
+              RadialAxis(
+                minimum: min,
+                maximum: max,
+                canScaleToFit: true,
+                showTicks: false,
+                startAngle: 150,
+                endAngle: 30,
+                maximumLabels: 1,
+                labelOffset: 32,
+                axisLabelStyle: GaugeTextStyle(
+                  fontFamily: labelStyle.fontFamily,
+                  fontStyle: labelStyle.fontStyle,
+                  fontSize: labelStyle.fontSize,
+                  fontWeight: labelStyle.fontWeight,
+                  color: theme.colorScheme.primary.withOpacity(.6),
                 ),
-              )
-            ],
-            annotations: <GaugeAnnotation>[
-              GaugeAnnotation(
-                widget: Text(
-                  value.value.toString(),
-                  style: theme.textTheme.headline3.copyWith(
-                    fontSize: theme.textTheme.headline1.fontSize,
-                    color: theme.colorScheme.secondary,
+                ranges: <GaugeRange>[
+                  GaugeRange(
+                    startWidth: 20,
+                    endWidth: 20,
+                    startValue: min,
+                    endValue: max,
+                    color: theme.colorScheme.primary.withOpacity(.6),
                   ),
-                ),
-                angle: 90,
-                positionFactor: 0.5,
+                ],
+                pointers: <GaugePointer>[
+                  NeedlePointer(
+                    enableAnimation: true,
+                    needleLength: .9,
+                    value: value.value,
+                    needleColor: theme.colorScheme.secondary,
+                    knobStyle: KnobStyle(
+                      color: theme.colorScheme.secondary,
+                    ),
+                  )
+                ],
+                annotations: <GaugeAnnotation>[
+                  GaugeAnnotation(
+                    widget: Text(
+                      value.value.toString(),
+                      style: theme.textTheme.headline3.copyWith(
+                        fontSize: theme.textTheme.headline1.fontSize,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    angle: 90,
+                    positionFactor: 0.5,
+                  )
+                ],
               )
             ],
-          )
-        ],
-      ),
+          ),
+        ),
+        const SizedBox(
+          height: 0,
+        )
+      ],
     );
   }
 }
