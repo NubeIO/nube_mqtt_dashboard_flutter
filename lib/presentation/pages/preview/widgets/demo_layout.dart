@@ -39,7 +39,7 @@ class DemoWidget extends StatelessWidget {
       id: "2",
       topic: "testTopic",
       name: "Slider Widget",
-      config: SliderConfig(max: 100, min: 0, defaultValue: 0),
+      config: SliderConfig(max: 100, min: 0, defaultValue: 0, step: 0.5),
     ),
     WidgetEntity.switchWidget(
       id: "3",

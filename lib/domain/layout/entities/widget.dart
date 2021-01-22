@@ -71,6 +71,7 @@ abstract class WidgetConfig with _$WidgetConfig {
   const factory WidgetConfig.sliderConfig({
     @required int min,
     @required int max,
+    @required double step,
     @required double defaultValue,
   }) = SliderConfig;
 

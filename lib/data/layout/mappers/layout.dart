@@ -89,6 +89,7 @@ class LayoutMapper {
     return SliderConfig(
       min: config.min,
       max: config.max,
+      step: config.step,
       defaultValue: config.defaultValue,
     );
   }

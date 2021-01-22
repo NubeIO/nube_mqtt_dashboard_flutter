@@ -150,6 +150,7 @@ abstract class WidgetConfig with _$WidgetConfig {
   const factory WidgetConfig.sliderConfig({
     @JsonKey(defaultValue: 0) int min,
     @JsonKey(defaultValue: 100) int max,
+    @JsonKey(defaultValue: 1) double step,
     @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
   }) = SliderConfigDto;
 
