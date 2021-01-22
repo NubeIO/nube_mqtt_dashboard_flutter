@@ -19,11 +19,11 @@ class SliderWidget extends StatelessWidget {
   }) : super(key: key);
 
   void _onDecrease() {
-    onChange(WidgetData(value: value.value - .1));
+    onChange(WidgetData(value: value.value - config.step));
   }
 
   void _onIncrease() {
-    onChange(WidgetData(value: value.value + .1));
+    onChange(WidgetData(value: value.value + config.step));
   }
 
   @override
