@@ -63,6 +63,13 @@ abstract class Widget with _$Widget {
     SwitchGroupConfigDto config,
   }) = _SwitchGroupWidget;
 
+  const factory Widget.MAP({
+    @required String id,
+    @required String topic,
+    @required String name,
+    MapConfigDto config,
+  }) = _MapWidget;
+
   const factory Widget.unknownWidget({
     @required String id,
     @required String topic,
@@ -121,7 +128,7 @@ bool isValidType(String type) {
   return getType(type) != WidgetType.UNKNOWN;
 }
 
-enum WidgetType { GAUGE, SWITCH, SLIDER, VALUE, SWITCH_GROUP, UNKNOWN }
+enum WidgetType { GAUGE, SWITCH, SLIDER, VALUE, SWITCH_GROUP, MAP, UNKNOWN }
 
 WidgetType getType(String type) {
   switch (type) {
@@ -135,6 +142,8 @@ WidgetType getType(String type) {
       return WidgetType.VALUE;
     case 'SWITCH_GROUP':
       return WidgetType.SWITCH_GROUP;
+    case 'MAP':
+      return WidgetType.MAP;
     default:
       return WidgetType.UNKNOWN;
   }
@@ -166,6 +175,10 @@ abstract class WidgetConfig with _$WidgetConfig {
     @JsonKey(defaultValue: []) List<SwitchGroupItemDto> items,
     @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
   }) = SwitchGroupConfigDto;
+
+  const factory WidgetConfig.mapConfig({
+    @JsonKey(defaultValue: {}) Map<String, String> maps,
+  }) = MapConfigDto;
 
   const factory WidgetConfig.emptyConfig() = EmptyConfigDto;
 

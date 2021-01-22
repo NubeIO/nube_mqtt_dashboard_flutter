@@ -12,6 +12,7 @@ import '../../../themes/nube_theme.dart';
 import '../../../widgets/page_widgets/button_group_widget.dart';
 import '../../../widgets/page_widgets/gauge_widget.dart';
 import '../../../widgets/page_widgets/invalid_widget.dart';
+import '../../../widgets/page_widgets/map_widget.dart';
 import '../../../widgets/page_widgets/slider_widget.dart';
 import '../../../widgets/page_widgets/switch_widget.dart';
 import '../../../widgets/page_widgets/value_widget.dart';
@@ -107,6 +108,19 @@ class WidgetItem extends StatelessWidget {
           onChange: (value) => _onChange(
             context,
             value,
+          ),
+        );
+      },
+      mapWidget: (widget) {
+        return _buildErrorState(
+          context,
+          normal: MapWidget(
+            value: value,
+            maps: widget.config.maps,
+          ),
+          error: _buildFailureWidget(
+            title: "N/A Map",
+            subtitle: "Invalid data provided",
           ),
         );
       },
@@ -223,6 +237,12 @@ class WidgetItem extends StatelessWidget {
       failure: (_) => error,
       success: () {
         return widgetEntity.maybeMap(
+          mapWidget: (widget) {
+            if (widget.config.maps.containsKey(state.data.value)) {
+              return normal;
+            }
+            return error;
+          },
           failure: (_) => error,
           orElse: () => normal,
         );

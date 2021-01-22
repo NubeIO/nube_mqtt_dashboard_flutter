@@ -41,6 +41,12 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required String name,
     @required SwitchGroupConfig config,
   }) = _SwitchGroupWidget;
+  const factory WidgetEntity.mapWidget({
+    @required String id,
+    @required String topic,
+    @required String name,
+    @required MapConfig config,
+  }) = _MapWidget;
   const factory WidgetEntity.failure({
     @required String id,
     @required String topic,
@@ -87,6 +93,10 @@ abstract class WidgetConfig with _$WidgetConfig {
     @required KtList<SwitchGroupItem> items,
     @required double defaultValue,
   }) = SwitchGroupConfig;
+
+  const factory WidgetConfig.mapWidget({
+    @required KtMap<double, String> maps,
+  }) = MapConfig;
 
   const factory WidgetConfig.emptyConfig() = EmptyConfig;
 }

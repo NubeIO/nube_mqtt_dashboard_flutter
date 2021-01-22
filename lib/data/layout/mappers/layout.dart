@@ -1,4 +1,5 @@
 import 'package:kt_dart/kt.dart';
+import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 import '../../../domain/layout/entities.dart';
 import '../../../domain/layout/layout_repository_interface.dart';
@@ -58,6 +59,16 @@ class LayoutMapper {
             ),
           );
         },
+        MAP: (widget) {
+          return WidgetEntity.mapWidget(
+            id: widget.id,
+            topic: widget.topic,
+            name: widget.name,
+            config: mapToMapConfig(
+              widget.config ?? MapConfigDto.fromJson({}),
+            ),
+          );
+        },
         invalidParse: (value) => WidgetEntity.failure(
           id: widget.id,
           topic: widget.topic,
@@ -113,5 +124,24 @@ class LayoutMapper {
       name: item.name,
       value: item.value,
     );
+  }
+
+  MapConfig mapToMapConfig(MapConfigDto config) {
+    return MapConfig(
+      maps: mapToDoubleKeys(config.maps),
+    );
+  }
+
+  KtMap<double, String> mapToDoubleKeys(Map<String, String> maps) {
+    final Map<double, String> output = {};
+    maps.forEach((key, value) {
+      try {
+        final intKey = double.parse(key);
+        output.putIfAbsent(intKey, () => value);
+      } catch (e) {
+        Log.e("Skipping mapping for key: $key $value");
+      }
+    });
+    return output.toImmutableMap();
   }
 }
