@@ -52,6 +52,7 @@ class WidgetsScreen extends StatelessWidget {
           valueWidget: (_) => StaggeredTile.count(widthCount, heightCalc),
           switchGroupWidget: (_) =>
               StaggeredTile.count(widthCount * 2, heightCalc),
+          mapWidget: (_) => StaggeredTile.count(widthCount, heightCalc),
           failure: (_) => StaggeredTile.count(widthCount, heightCalc),
         );
       },
