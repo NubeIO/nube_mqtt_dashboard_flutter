@@ -6,7 +6,7 @@ part 'widget_dto.g.dart';
 @freezed
 abstract class WidgetDataDto with _$WidgetDataDto {
   const factory WidgetDataDto({
-    @required double value,
+    @required dynamic value,
   }) = _WidgetDataDto;
 
   factory WidgetDataDto.fromJson(Map<String, dynamic> json) =>
