@@ -57,10 +57,7 @@ class WidgetDataRepositoryImpl extends IWidgetDataRepository {
   ) async {
     try {
       await _mqttRepository.write(
-          topic,
-          jsonEncode(
-            dataMapper.mapToWidgetDataDto(value).toJson(),
-          ));
+          topic, jsonEncode(dataMapper.mapToWidgetDataDto(value).toJson()));
       return const Right(unit);
     } catch (e) {
       return const Left(WidgetSetFailure.unexpected());
