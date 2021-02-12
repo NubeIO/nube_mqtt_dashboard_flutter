@@ -201,6 +201,7 @@ abstract class WidgetConfig with _$WidgetConfig {
 
   const factory WidgetConfig.mapConfig({
     @JsonKey(defaultValue: {}) Map<String, String> maps,
+    @JsonKey(defaultValue: {}) Map<String, String> colors,
   }) = MapConfigDto;
 
   const factory WidgetConfig.emptyConfig() = EmptyConfigDto;
