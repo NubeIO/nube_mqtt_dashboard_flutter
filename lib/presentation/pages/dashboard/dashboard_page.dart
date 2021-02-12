@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:framy_annotation/framy_annotation.dart';
+import 'package:nube_mqtt_dashboard/domain/layout/entities.dart';
 
 import '../../../application/layout/layout_cubit.dart';
 import '../../../domain/layout/failures.dart';
@@ -99,6 +100,36 @@ class _DashboardPageState extends State<DashboardPage>
     );
   }
 
+  Future<void> _onProtectedNavigation(
+    BuildContext context, {
+    @required PageEntity page,
+  }) async {
+    if (cubit.state.selectedPage == page) {
+      Navigator.pop(context);
+      return;
+    }
+
+    // Navigate and Start Timeout
+    void navigate() {
+      Navigator.pop(context);
+      cubit.setSelected(page);
+      cubit.startTimeout(page.config);
+    }
+
+    if (page.config.protected) {
+      final result = await ExtendedNavigator.of(context).pushValidatePinPage();
+      switch (result) {
+        case UserType.USER:
+        case UserType.ADMIN:
+          navigate();
+          break;
+        default:
+      }
+    } else {
+      navigate();
+    }
+  }
+
   void _onFailureMessage(BuildContext context, String message) {
     final snackbar = ResponsiveSnackbar.build(
       context,
@@ -151,25 +182,29 @@ class _DashboardPageState extends State<DashboardPage>
           },
           builder: (context, state) {
             final list = state.layout.pages;
+            final selectedPage = state.selectedPage;
             return DrawerDetailLayout(
-              appBarBuilder: (context, index) {
-                return AppBar(
-                  elevation: 4,
-                  backgroundColor: NubeTheme.backgroundOverlay(context),
-                  title: Text(list[index].name),
-                );
-              },
-              detailBuilder: (context, selectedIndex) {
-                return WidgetsScreen(
-                  key: ValueKey(list[selectedIndex].id),
-                  page: list[selectedIndex],
-                );
-              },
-              itemBuilder: (context, index, selected, onTapCallback) {
+              appBar: AppBar(
+                elevation: 4,
+                backgroundColor: NubeTheme.backgroundOverlay(context),
+                title: Text(selectedPage?.name ?? "No Layout"),
+              ),
+              detailBuilder: selectedPage != null
+                  ? WidgetsScreen(
+                      key: ValueKey(selectedPage.id),
+                      page: selectedPage,
+                    )
+                  : Container(),
+              itemBuilder: (context, index) {
+                final currentItem = list[index];
+                final selected = selectedPage?.id == currentItem.id;
                 return ListTile(
                   selected: selected,
-                  onTap: () => onTapCallback(index),
-                  title: Text(list[index].name),
+                  onTap: () => _onProtectedNavigation(
+                    context,
+                    page: currentItem,
+                  ),
+                  title: Text(currentItem.name),
                 );
               },
               itemCount: list.size,

@@ -52,28 +52,24 @@ class DemoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DrawerDetailLayout(
-      appBarBuilder: (context, index) {
-        return AppBar(
-          elevation: 4,
-          backgroundColor: NubeTheme.backgroundOverlay(context, 4),
-          title: Text(list[index]),
-          actions: actions,
-        );
-      },
-      detailBuilder: (BuildContext context, int selectedIndex) {
-        return WidgetsScreen(
-          page: PageEntity(
-            id: "1",
-            name: "",
-            widgets: widgets.toImmutableList(),
-          ),
-        );
-      },
-      itemBuilder: (BuildContext context, int index, bool selected,
-          void Function(int) onTapCallback) {
+      appBar: AppBar(
+        elevation: 4,
+        backgroundColor: NubeTheme.backgroundOverlay(context),
+        title: const Text("Demo Page"),
+        actions: actions,
+      ),
+      detailBuilder: WidgetsScreen(
+        page: PageEntity(
+          id: "1",
+          name: "Demo Page",
+          config: const Config(protected: false),
+          widgets: widgets.toImmutableList(),
+        ),
+      ),
+      itemBuilder: (BuildContext context, int index) {
         return ListTile(
-          selected: selected,
-          onTap: () => onTapCallback(index),
+          selected: index == 0,
+          onTap: () => Navigator.pop(context),
           title: Text(list[index]),
         );
       },

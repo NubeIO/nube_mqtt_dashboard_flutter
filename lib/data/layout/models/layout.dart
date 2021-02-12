@@ -20,6 +20,7 @@ abstract class Page with _$Page {
   const factory Page({
     @required String id,
     @required String name,
+    PageConfig config,
     @WidgetResponseConverter() @required List<Widget> widgets,
   }) = _Page;
 
@@ -147,6 +148,28 @@ WidgetType getType(String type) {
     default:
       return WidgetType.UNKNOWN;
   }
+}
+
+@freezed
+abstract class PageConfig with _$PageConfig {
+  const factory PageConfig({
+    @JsonKey(defaultValue: false) bool protected,
+    @JsonKey(name: 'timeout') PageTimeoutEntity pageTimeout,
+  }) = _PageConfig;
+
+  factory PageConfig.fromJson(Map<String, dynamic> json) =>
+      _$PageConfigFromJson(json);
+}
+
+@freezed
+abstract class PageTimeoutEntity with _$PageTimeoutEntity {
+  const factory PageTimeoutEntity({
+    @required @JsonKey(name: "fallback") String fallbackId,
+    @JsonKey(defaultValue: 60000) int duration,
+  }) = _PageTimeoutEntity;
+
+  factory PageTimeoutEntity.fromJson(Map<String, dynamic> json) =>
+      _$PageTimeoutEntityFromJson(json);
 }
 
 @freezed
