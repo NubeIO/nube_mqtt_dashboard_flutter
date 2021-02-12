@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:kt_dart/kt.dart';
+import 'package:nube_mqtt_dashboard/utils/hex_color.dart';
 import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 import '../../../domain/layout/entities.dart';
@@ -145,7 +148,21 @@ class LayoutMapper {
   MapConfig mapToMapConfig(MapConfigDto config) {
     return MapConfig(
       maps: mapToDoubleKeys(config.maps),
+      colors: mapToColorsKeys(config.colors),
     );
+  }
+
+  KtMap<double, Color> mapToColorsKeys(Map<String, String> maps) {
+    final Map<double, Color> output = {};
+    maps.forEach((key, value) {
+      try {
+        final intKey = double.parse(key);
+        output.putIfAbsent(intKey, () => HexColor.parseColor(value));
+      } catch (e) {
+        Log.e("Skipping mapping for key: $key $value");
+      }
+    });
+    return output.toImmutableMap();
   }
 
   KtMap<double, String> mapToDoubleKeys(Map<String, String> maps) {

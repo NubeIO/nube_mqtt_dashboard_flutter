@@ -117,6 +117,7 @@ class WidgetItem extends StatelessWidget {
           normal: MapWidget(
             value: value,
             maps: widget.config.maps,
+            colors: widget.config.colors,
           ),
           error: _buildFailureWidget(
             title: "N/A Map",

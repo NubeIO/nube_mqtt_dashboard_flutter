@@ -96,6 +96,7 @@ abstract class WidgetConfig with _$WidgetConfig {
 
   const factory WidgetConfig.mapWidget({
     @required KtMap<double, String> maps,
+    @required KtMap<double, Color> colors,
   }) = MapConfig;
 
   const factory WidgetConfig.emptyConfig() = EmptyConfig;

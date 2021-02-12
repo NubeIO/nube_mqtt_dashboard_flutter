@@ -7,18 +7,19 @@ import '../../../domain/widget_data/entities.dart';
 class MapWidget extends StatelessWidget {
   final WidgetData value;
   final KtMap<double, String> maps;
+  final KtMap<double, Color> colors;
   final String errorValue;
 
   const MapWidget({
     Key key,
     @required this.value,
     @required this.maps,
+    @required this.colors,
     this.errorValue = "Invalid",
   }) : super(key: key);
 
   String getValue() {
-    if (maps[value.value] != null) return maps[value.value];
-    return errorValue;
+    return maps[value.value] ?? errorValue;
   }
 
   @override
@@ -33,7 +34,7 @@ class MapWidget extends StatelessWidget {
             getValue(),
             style: textTheme.headline3.copyWith(
               fontSize: 40,
-              color: colorScheme.primary,
+              color: colors[value.value] ?? colorScheme.primary,
             ),
           ),
         ],
