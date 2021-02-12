@@ -54,7 +54,7 @@ class SliderWidget extends StatelessWidget {
             .copyWith(color: Theme.of(context).colorScheme.onPrimary),
       ),
       child: Transform.translate(
-        offset: const Offset(0, -12),
+        offset: const Offset(0, -16),
         child: Stack(
           children: [
             Stack(

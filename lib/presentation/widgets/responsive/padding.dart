@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 import '../../extensions/device_screen_type.dart';
 import '../../models/device_screen_type.dart';
@@ -126,15 +127,14 @@ class ResponsiveSize {
   }
 
   static double widgetHeight(BuildContext context) {
-    final screenSize = deviceScreenSize(context);
+    final deviceType = MediaQuery.of(context).getDeviceType();
+    final axisCount = widgetsCrossAxisCount(context, deviceType);
+    final width = MediaQuery.of(context).size.width -
+        ResponsiveSize.padding(context) * axisCount;
 
-    if (screenSize == ScreenSize.small) {
-      return 1;
-    } else if (screenSize == ScreenSize.medium) {
-      return .9;
-    } else {
-      return .85;
-    }
+    final singeHeight = width / (axisCount / 2);
+
+    return 112 / singeHeight;
   }
 }
 

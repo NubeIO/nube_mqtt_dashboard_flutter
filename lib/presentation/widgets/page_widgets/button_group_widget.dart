@@ -18,7 +18,8 @@ class SwitchGroupWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final options = config.items.asList();
-    return Center(
+    return Align(
+      alignment: const FractionalOffset(0.5, 0.1),
       child: ToggleButtons(
         borderRadius: BorderRadius.all(
           Radius.circular(ResponsiveSize.padding(

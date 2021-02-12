@@ -296,13 +296,6 @@ class WidgetItem extends StatelessWidget {
                               _buildWidgets(context, value: state.data)),
                     ),
                   ),
-                  _buildErrorState(
-                    context,
-                    normal: _buildFooter(
-                      context,
-                    ),
-                    error: const SizedBox.shrink(),
-                  ),
                 ],
               ));
         },

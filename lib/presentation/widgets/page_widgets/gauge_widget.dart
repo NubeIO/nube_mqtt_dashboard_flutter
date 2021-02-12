@@ -83,7 +83,7 @@ class GaugeWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(
-          height: 0,
+          height: 12,
         )
       ],
     );

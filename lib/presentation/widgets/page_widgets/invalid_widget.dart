@@ -26,7 +26,7 @@ class ErrorTypeWidget extends StatelessWidget {
         ),
         Text(
           subtitle,
-          maxLines: 2,
+          maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: theme.bodyText1.copyWith(
             color: colorScheme.onError.withOpacity(.6),
