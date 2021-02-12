@@ -17,6 +17,7 @@ class TimeOutHelper {
   }) : _interval = interval;
 
   void _onComplete() {
+    Log.d("Timer Completed");
     if (_timer != null) {
       _timer.cancel();
       _timer = null;
@@ -24,6 +25,7 @@ class TimeOutHelper {
   }
 
   void cancel() {
+    Log.d("Timer Cancelled");
     _onComplete();
   }
 
@@ -49,7 +51,6 @@ class TimeOutHelper {
         callback(const TimerStatus.completed(unit));
       } else {
         Log.d("Timer Running $_currentDuration");
-        callback(TimerStatus.running(_currentDuration));
       }
     });
   }

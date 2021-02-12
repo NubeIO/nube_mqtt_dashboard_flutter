@@ -13,8 +13,24 @@ class LayoutMapper {
   PageEntity mapToPage(Page element) => PageEntity(
         id: element.id,
         name: element.name,
+        config: mapToPageConfig(element.config),
         widgets: element.widgets.map(mapToWidget).toImmutableList(),
       );
+
+  Config mapToPageConfig(PageConfig config) {
+    if (config == null) return const Config(protected: false);
+    final pageTimeout = config.pageTimeout;
+    return Config(
+      protected: config.protected,
+      timeout: pageTimeout != null
+          ? PageTimeout(
+              fallbackId: pageTimeout.fallbackId,
+              duration: Duration(
+                milliseconds: pageTimeout.duration,
+              ))
+          : null,
+    );
+  }
 
   WidgetEntity mapToWidget(Widget widget) => widget.map(
         GAUGE: (widget) => WidgetEntity.gaugeWidget(

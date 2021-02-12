@@ -3,35 +3,24 @@ import 'package:flutter/widgets.dart';
 
 import '../../themes/nube_theme.dart';
 
-typedef IndexedWidgetBuilder = Widget Function(BuildContext context, int index,
-    bool selected, void Function(int index) onTapCallback);
-typedef DetailWidgetBuilder = Widget Function(
-  BuildContext context,
-  int selectedIndex,
-);
+typedef IndexedWidgetBuilder = Widget Function(BuildContext context, int index);
 
-PreferredSizeWidget _defaultAppbar(BuildContext context, int key) => AppBar();
-
-class DrawerDetailLayout extends StatefulWidget {
+class DrawerDetailLayout extends StatelessWidget {
   final Widget _header;
   final Widget _footer;
-  final DetailWidgetBuilder _builder;
+  final Widget _builder;
   final int itemCount;
   final IndexedWidgetBuilder _itemBuilder;
-  final void Function(int key) _onSelectedChange;
-  final PreferredSizeWidget Function(BuildContext context, int key)
-      _appBarBuilder;
+  final PreferredSizeWidget _appBar;
 
   const DrawerDetailLayout({
     Key key,
     Widget header,
     Widget footer,
-    @required DetailWidgetBuilder detailBuilder,
+    @required Widget detailBuilder,
     @required this.itemCount,
     @required IndexedWidgetBuilder itemBuilder,
-    Function(int index) onSelectedChange,
-    PreferredSizeWidget Function(BuildContext context, int index)
-        appBarBuilder = _defaultAppbar,
+    PreferredSizeWidget appBar,
   })  : assert(detailBuilder != null),
         assert(itemCount != null),
         assert(itemBuilder != null),
@@ -39,47 +28,8 @@ class DrawerDetailLayout extends StatefulWidget {
         _footer = footer,
         _builder = detailBuilder,
         _itemBuilder = itemBuilder,
-        _onSelectedChange = onSelectedChange,
-        _appBarBuilder = appBarBuilder,
+        _appBar = appBar,
         super(key: key);
-
-  @override
-  _DrawerDetailLayoutState createState() => _DrawerDetailLayoutState();
-}
-
-class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
-  int selectedIndex = -1;
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  void initState() {
-    super.initState();
-    _fixIndex();
-  }
-
-  @override
-  void didUpdateWidget(Widget oldWidget) {
-    super.didUpdateWidget(widget);
-    if (widget.itemCount > 0 && selectedIndex == -1) {
-      _fixIndex();
-    }
-  }
-
-  void _fixIndex() {
-    setState(() {
-      selectedIndex = widget.itemCount > 0 ? 0 : -1;
-    });
-  }
-
-  void _onSelected(int selectedIndex) {
-    if (this.selectedIndex == selectedIndex) return;
-    setState(() {
-      this.selectedIndex = selectedIndex;
-    });
-    if (widget._onSelectedChange != null) {
-      widget._onSelectedChange(selectedIndex);
-    }
-  }
 
   Widget _buildDrawer(BuildContext context) {
     final theme = Theme.of(context).copyWith(
@@ -99,32 +49,24 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
       child: Column(
         children: [
           DrawerHeader(
-              child: widget._header ??
+              child: _header ??
                   Center(
                       child: Text(
                     'Nubeio',
                     style: theme.textTheme.headline1,
                   ))),
-          if (widget.itemCount > 0)
+          if (itemCount > 0)
             Expanded(
               child: ListView.builder(
-                itemCount: widget.itemCount,
+                itemCount: itemCount,
                 itemBuilder: (context, position) {
-                  return widget._itemBuilder(
-                    context,
-                    position,
-                    selectedIndex == position,
-                    (index) {
-                      _onSelected(index);
-                      Navigator.pop(context);
-                    },
-                  );
+                  return _itemBuilder(context, position);
                 },
               ),
             )
           else
             Expanded(child: Container()),
-          widget._footer ?? Container(),
+          _footer ?? Container(),
           SizedBox(
             height: bottomPadding,
           ),
@@ -133,17 +75,9 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
     );
   }
 
-  Widget _builder(BuildContext context, int selectedIndex) {
-    if (widget.itemCount > 0) {
-      return widget._builder(context, selectedIndex);
-    } else {
-      return Container();
-    }
-  }
-
-  PreferredSizeWidget _appBarBuilder(BuildContext context, int selectedIndex) {
-    if (widget.itemCount > 0) {
-      return widget._appBarBuilder(context, selectedIndex);
+  PreferredSizeWidget _appBarBuilder(BuildContext context) {
+    if (itemCount > 0) {
+      return _appBar;
     } else {
       return AppBar(
         elevation: 4,
@@ -155,14 +89,13 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
-      appBar: _appBarBuilder(context, selectedIndex),
+      appBar: _appBarBuilder(context),
       drawer: Drawer(
         child: Container(
           child: _buildDrawer(context),
         ),
       ),
-      body: _builder(context, selectedIndex),
+      body: _builder,
     );
   }
 }
