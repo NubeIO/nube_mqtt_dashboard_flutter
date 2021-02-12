@@ -21,12 +21,14 @@ class SwitchGroupWidget extends StatelessWidget {
     return Align(
       alignment: const FractionalOffset(0.5, 0.1),
       child: ToggleButtons(
-        borderRadius: BorderRadius.all(
-          Radius.circular(ResponsiveSize.padding(
-            context,
-            size: PaddingSize.xsmall,
-          )),
-        ),
+        borderRadius: options.length == 1
+            ? null
+            : BorderRadius.all(
+                Radius.circular(ResponsiveSize.padding(
+                  context,
+                  size: PaddingSize.xsmall,
+                )),
+              ),
         onPressed: (index) {
           onChange(WidgetData(value: config.items[index].value));
         },
