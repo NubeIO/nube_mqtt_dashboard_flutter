@@ -1,0 +1,83 @@
+{
+    "pages": [
+        {
+            "id": "1",
+            "name": "Users",
+            "widgets": [
+                {
+                    "id": "widget1",
+                    "type": "MAP",
+                    "name": "Washroom 1",
+                    "topic": "gaugeEase12",
+                    "config": {
+                        "maps": {
+                            "0": "Ready",
+                            "1": "Wait"
+                        },
+                        "colors": {
+                            "0": "#FF339999",
+                            "1": "#FFCF6679"
+                        }
+                    },
+                    "position": 1
+                },
+                {
+                    "id": "widget2",
+                    "type": "MAP",
+                    "name": "Washroom 2",
+                    "config": {
+                        "maps": {
+                            "0": "Ready",
+                            "1": "Wait"
+                        }
+                    },
+                    "topic": "valueAccess",
+                    "position": 2
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "name": "Admins",
+            "config": {
+                "protected": true,
+                "timeout": {
+                    "fallback": "1",
+                    "duration": 60000
+                }
+            },
+            "widgets": [
+                {
+                    "id": "widget1",
+                    "type": "SWITCH_GROUP",
+                    "name": "Washroom 1",
+                    "topic": "gaugeEase12",
+                    "config": {
+                        "items": [
+                            {
+                                "id": "1",
+                                "name": "Mark Clean",
+                                "value": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "widget2",
+                    "type": "SWITCH_GROUP",
+                    "name": "Washroom 12",
+                    "config": {
+                        "items": [
+                            {
+                                "id": "1",
+                                "name": "Mark Clean",
+                                "value": 0
+                            }
+                        ]
+                    },
+                    "topic": "valueAccess"
+                }
+            ]
+        }
+    ]
+}
