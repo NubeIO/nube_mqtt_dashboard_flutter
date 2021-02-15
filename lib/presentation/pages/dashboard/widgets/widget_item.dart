@@ -195,6 +195,8 @@ class WidgetItem extends StatelessWidget {
   ) {
     if (widgetEntity is EditableWidget) {
       return _buildWidgets(context, value: null, isDefault: true);
+    } else {
+      return _buildWidgets(context, value: const WidgetData(value: 0));
     }
     return widgetEntity.maybeMap(
       failure: (value) => _buildParseFailureWidget(value.failure),
@@ -249,11 +251,7 @@ class WidgetItem extends StatelessWidget {
         );
       },
       initial: () {
-        if (widgetEntity is EditableWidget) {
-          return normal;
-        } else {
-          return error;
-        }
+        return normal;
       },
       orElse: () => normal,
     );
