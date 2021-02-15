@@ -99,8 +99,12 @@ class ResponsiveSize {
       return MediaQuery.of(context).orientation == Orientation.portrait ? 4 : 6;
     } else if (size < 800) {
       return MediaQuery.of(context).orientation == Orientation.portrait ? 6 : 8;
+    } else if (size < 1280) {
+      return MediaQuery.of(context).orientation == Orientation.portrait
+          ? 8
+          : 10;
     }
-    return MediaQuery.of(context).orientation == Orientation.portrait ? 8 : 10;
+    return size ~/ 90;
   }
 
   static ScreenSize deviceScreenSize(
