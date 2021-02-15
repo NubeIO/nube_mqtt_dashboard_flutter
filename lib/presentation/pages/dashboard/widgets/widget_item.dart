@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nube_mqtt_dashboard/domain/core/internal_state.dart';
 
 import '../../../../application/layout/widget/widget_cubit.dart';
 import '../../../../domain/layout/entities.dart';
@@ -205,6 +206,11 @@ class WidgetItem extends StatelessWidget {
   ) {
     if (widgetEntity is EditableWidget) {
       return _buildWidgets(context, value: null, isDefault: true);
+    } else if (widgetEntity.globalConfig.initial != null) {
+      return _buildWidgets(
+        context,
+        value: WidgetData(value: widgetEntity.globalConfig.initial),
+      );
     }
     return widgetEntity.maybeMap(
       failure: (value) => _buildParseFailureWidget(value.failure),
@@ -259,21 +265,30 @@ class WidgetItem extends StatelessWidget {
         );
       },
       initial: () {
-        if (widgetEntity is EditableWidget) {
-          return normal;
-        } else {
-          return error;
-        }
+        return widgetEntity.globalConfig.initial == null ? error : normal;
       },
       orElse: () => normal,
     );
   }
 
-  Color _getWidgetBackground(BuildContext context, WidgetData data) {
+  Color _getWidgetBackground(
+    BuildContext context,
+    WidgetData data,
+  ) {
     final background = widgetEntity.globalConfig.background;
     return background.colors[data.value] ??
         background.color ??
         NubeTheme.surfaceOverlay(context, 2);
+  }
+
+  WidgetData _getInitialData(
+    InternalState<WidgetDataSubscribeFailure> loadState,
+    WidgetData data,
+  ) {
+    final value = loadState.maybeWhen(initial: () => true, orElse: () => false)
+        ? widgetEntity.globalConfig.initial
+        : data.value;
+    return WidgetData(value: value);
   }
 
   @override
@@ -294,23 +309,28 @@ class WidgetItem extends StatelessWidget {
               color: _buildErrorState<Color>(
                 context,
                 error: Theme.of(context).colorScheme.error,
-                normal: _getWidgetBackground(context, state.data),
+                normal: _getWidgetBackground(
+                  context,
+                  _getInitialData(state.loadState, state.data),
+                ),
               ),
               borderRadius: BorderRadius.circular(8.0),
               elevation: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTitle(context, state.data),
+                  _buildTitle(
+                      context, _getInitialData(state.loadState, state.data)),
                   Expanded(
                     child: GridBody(
                       child: state.loadState.when(
-                          failure: (failure) =>
-                              _buildWidgetError(context, failure),
-                          loading: () => _buildWidgetLoading(context),
-                          initial: () => _buildInitialWidget(context),
-                          success: () =>
-                              _buildWidgets(context, value: state.data)),
+                        failure: (failure) =>
+                            _buildWidgetError(context, failure),
+                        loading: () => _buildWidgetLoading(context),
+                        initial: () => _buildInitialWidget(context),
+                        success: () =>
+                            _buildWidgets(context, value: state.data),
+                      ),
                     ),
                   ),
                 ],
