@@ -10,6 +10,7 @@ part 'layout.g.dart';
 abstract class Layout with _$Layout {
   const factory Layout({
     @required List<Page> pages,
+    LayoutConfig config,
   }) = _Layout;
 
   factory Layout.fromJson(Map<String, dynamic> json) => _$LayoutFromJson(json);
@@ -159,6 +160,17 @@ abstract class PageConfig with _$PageConfig {
 
   factory PageConfig.fromJson(Map<String, dynamic> json) =>
       _$PageConfigFromJson(json);
+}
+
+@freezed
+abstract class LayoutConfig with _$LayoutConfig {
+  const factory LayoutConfig({
+    @JsonKey(name: "show_loading", defaultValue: false) bool showLoading,
+    @JsonKey(name: "persistent", defaultValue: true) bool persistData,
+  }) = _LayoutConfig;
+
+  factory LayoutConfig.fromJson(Map<String, dynamic> json) =>
+      _$LayoutConfigFromJson(json);
 }
 
 @freezed

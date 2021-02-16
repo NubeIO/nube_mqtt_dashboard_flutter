@@ -10,8 +10,17 @@ import '../models/layout.dart';
 
 class LayoutMapper {
   LayoutEntity mapToBuilder(Layout layout) => LayoutEntity(
+        config: mapToLayoutEntityConfig(layout.config),
         pages: layout.pages.map(mapToPage).toImmutableList(),
       );
+
+  LayoutEntityConfig mapToLayoutEntityConfig(LayoutConfig config) {
+    if (config == null) return LayoutEntityConfig.empty();
+    return LayoutEntityConfig(
+      persistData: config.persistData,
+      showLoading: config.showLoading,
+    );
+  }
 
   PageEntity mapToPage(Page element) => PageEntity(
         id: element.id,

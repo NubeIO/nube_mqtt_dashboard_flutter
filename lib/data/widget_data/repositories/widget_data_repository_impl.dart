@@ -19,6 +19,8 @@ class WidgetDataRepositoryImpl extends IWidgetDataRepository {
   @override
   Future<Either<SubscribeFailure, Unit>> subscribeWidget(String topic) async {
     try {
+      await _mqttRepository.connectionStream
+          .firstWhere((element) => element == ServerConnectionState.CONNECTED);
       await _mqttRepository.subscribe(topic);
       return const Right(unit);
     } catch (e) {

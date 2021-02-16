@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:nube_mqtt_dashboard/data/layout/managers/layout_data_preference.dart';
+import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 import '../../../domain/configuration/configuration_repository_interface.dart';
 import '../../../domain/core/extensions/option_ext.dart';
@@ -14,13 +16,40 @@ import '../models/layout.dart';
 class LayoutRepositoryImpl extends ILayoutRepository {
   final IMqttRepository _mqttRepository;
   final IConfigurationRepository _configurationRepository;
+  final LayoutPreferenceManager _layoutPreferenceManager;
 
   LayoutRepositoryImpl(
     this._mqttRepository,
     this._configurationRepository,
+    this._layoutPreferenceManager,
   );
 
   final layoutMapper = LayoutMapper();
+
+  @override
+  Future<Either<LayoutFailure, LayoutEntity>> getPersistantLayout() async {
+    final result = await _configurationRepository.getConfiguration();
+    if (result.isSome()) {
+      final config = result.getOrCrash();
+      if (config.layoutTopic.isEmpty) {
+        return const Left(LayoutFailure.noLayoutConfig());
+      } else {
+        final message = _layoutPreferenceManager.message;
+        if (message == null || message.topic != config.layoutTopic) {
+          return Right(LayoutEntity.empty());
+        } else {
+          final result = await _mapToLayoutBuilder(message);
+          Log.d("Restoring layout $result");
+          return result.fold(
+            (l) => Right(LayoutEntity.empty()),
+            (layout) => Right(layout),
+          );
+        }
+      }
+    } else {
+      return const Left(LayoutFailure.noLayoutConfig());
+    }
+  }
 
   @override
   Future<Either<LayoutSubscribeFailure, Unit>> subscribe() async {
@@ -57,10 +86,12 @@ class LayoutRepositoryImpl extends ILayoutRepository {
       if (config.layoutTopic.isEmpty) {
         yield const Left(LayoutFailure.noLayoutConfig());
       } else {
-        yield Right(LayoutEntity.empty());
-        yield* _mqttRepository.getTopicMessage(config.layoutTopic).asyncMap(
-            (message) =>
-                _mapToLayoutBuilder(message).catchError(_onErrorCatch));
+        yield* _mqttRepository
+            .getTopicMessage(config.layoutTopic)
+            .asyncMap((message) => _mapToLayoutBuilder(message).then((value) {
+                  _layoutPreferenceManager.message = message;
+                  return value;
+                }).catchError(_onErrorCatch));
       }
     } else {
       yield const Left(LayoutFailure.noLayoutConfig());
