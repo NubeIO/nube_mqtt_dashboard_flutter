@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../responsive/padding.dart';
 
 class LoadingOverlay {
+  static LoadingOverlay _lastInstance;
+
   BuildContext _context;
   bool isShowing = false;
 
@@ -15,12 +17,12 @@ class LoadingOverlay {
   }
 
   void show({Widget child}) {
+    isShowing = true;
     showDialog(
       context: _context,
       barrierDismissible: false,
       builder: (context) => _FullScreenLoader(child: child),
     );
-    isShowing = true;
   }
 
   void showText(String text) {
@@ -38,7 +40,11 @@ class LoadingOverlay {
   LoadingOverlay._create(this._context);
 
   factory LoadingOverlay.of(BuildContext context) {
-    return LoadingOverlay._create(context);
+    if (_lastInstance != null) {
+      _lastInstance.hide();
+      _lastInstance = null;
+    }
+    return _lastInstance ??= LoadingOverlay._create(context);
   }
 }
 
