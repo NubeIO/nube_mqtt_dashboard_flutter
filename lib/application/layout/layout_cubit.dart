@@ -25,11 +25,34 @@ class LayoutCubit extends Cubit<LayoutState> {
   StreamSubscription<Either<LayoutFailure, LayoutEntity>> subscription;
 
   LayoutCubit(this._layoutRepository) : super(LayoutState.initial()) {
-    init(shouldReconnect: true);
+    _initializePersistant();
   }
 
-  Future<void> init({bool shouldReconnect = false}) async {
-    emit(state.copyWith(layoutConnection: const InternalState.loading()));
+  Future<void> _initializePersistant() async {
+    final event = await _layoutRepository.getPersistantLayout();
+    // Only Restore if persistent config isn't disabled
+    if (event.fold((l) => true, (layout) => layout.config.persistData)) {
+      _onLayoutChange(event);
+    }
+    init(
+      showLoading: event.fold(
+        (l) => true,
+        (layout) => layout.config.showLoading,
+      ),
+      shouldReconnect: true,
+    );
+  }
+
+  Future<void> init({
+    bool showLoading = true,
+    bool shouldReconnect = false,
+  }) async {
+    if (showLoading) {
+      emit(state.copyWith(layoutConnection: const InternalState.loading()));
+    } else {
+      emit(state.copyWith(layoutConnection: const InternalState.success()));
+    }
+
     final result = await _layoutRepository.subscribe();
 
     result.fold(
@@ -41,10 +64,11 @@ class LayoutCubit extends Cubit<LayoutState> {
       (r) {
         if (shouldReconnect) {
           _listen();
+        } else {
+          emit(
+            state.copyWith(layoutConnection: const InternalState.success()),
+          );
         }
-        emit(
-          state.copyWith(layoutConnection: const InternalState.success()),
-        );
       },
     );
   }
@@ -55,21 +79,28 @@ class LayoutCubit extends Cubit<LayoutState> {
       subscription = null;
     }
     subscription = _layoutRepository.layoutStream.listen((event) {
-      event.fold(
-        (failure) => emit(
-          state.copyWith(layoutState: InternalState.failure(failure)),
-        ),
-        (layout) {
-          final currentPage =
-              _getPageFromId(state.selectedPage?.id, layout: layout);
-          emit(state.copyWith(
-            layout: layout,
-            selectedPage: currentPage,
-            layoutState: const InternalState.success(),
-          ));
-        },
-      );
+      _onLayoutChange(event);
     });
+  }
+
+  void _onLayoutChange(Either<LayoutFailure, LayoutEntity> event) {
+    event.fold(
+      (failure) => emit(
+        state.copyWith(layoutState: InternalState.failure(failure)),
+      ),
+      (layout) {
+        final currentPage = _getPageFromId(
+          state.selectedPage?.id,
+          layout: layout,
+        );
+        emit(state.copyWith(
+          layout: layout,
+          selectedPage: currentPage,
+          layoutState: const InternalState.success(),
+          layoutConnection: const InternalState.success(),
+        ));
+      },
+    );
   }
 
   @override
