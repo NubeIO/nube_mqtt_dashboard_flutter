@@ -2,7 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.3...HEAD)
+[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.4...HEAD)
+
+## [1.0.4] - 2021-01-17
+[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.3...v1.0.4)
+
+### Added
+- Add Custom Icon and Size
 
 ## [1.0.3] - 2021-01-16
 [Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.2...v1.0.3)
@@ -82,6 +88,7 @@ All notable changes to this project will be documented in this file.
 [Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/0f8e9bba816df883be8f32522e0679567f87f0ed...v0.0-alpha.1)
 
 [Unreleased]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/tree/HEAD
+[1.0.4]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v1.0.4
 [1.0.3]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v1.0.3
 [1.0.2]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v1.0.2
 [1.0.1]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v1.0.1
