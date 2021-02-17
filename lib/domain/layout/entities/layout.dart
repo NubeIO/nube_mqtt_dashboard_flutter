@@ -5,13 +5,14 @@ abstract class LayoutEntity with _$LayoutEntity {
   const factory LayoutEntity({
     @required LayoutEntityConfig config,
     @required KtList<PageEntity> pages,
+    @required Logo logo,
   }) = _LayoutEntity;
 
   factory LayoutEntity.empty() {
     return LayoutEntity(
-      config: LayoutEntityConfig.empty(),
-      pages: const KtList.empty(),
-    );
+        config: LayoutEntityConfig.empty(),
+        pages: const KtList.empty(),
+        logo: Logo.empty());
   }
 }
 

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:framy_annotation/framy_annotation.dart';
 import 'package:nube_mqtt_dashboard/domain/layout/entities.dart';
+import 'package:nube_mqtt_dashboard/domain/theme/entities.dart';
+import 'package:nube_mqtt_dashboard/presentation/widgets/logo_widget.dart';
+import 'package:nube_mqtt_dashboard/presentation/widgets/responsive/padding.dart';
 
 import '../../../application/layout/layout_cubit.dart';
 import '../../../domain/layout/failures.dart';
@@ -182,12 +185,21 @@ class _DashboardPageState extends State<DashboardPage>
           },
           builder: (context, state) {
             final list = state.layout.pages;
+            final logo = state.layout.logo;
             final selectedPage = state.selectedPage;
             return DrawerDetailLayout(
-              appBar: AppBar(
-                elevation: 4,
-                backgroundColor: NubeTheme.backgroundOverlay(context),
-                title: Text(selectedPage?.name ?? "No Layout"),
+              appBarBuilder: (context, state) => dashboardAppBar(
+                context,
+                state: state,
+                logo: logo,
+                name: selectedPage?.name,
+              ),
+              header: Padding(
+                padding: EdgeInsets.all(ResponsiveSize.padding(context)),
+                child: LogoWidget(
+                  logo: logo,
+                  size: Size.large,
+                ),
               ),
               detailBuilder: selectedPage != null
                   ? WidgetsScreen(
@@ -215,4 +227,65 @@ class _DashboardPageState extends State<DashboardPage>
       ),
     );
   }
+}
+
+AppBar dashboardAppBar(
+  BuildContext context, {
+  ScaffoldState state,
+  @required Logo logo,
+  @required String name,
+}) {
+  final iconSize = logo.size;
+  final smallPadding =
+      ResponsiveSize.padding(context, size: PaddingSize.xsmall);
+  final verticalPadding =
+      ResponsiveSize.padding(context, size: PaddingSize.small);
+  final horizontalPadding = ResponsiveSize.padding(context);
+  if (!logo.showIcon) {
+    return AppBar(
+      titleSpacing: 0,
+      centerTitle: false,
+      backgroundColor: NubeTheme.backgroundOverlay(context, 0),
+      title: Text(
+        name ?? "No Layout",
+        style: Theme.of(context).textTheme.headline1.copyWith(
+              color: NubeTheme.colorText200(context),
+            ),
+      ),
+    );
+  }
+  return AppBar(
+    automaticallyImplyLeading: false,
+    toolbarHeight: iconSize + verticalPadding * 2,
+    leadingWidth: iconSize + horizontalPadding * 2,
+    leading: IconButton(
+      onPressed: () {
+        state?.openDrawer();
+      },
+      tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+      icon: Padding(
+        padding: EdgeInsets.only(left: smallPadding),
+        child: SizedBox(
+          width: iconSize,
+          height: iconSize,
+          child: Material(
+            color: NubeTheme.surfaceOverlay(context, 2),
+            borderRadius: BorderRadius.circular(smallPadding),
+            child: LogoWidget(
+              logo: logo,
+            ),
+          ),
+        ),
+      ),
+    ),
+    titleSpacing: 0,
+    centerTitle: false,
+    backgroundColor: NubeTheme.backgroundOverlay(context, 0),
+    title: Text(
+      name ?? "No Layout",
+      style: Theme.of(context).textTheme.headline1.copyWith(
+            color: NubeTheme.colorText200(context),
+          ),
+    ),
+  );
 }
