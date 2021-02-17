@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:kt_dart/kt.dart';
+import 'package:nube_mqtt_dashboard/domain/theme/entities.dart';
 import 'package:nube_mqtt_dashboard/utils/hex_color.dart';
 import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
@@ -11,8 +12,27 @@ import '../models/layout.dart';
 class LayoutMapper {
   LayoutEntity mapToBuilder(Layout layout) => LayoutEntity(
         config: mapToLayoutEntityConfig(layout.config),
+        logo: mapToLogo(layout.logo),
         pages: layout.pages.map(mapToPage).toImmutableList(),
       );
+
+  Logo mapToLogo(LogoConfig logo) {
+    if (logo == null) return Logo.empty();
+    return Logo(
+      size: logo.size,
+      showIcon: logo.showIcon,
+      dark: mapToLogoItem(logo.dark),
+      light: mapToLogoItem(logo.light),
+    );
+  }
+
+  LogoItem mapToLogoItem(LogoItemDto item) {
+    if (item == null) return LogoItem.empty();
+    return LogoItem(
+      smallUrl: item.small,
+      largeUrl: item.large,
+    );
+  }
 
   LayoutEntityConfig mapToLayoutEntityConfig(LayoutConfig config) {
     if (config == null) return LayoutEntityConfig.empty();

@@ -5,13 +5,14 @@ import '../../themes/nube_theme.dart';
 
 typedef IndexedWidgetBuilder = Widget Function(BuildContext context, int index);
 
-class DrawerDetailLayout extends StatelessWidget {
+class DrawerDetailLayout extends StatefulWidget {
   final Widget _header;
   final Widget _footer;
   final Widget _builder;
   final int itemCount;
   final IndexedWidgetBuilder _itemBuilder;
-  final PreferredSizeWidget _appBar;
+  final PreferredSizeWidget Function(BuildContext context, ScaffoldState state)
+      _appBarBuilder;
 
   const DrawerDetailLayout({
     Key key,
@@ -20,7 +21,8 @@ class DrawerDetailLayout extends StatelessWidget {
     @required Widget detailBuilder,
     @required this.itemCount,
     @required IndexedWidgetBuilder itemBuilder,
-    PreferredSizeWidget appBar,
+    PreferredSizeWidget Function(BuildContext context, ScaffoldState state)
+        appBarBuilder,
   })  : assert(detailBuilder != null),
         assert(itemCount != null),
         assert(itemBuilder != null),
@@ -28,8 +30,15 @@ class DrawerDetailLayout extends StatelessWidget {
         _footer = footer,
         _builder = detailBuilder,
         _itemBuilder = itemBuilder,
-        _appBar = appBar,
+        _appBarBuilder = appBarBuilder,
         super(key: key);
+
+  @override
+  _DrawerDetailLayoutState createState() => _DrawerDetailLayoutState();
+}
+
+class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Widget _buildDrawer(BuildContext context) {
     final theme = Theme.of(context).copyWith(
@@ -49,24 +58,24 @@ class DrawerDetailLayout extends StatelessWidget {
       child: Column(
         children: [
           DrawerHeader(
-              child: _header ??
+              child: widget._header ??
                   Center(
                       child: Text(
                     'Nubeio',
                     style: theme.textTheme.headline1,
                   ))),
-          if (itemCount > 0)
+          if (widget.itemCount > 0)
             Expanded(
               child: ListView.builder(
-                itemCount: itemCount,
+                itemCount: widget.itemCount,
                 itemBuilder: (context, position) {
-                  return _itemBuilder(context, position);
+                  return widget._itemBuilder(context, position);
                 },
               ),
             )
           else
             Expanded(child: Container()),
-          _footer ?? Container(),
+          widget._footer ?? Container(),
           SizedBox(
             height: bottomPadding,
           ),
@@ -75,9 +84,9 @@ class DrawerDetailLayout extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _appBarBuilder(BuildContext context) {
-    if (itemCount > 0) {
-      return _appBar;
+  PreferredSizeWidget _buildAppBar(BuildContext context, ScaffoldState state) {
+    if (widget.itemCount > 0) {
+      return widget._appBarBuilder(context, state);
     } else {
       return AppBar(
         elevation: 4,
@@ -89,13 +98,14 @@ class DrawerDetailLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _appBarBuilder(context),
+      key: _scaffoldKey,
+      appBar: _buildAppBar(context, _scaffoldKey.currentState),
       drawer: Drawer(
         child: Container(
           child: _buildDrawer(context),
         ),
       ),
-      body: _builder,
+      body: widget._builder,
     );
   }
 }

@@ -52,7 +52,7 @@ class DemoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DrawerDetailLayout(
-      appBar: AppBar(
+      appBarBuilder: (context, state) => AppBar(
         elevation: 4,
         backgroundColor: NubeTheme.backgroundOverlay(context),
         title: const Text("Demo Page"),

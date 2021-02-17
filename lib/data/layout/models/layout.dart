@@ -11,6 +11,7 @@ abstract class Layout with _$Layout {
   const factory Layout({
     @required List<Page> pages,
     LayoutConfig config,
+    LogoConfig logo,
   }) = _Layout;
 
   factory Layout.fromJson(Map<String, dynamic> json) => _$LayoutFromJson(json);
@@ -171,6 +172,30 @@ abstract class LayoutConfig with _$LayoutConfig {
 
   factory LayoutConfig.fromJson(Map<String, dynamic> json) =>
       _$LayoutConfigFromJson(json);
+}
+
+@freezed
+abstract class LogoConfig with _$LogoConfig {
+  const factory LogoConfig({
+    LogoItemDto light,
+    LogoItemDto dark,
+    @JsonKey(defaultValue: 40) double size,
+    @JsonKey(name: "show_icon", defaultValue: true) bool showIcon,
+  }) = _LogoConfig;
+
+  factory LogoConfig.fromJson(Map<String, dynamic> json) =>
+      _$LogoConfigFromJson(json);
+}
+
+@freezed
+abstract class LogoItemDto with _$LogoItemDto {
+  const factory LogoItemDto({
+    @JsonKey(defaultValue: "") String small,
+    @JsonKey(defaultValue: "") String large,
+  }) = _LogoItemDto;
+
+  factory LogoItemDto.fromJson(Map<String, dynamic> json) =>
+      _$LogoItemDtoFromJson(json);
 }
 
 @freezed
