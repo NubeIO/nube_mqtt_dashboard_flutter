@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:nube_mqtt_dashboard/domain/layout/exceptions/layout.dart';
 import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 part 'layout.freezed.dart';
@@ -33,59 +34,102 @@ abstract class Page with _$Page {
 abstract class Widget with _$Widget {
   const factory Widget.GAUGE({
     @required String id,
-    @required String topic,
+    @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
     GaugeConfigDto config,
   }) = _GaugeWidget;
 
   const factory Widget.SWITCH({
     @required String id,
-    @required String topic,
+    @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
     SwitchConfigDto config,
   }) = _SwitchWidget;
 
   const factory Widget.SLIDER({
     @required String id,
-    @required String topic,
+    @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
     SliderConfigDto config,
   }) = _SliderWidget;
 
   const factory Widget.VALUE({
     @required String id,
-    @required String topic,
+    @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
     ValueConfigDto config,
   }) = _ValueWidget;
 
   const factory Widget.SWITCH_GROUP({
     @required String id,
-    @required String topic,
+    @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
     SwitchGroupConfigDto config,
   }) = _SwitchGroupWidget;
 
   const factory Widget.MAP({
     @required String id,
-    @required String topic,
+    @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
     MapConfigDto config,
   }) = _MapWidget;
 
   const factory Widget.unknownWidget({
     @required String id,
-    @required String topic,
+    @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
   }) = _UnknownFailureWidget;
 
   const factory Widget.invalidParse({
     @required String id,
-    @required String topic,
+    @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
   }) = _InvalidParseWidget;
 
   factory Widget.fromJson(Map<String, dynamic> json) => _$WidgetFromJson(json);
+}
+
+@freezed
+abstract class FlexibleTopicDto with _$FlexibleTopicDto {
+  const factory FlexibleTopicDto({
+    @required String read,
+    @required String write,
+  }) = _FlexibleTopicDto;
+
+  factory FlexibleTopicDto.fromJson(Map<String, dynamic> json) =>
+      _$FlexibleTopicDtoFromJson(json);
+
+  factory FlexibleTopicDto.plain(String topic) =>
+      FlexibleTopicDto(read: topic, write: topic);
+}
+
+class FlexibleTopicConverter
+    implements JsonConverter<FlexibleTopicDto, dynamic> {
+  const FlexibleTopicConverter();
+
+  @override
+  FlexibleTopicDto fromJson(dynamic topic) {
+    if (topic is String) {
+      return FlexibleTopicDto(read: topic, write: topic);
+    } else if (topic is Map<String, dynamic>) {
+      try {
+        final read = topic["read"] as String;
+        final write = topic["write"] as String;
+        return FlexibleTopicDto(
+          read: read,
+          write: write,
+        );
+      } catch (e) {
+        throw InvalidTopicException();
+      }
+    }
+    throw InvalidTopicException();
+  }
+
+  @override
+  Map<String, dynamic> toJson(FlexibleTopicDto data) {
+    return data.toJson();
+  }
 }
 
 class WidgetResponseConverter
@@ -98,7 +142,7 @@ class WidgetResponseConverter
       return null;
     }
     final id = json["id"] as String;
-    final topic = json["topic"] as String;
+    final topic = json["topic"] as dynamic;
     final name = json["name"] as String;
     try {
       // type data was already set (e.g. because we serialized it ourselves)
@@ -109,7 +153,7 @@ class WidgetResponseConverter
         Log.e("Unknown Widget type: $type");
         return Widget.unknownWidget(
           id: id,
-          topic: topic,
+          topic: const FlexibleTopicConverter().fromJson(topic),
           name: name,
         );
       }
@@ -117,7 +161,9 @@ class WidgetResponseConverter
       Log.e("Error Parsing Widget", ex: e);
       return Widget.invalidParse(
         id: id ?? "unknown_id",
-        topic: topic ?? "",
+        topic: e is InvalidTopicException
+            ? FlexibleTopicDto.plain("")
+            : const FlexibleTopicConverter().fromJson(topic),
         name: name ?? "",
       );
     }

@@ -101,6 +101,7 @@ class LayoutRepositoryImpl extends ILayoutRepository {
   Future<Either<LayoutFailure, LayoutEntity>> _onErrorCatch(
     Object error,
   ) async {
+    Log.e("Layout Failure", ex: error);
     if (error is FormatException) {
       return left(const LayoutFailure.invalidLayout());
     } else {

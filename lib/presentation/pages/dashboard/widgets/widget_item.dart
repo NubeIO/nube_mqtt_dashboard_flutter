@@ -166,7 +166,7 @@ class WidgetItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
       child: Text(
-        widgetEntity.topic,
+        widgetEntity.topic.read,
         style: Theme.of(context).textTheme.caption.copyWith(
               color: textColor,
             ),

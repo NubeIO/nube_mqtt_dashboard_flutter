@@ -9,50 +9,61 @@ abstract class WidgetEntity with _$WidgetEntity {
   @Implements(NonEditableWidget)
   const factory WidgetEntity.gaugeWidget({
     @required String id,
-    @required String topic,
+    @required FlexibleTopic topic,
     @required String name,
     @required GaugeConfig config,
   }) = _GaugeWidget;
   @Implements(EditableWidget)
   const factory WidgetEntity.sliderWidget({
     @required String id,
-    @required String topic,
+    @required FlexibleTopic topic,
     @required String name,
     @required SliderConfig config,
   }) = _SliderWidget;
   @Implements(EditableWidget)
   const factory WidgetEntity.switchWidget({
     @required String id,
-    @required String topic,
+    @required FlexibleTopic topic,
     @required String name,
     @required SwitchConfig config,
   }) = _SwitchWidget;
   @Implements(NonEditableWidget)
   const factory WidgetEntity.valueWidget({
     @required String id,
-    @required String topic,
+    @required FlexibleTopic topic,
     @required String name,
     @required ValueConfig config,
   }) = _ValueWidget;
   @Implements(EditableWidget)
   const factory WidgetEntity.switchGroupWidget({
     @required String id,
-    @required String topic,
+    @required FlexibleTopic topic,
     @required String name,
     @required SwitchGroupConfig config,
   }) = _SwitchGroupWidget;
   const factory WidgetEntity.mapWidget({
     @required String id,
-    @required String topic,
+    @required FlexibleTopic topic,
     @required String name,
     @required MapConfig config,
   }) = _MapWidget;
   const factory WidgetEntity.failure({
     @required String id,
-    @required String topic,
+    @required FlexibleTopic topic,
     @required String name,
     @required LayoutParseFailure failure,
   }) = _FailureWidget;
+}
+
+@freezed
+abstract class FlexibleTopic with _$FlexibleTopic {
+  const factory FlexibleTopic({
+    @required String read,
+    @required String write,
+  }) = _FlexibleTopic;
+
+  factory FlexibleTopic.plain(String topic) =>
+      FlexibleTopic(read: topic, write: topic);
 }
 
 extension SliderWidgetExt on _SliderWidget {

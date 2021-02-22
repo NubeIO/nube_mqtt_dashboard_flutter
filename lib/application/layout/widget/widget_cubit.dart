@@ -52,7 +52,7 @@ class WidgetCubit extends Cubit<WidgetState> {
   }
 
   Future<void> init() async {
-    final topic = _widgetEntity.topic;
+    final topic = _widgetEntity.topic.read;
     await _widgetDataRepository.subscribeWidget(topic);
 
     stateSubscription =
@@ -93,7 +93,7 @@ class WidgetCubit extends Cubit<WidgetState> {
   }
 
   Future<bool> _setDataInternal(WidgetData value) async {
-    final topic = _widgetEntity.topic;
+    final topic = _widgetEntity.topic.write;
 
     final result = await _widgetDataRepository.setData(topic, value);
 

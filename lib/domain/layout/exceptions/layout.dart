@@ -1,0 +1,1 @@
+class InvalidTopicException implements Exception {}

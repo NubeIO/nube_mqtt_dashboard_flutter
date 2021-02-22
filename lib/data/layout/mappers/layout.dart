@@ -67,7 +67,7 @@ class LayoutMapper {
   WidgetEntity mapToWidget(Widget widget) => widget.map(
         GAUGE: (widget) => WidgetEntity.gaugeWidget(
           id: widget.id,
-          topic: widget.topic,
+          topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           config: mapToGaugeConfig(
             widget.config ?? GaugeConfigDto.fromJson({}),
@@ -75,7 +75,7 @@ class LayoutMapper {
         ),
         SWITCH: (widget) => WidgetEntity.switchWidget(
           id: widget.id,
-          topic: widget.topic,
+          topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           config: mapToSwitchConfig(
             widget.config ?? SwitchConfigDto.fromJson({}),
@@ -83,7 +83,7 @@ class LayoutMapper {
         ),
         SLIDER: (widget) => WidgetEntity.sliderWidget(
           id: widget.id,
-          topic: widget.topic,
+          topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           config: mapToSliderConfig(
             widget.config ?? SliderConfigDto.fromJson({}),
@@ -91,7 +91,7 @@ class LayoutMapper {
         ),
         VALUE: (widget) => WidgetEntity.valueWidget(
           id: widget.id,
-          topic: widget.topic,
+          topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           config: mapToValueConfig(
             widget.config ?? ValueConfigDto.fromJson({}),
@@ -100,7 +100,7 @@ class LayoutMapper {
         SWITCH_GROUP: (widget) {
           return WidgetEntity.switchGroupWidget(
             id: widget.id,
-            topic: widget.topic,
+            topic: mapToFlexibleTopic(widget.topic),
             name: widget.name,
             config: mapToSwitchGroupConfig(
               widget.config ?? SwitchGroupConfigDto.fromJson({}),
@@ -110,7 +110,7 @@ class LayoutMapper {
         MAP: (widget) {
           return WidgetEntity.mapWidget(
             id: widget.id,
-            topic: widget.topic,
+            topic: mapToFlexibleTopic(widget.topic),
             name: widget.name,
             config: mapToMapConfig(
               widget.config ?? MapConfigDto.fromJson({}),
@@ -119,17 +119,24 @@ class LayoutMapper {
         },
         invalidParse: (value) => WidgetEntity.failure(
           id: widget.id,
-          topic: widget.topic,
+          topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           failure: const LayoutParseFailure.parse(),
         ),
         unknownWidget: (value) => WidgetEntity.failure(
           id: widget.id,
-          topic: widget.topic,
+          topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           failure: const LayoutParseFailure.unknown(),
         ),
       );
+
+  FlexibleTopic mapToFlexibleTopic(FlexibleTopicDto topic) {
+    return FlexibleTopic(
+      read: topic.read,
+      write: topic.write,
+    );
+  }
 
   GaugeConfig mapToGaugeConfig(GaugeConfigDto config) {
     return GaugeConfig(
