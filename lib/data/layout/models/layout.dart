@@ -124,6 +124,7 @@ abstract class TitleConfigDto with _$TitleConfigDto {
     @JsonKey(name: 'font_size') double fontSize,
     @JsonKey(unknownEnumValue: AlignmentType.LEFT) AlignmentType align,
     String color,
+    Map<String, String> colors,
   }) = _TitleConfigDto;
 
   factory TitleConfigDto.fromJson(Map<String, dynamic> json) =>
