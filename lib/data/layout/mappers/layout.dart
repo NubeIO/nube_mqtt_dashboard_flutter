@@ -220,16 +220,18 @@ class LayoutMapper {
     @required GlobalWidgetConfigDto page,
   }) {
     return GlobalConfig(
-        background: mapToBackground(
-          config?.background,
-          global: global?.background,
-          page: page?.background,
-        ),
-        title: mapToTitle(
-          config?.title,
-          global: global?.title,
-          page: page?.title,
-        ));
+      background: mapToBackground(
+        config?.background,
+        global: global?.background,
+        page: page?.background,
+      ),
+      title: mapToTitle(
+        config?.title,
+        global: global?.title,
+        page: page?.title,
+      ),
+      initial: config?.initial ?? page?.initial ?? global?.initial,
+    );
   }
 
   BackgroundConfig mapToBackground(

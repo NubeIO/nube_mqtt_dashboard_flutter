@@ -145,6 +145,7 @@ abstract class GlobalWidgetConfigDto with _$GlobalWidgetConfigDto {
     BackgroundConfigDto background,
     TitleConfigDto title,
     GlobalWidgetTypeConfigDto widget,
+    double initial,
   }) = _GlobalWidgetConfigDto;
 
   factory GlobalWidgetConfigDto.empty() => const GlobalWidgetConfigDto();
@@ -325,6 +326,7 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
   const factory WidgetConfigDto.gaugeConfig({
     int min,
     int max,
+    double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = GaugeConfigDto;
@@ -334,18 +336,21 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     int max,
     double step,
     @JsonKey(name: 'default') double defaultValue,
+    double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = SliderConfigDto;
 
   const factory WidgetConfigDto.switchConfig({
     @JsonKey(name: 'default') bool defaultValue,
+    double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = SwitchConfigDto;
 
   const factory WidgetConfigDto.valueConfig({
     String unit,
+    double initial,
     @JsonKey(name: 'font_size') double fontSize,
     @JsonKey(unknownEnumValue: AlignmentType.LEFT) AlignmentType align,
     BackgroundConfigDto background,
@@ -355,6 +360,7 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
   const factory WidgetConfigDto.switchGroupConfig({
     List<SwitchGroupItemDto> items,
     @JsonKey(name: 'default') double defaultValue,
+    double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = SwitchGroupConfigDto;
@@ -364,11 +370,13 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     Map<String, String> colors,
     @JsonKey(name: 'font_size') double fontSize,
     @JsonKey(unknownEnumValue: AlignmentType.LEFT) AlignmentType align,
+    double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = MapConfigDto;
 
   const factory WidgetConfigDto.emptyConfig({
+    double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = EmptyConfigDto;
