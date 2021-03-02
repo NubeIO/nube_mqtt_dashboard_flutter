@@ -22,30 +22,35 @@ class DemoWidget extends StatelessWidget {
       topic: FlexibleTopic.plain("testTopic"),
       name: "Gauge Widget",
       config: const GaugeConfig(max: 100, min: 0),
+      globalConfig: GlobalConfig.empty(),
     ),
     WidgetEntity.valueWidget(
       id: "4",
       topic: FlexibleTopic.plain("testTopic"),
       name: "Value Widget",
       config: const ValueConfig(unit: "C"),
+      globalConfig: GlobalConfig.empty(),
     ),
     WidgetEntity.failure(
       id: "4",
       topic: FlexibleTopic.plain("testTopic"),
       name: "Value Widget",
       failure: const LayoutParseFailure.unknown(),
+      globalConfig: GlobalConfig.empty(),
     ),
     WidgetEntity.sliderWidget(
       id: "2",
       topic: FlexibleTopic.plain("testTopic"),
       name: "Slider Widget",
       config: const SliderConfig(max: 100, min: 0, defaultValue: 0, step: 0.5),
+      globalConfig: GlobalConfig.empty(),
     ),
     WidgetEntity.switchWidget(
       id: "3",
       topic: FlexibleTopic.plain("testTopic"),
       name: "Switch Widget",
       config: const SwitchConfig(defaultValue: false),
+      globalConfig: GlobalConfig.empty(),
     ),
   ];
 
