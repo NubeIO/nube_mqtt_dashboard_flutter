@@ -323,6 +323,10 @@ class LayoutMapper {
   }) {
     return ValueConfig(
       unit: widget?.unit ?? page?.unit ?? global?.unit ?? "",
+      align: mapToAlignment(
+        widget?.align ?? page?.align ?? global?.align,
+      ),
+      fontSize: widget?.fontSize ?? page?.fontSize ?? global?.fontSize,
     );
   }
 
@@ -354,6 +358,10 @@ class LayoutMapper {
       colors: mapToColorsKeys(
         widget?.colors ?? page?.colors ?? global?.colors ?? {},
       ),
+      align: mapToAlignment(
+        widget?.align ?? page?.align ?? global?.align,
+      ),
+      fontSize: widget?.fontSize ?? page?.fontSize ?? global?.fontSize,
     );
   }
 

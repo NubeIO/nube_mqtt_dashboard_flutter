@@ -150,6 +150,8 @@ abstract class WidgetConfig with _$WidgetConfig {
 
   const factory WidgetConfig.valueWidget({
     @required String unit,
+    @required Alignment align,
+    double fontSize,
   }) = ValueConfig;
 
   const factory WidgetConfig.buttonSwitchWidget({
@@ -160,6 +162,8 @@ abstract class WidgetConfig with _$WidgetConfig {
   const factory WidgetConfig.mapWidget({
     @required KtMap<double, String> maps,
     @required KtMap<double, Color> colors,
+    @required Alignment align,
+    double fontSize,
   }) = MapConfig;
 
   const factory WidgetConfig.emptyConfig() = EmptyConfig;

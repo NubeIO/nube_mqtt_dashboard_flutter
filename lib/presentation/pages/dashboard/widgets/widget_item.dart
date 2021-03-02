@@ -99,7 +99,7 @@ class WidgetItem extends StatelessWidget {
       ),
       valueWidget: (widget) => ValueWidget(
         value: value,
-        unit: widget.config.unit,
+        config: widget.config,
       ),
       switchGroupWidget: (widget) {
         return SwitchGroupWidget(
@@ -116,8 +116,7 @@ class WidgetItem extends StatelessWidget {
           context,
           normal: MapWidget(
             value: value,
-            maps: widget.config.maps,
-            colors: widget.config.colors,
+            config: widget.config,
           ),
           error: _buildFailureWidget(
             title: "N/A Map",
