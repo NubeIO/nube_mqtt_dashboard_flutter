@@ -119,9 +119,31 @@ abstract class BackgroundConfigDto with _$BackgroundConfigDto {
 }
 
 @freezed
+abstract class TitleConfigDto with _$TitleConfigDto {
+  const factory TitleConfigDto({
+    @JsonKey(name: 'font_size') double fontSize,
+    @JsonKey(unknownEnumValue: AlignmentType.LEFT) AlignmentType align,
+    String color,
+  }) = _TitleConfigDto;
+
+  factory TitleConfigDto.fromJson(Map<String, dynamic> json) =>
+      _$TitleConfigDtoFromJson(json);
+}
+
+enum AlignmentType {
+  @JsonValue("center")
+  CENTER,
+  @JsonValue("left")
+  LEFT,
+  @JsonValue("right")
+  RIGHT
+}
+
+@freezed
 abstract class GlobalWidgetConfigDto with _$GlobalWidgetConfigDto {
   const factory GlobalWidgetConfigDto({
     BackgroundConfigDto background,
+    TitleConfigDto title,
   }) = _GlobalWidgetConfigDto;
 
   factory GlobalWidgetConfigDto.empty() => const GlobalWidgetConfigDto();
@@ -288,6 +310,7 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     @JsonKey(defaultValue: 0) int min,
     @JsonKey(defaultValue: 100) int max,
     BackgroundConfigDto background,
+    TitleConfigDto title,
   }) = GaugeConfigDto;
 
   const factory WidgetConfigDto.sliderConfig({
@@ -296,32 +319,38 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     @JsonKey(defaultValue: 1) double step,
     @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
     BackgroundConfigDto background,
+    TitleConfigDto title,
   }) = SliderConfigDto;
 
   const factory WidgetConfigDto.switchConfig({
     @JsonKey(name: 'default', defaultValue: false) bool defaultValue,
     BackgroundConfigDto background,
+    TitleConfigDto title,
   }) = SwitchConfigDto;
 
   const factory WidgetConfigDto.valueConfig({
     @JsonKey(defaultValue: "") String unit,
     BackgroundConfigDto background,
+    TitleConfigDto title,
   }) = ValueConfigDto;
 
   const factory WidgetConfigDto.switchGroupConfig({
     @JsonKey(defaultValue: []) List<SwitchGroupItemDto> items,
     @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
     BackgroundConfigDto background,
+    TitleConfigDto title,
   }) = SwitchGroupConfigDto;
 
   const factory WidgetConfigDto.mapConfig({
     @JsonKey(defaultValue: {}) Map<String, String> maps,
     @JsonKey(defaultValue: {}) Map<String, String> colors,
     BackgroundConfigDto background,
+    TitleConfigDto title,
   }) = MapConfigDto;
 
   const factory WidgetConfigDto.emptyConfig({
     BackgroundConfigDto background,
+    TitleConfigDto title,
   }) = EmptyConfigDto;
 
   factory WidgetConfigDto.fromJson(Map<String, dynamic> json) =>

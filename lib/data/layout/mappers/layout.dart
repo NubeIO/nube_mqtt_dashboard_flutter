@@ -211,12 +211,16 @@ class LayoutMapper {
     @required GlobalWidgetConfigDto page,
   }) {
     return GlobalConfig(
-      background: mapToBackground(
-        config.background,
-        global: global.background,
-        page: page.background,
-      ),
-    );
+        background: mapToBackground(
+          config.background,
+          global: global.background,
+          page: page.background,
+        ),
+        title: mapToTitle(
+          config.title,
+          global: global.title,
+          page: page.title,
+        ));
   }
 
   BackgroundConfig mapToBackground(
@@ -230,6 +234,35 @@ class LayoutMapper {
       color: HexColor.parseColor(background.color),
       colors: mapToColorsKeys(background.colors ?? {}),
     );
+  }
+
+  TitleConfig mapToTitle(
+    TitleConfigDto widget, {
+    @required TitleConfigDto global,
+    @required TitleConfigDto page,
+  }) {
+    final title = widget ?? page ?? global;
+    if (title == null) return TitleConfig.empty();
+    return TitleConfig(
+      fontSize: title.fontSize,
+      align: mapToAlignment(title.align),
+      color: HexColor.parseColor(title.color),
+    );
+  }
+
+  Alignment mapToAlignment(
+    AlignmentType type, {
+    Alignment fallback = const Alignment.left(),
+  }) {
+    switch (type) {
+      case AlignmentType.CENTER:
+        return const Alignment.center();
+      case AlignmentType.LEFT:
+        return const Alignment.left();
+      case AlignmentType.RIGHT:
+        return const Alignment.right();
+    }
+    return fallback;
   }
 
   GaugeConfig mapToGaugeConfig(GaugeConfigDto config) {
