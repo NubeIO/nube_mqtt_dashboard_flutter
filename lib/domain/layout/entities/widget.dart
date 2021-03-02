@@ -67,11 +67,14 @@ abstract class GlobalConfig with _$GlobalConfig {
   const factory GlobalConfig({
     @required BackgroundConfig background,
     @required TitleConfig title,
+    double initial,
   }) = _GlobalConfig;
 
   factory GlobalConfig.empty() {
     return GlobalConfig(
-        background: BackgroundConfig.empty(), title: TitleConfig.empty());
+      background: BackgroundConfig.empty(),
+      title: TitleConfig.empty(),
+    );
   }
 }
 
