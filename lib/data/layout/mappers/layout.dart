@@ -260,6 +260,8 @@ class LayoutMapper {
         widget?.align ?? page?.align ?? global?.align,
       ),
       color: hexColor != null ? HexColor.parseColor(hexColor) : null,
+      colors: mapToColorsKeys(
+          widget?.colors ?? page?.colors ?? global?.colors ?? {}),
     );
   }
 

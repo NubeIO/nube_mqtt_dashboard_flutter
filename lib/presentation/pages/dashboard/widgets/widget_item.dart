@@ -128,16 +128,16 @@ class WidgetItem extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(BuildContext context) {
+  Widget _buildTitle(BuildContext context, WidgetData data) {
     final title = widgetEntity.globalConfig.title;
 
-    final normalColor = title.color ?? Theme.of(context).colorScheme.onSurface;
-    final errorColor = Theme.of(context).colorScheme.onError;
+    final normalColor = Theme.of(context).colorScheme.onSurface.withOpacity(.6);
+    final errorColor = Theme.of(context).colorScheme.onError.withOpacity(.6);
     final textColor = _buildErrorState<Color>(
       context,
-      normal: normalColor,
+      normal: title.colors[data.value] ?? title.color ?? normalColor,
       error: errorColor,
-    ).withOpacity(.6);
+    );
 
     final textStyle = Theme.of(context).textTheme.bodyText1;
     final fontSize = title.fontSize ?? textStyle.fontSize;
@@ -301,7 +301,7 @@ class WidgetItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTitle(context),
+                  _buildTitle(context, state.data),
                   Expanded(
                     child: GridBody(
                       child: state.loadState.when(

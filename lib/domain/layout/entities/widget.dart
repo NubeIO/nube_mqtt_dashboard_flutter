@@ -106,11 +106,13 @@ abstract class TitleConfig with _$TitleConfig {
   const factory TitleConfig({
     double fontSize,
     Color color,
+    @required KtMap<double, Color> colors,
     @required Alignment align,
   }) = _TitleConfig;
 
-  factory TitleConfig.empty() => const TitleConfig(
-        align: Alignment.left(),
+  factory TitleConfig.empty() => TitleConfig(
+        align: const Alignment.left(),
+        colors: emptyMap(),
       );
 }
 
