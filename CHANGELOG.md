@@ -2,11 +2,24 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.5...HEAD)
+[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.6..HEAD)
 
+## [1.0.6] - 2021-02-02
+[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.5...v1.0.6)
+
+### Added
+- Color Support for Title
+- Config for Initial Data
+- Text Config to MAP and VALUE
+- Global and Page level widget config
+- Config for variable title text
+- Add Config for variable background color
+
+### BugFix
+- BugFix Slider Widget Edgecase
 
 ## [1.0.5] - 2021-01-23
-[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.5...v1.0.5)
+[Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/v1.0.4...v1.0.5)
 
 ### Added
 - Add Flexible Topics
@@ -95,6 +108,7 @@ All notable changes to this project will be documented in this file.
 [Full Changelog](https://github.com/NubeIO/nube_mqtt_dashboard_flutter/compare/0f8e9bba816df883be8f32522e0679567f87f0ed...v0.0-alpha.1)
 
 [Unreleased]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/tree/HEAD
+[1.0.6]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v1.0.6
 [1.0.5]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v1.0.5
 [1.0.4]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v1.0.4
 [1.0.3]: https://github.com/NubeIO/nube_mqtt_dashboard_flutter/releases/tag/v1.0.3
