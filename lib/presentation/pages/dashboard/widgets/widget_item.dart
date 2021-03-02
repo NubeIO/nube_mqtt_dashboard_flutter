@@ -130,19 +130,30 @@ class WidgetItem extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
-    final normalColor = Theme.of(context).colorScheme.onSurface;
+    final title = widgetEntity.globalConfig.title;
+
+    final normalColor = title.color ?? Theme.of(context).colorScheme.onSurface;
     final errorColor = Theme.of(context).colorScheme.onError;
     final textColor = _buildErrorState<Color>(
       context,
       normal: normalColor,
       error: errorColor,
     ).withOpacity(.6);
+
+    final textStyle = Theme.of(context).textTheme.bodyText1;
+    final fontSize = title.fontSize ?? textStyle.fontSize;
+
+    final textAlign = title.align.when(
+      center: () => TextAlign.center,
+      left: () => TextAlign.left,
+      right: () => TextAlign.right,
+    );
+
     return GridTileBar(
       title: Text(
         widgetEntity.name,
-        style: Theme.of(context).textTheme.bodyText1.copyWith(
-              color: textColor,
-            ),
+        textAlign: textAlign,
+        style: textStyle.copyWith(color: textColor, fontSize: fontSize),
       ),
       trailing: _buildErrorState<Widget>(
         context,

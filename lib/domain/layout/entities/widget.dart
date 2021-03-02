@@ -66,12 +66,12 @@ abstract class WidgetEntity with _$WidgetEntity {
 abstract class GlobalConfig with _$GlobalConfig {
   const factory GlobalConfig({
     @required BackgroundConfig background,
+    @required TitleConfig title,
   }) = _GlobalConfig;
 
   factory GlobalConfig.empty() {
     return GlobalConfig(
-      background: BackgroundConfig.empty(),
-    );
+        background: BackgroundConfig.empty(), title: TitleConfig.empty());
   }
 }
 
@@ -96,6 +96,26 @@ abstract class BackgroundConfig with _$BackgroundConfig {
   factory BackgroundConfig.empty() {
     return BackgroundConfig(colors: emptyMap());
   }
+}
+
+@freezed
+abstract class TitleConfig with _$TitleConfig {
+  const factory TitleConfig({
+    double fontSize,
+    Color color,
+    @required Alignment align,
+  }) = _TitleConfig;
+
+  factory TitleConfig.empty() => const TitleConfig(
+        align: Alignment.left(),
+      );
+}
+
+@freezed
+abstract class Alignment with _$Alignment {
+  const factory Alignment.center() = _AlignCenter;
+  const factory Alignment.left() = _AlignLeft;
+  const factory Alignment.right() = _AlignRight;
 }
 
 extension SliderWidgetExt on _SliderWidget {
