@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kt_dart/collection.dart';
 import 'package:nube_mqtt_dashboard/domain/layout/layout_repository_interface.dart';
 
-import '../../../../domain/layout/entities.dart';
+import '../../../../domain/layout/entities.dart' as entities;
 import '../../../themes/nube_theme.dart';
 import '../../../widgets/responsive/drawer_detail_layout.dart';
 import '../../dashboard/widgets/page_screen.dart';
@@ -28,7 +28,7 @@ class DemoWidget extends StatelessWidget {
       id: "4",
       topic: FlexibleTopic.plain("testTopic"),
       name: "Value Widget",
-      config: const ValueConfig(unit: "C"),
+      config: const ValueConfig(unit: "C", align: entities.Alignment.left()),
       globalConfig: GlobalConfig.empty(),
     ),
     WidgetEntity.failure(

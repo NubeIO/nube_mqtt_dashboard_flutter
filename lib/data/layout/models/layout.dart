@@ -346,6 +346,8 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
 
   const factory WidgetConfigDto.valueConfig({
     String unit,
+    @JsonKey(name: 'font_size') double fontSize,
+    @JsonKey(unknownEnumValue: AlignmentType.LEFT) AlignmentType align,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = ValueConfigDto;
@@ -360,6 +362,8 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
   const factory WidgetConfigDto.mapConfig({
     Map<String, String> maps,
     Map<String, String> colors,
+    @JsonKey(name: 'font_size') double fontSize,
+    @JsonKey(unknownEnumValue: AlignmentType.LEFT) AlignmentType align,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = MapConfigDto;
