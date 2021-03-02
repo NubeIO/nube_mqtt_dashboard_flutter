@@ -259,6 +259,13 @@ class WidgetItem extends StatelessWidget {
     );
   }
 
+  Color _getWidgetBackground(BuildContext context, WidgetData data) {
+    final background = widgetEntity.globalConfig.background;
+    return background.colors[data.value] ??
+        background.color ??
+        NubeTheme.surfaceOverlay(context, 2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider<WidgetCubit>(
@@ -277,7 +284,7 @@ class WidgetItem extends StatelessWidget {
               color: _buildErrorState<Color>(
                 context,
                 error: Theme.of(context).colorScheme.error,
-                normal: NubeTheme.surfaceOverlay(context, 2),
+                normal: _getWidgetBackground(context, state.data),
               ),
               borderRadius: BorderRadius.circular(8.0),
               elevation: 2,

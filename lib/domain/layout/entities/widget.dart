@@ -12,6 +12,7 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required FlexibleTopic topic,
     @required String name,
     @required GaugeConfig config,
+    @required GlobalConfig globalConfig,
   }) = _GaugeWidget;
   @Implements(EditableWidget)
   const factory WidgetEntity.sliderWidget({
@@ -19,6 +20,7 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required FlexibleTopic topic,
     @required String name,
     @required SliderConfig config,
+    @required GlobalConfig globalConfig,
   }) = _SliderWidget;
   @Implements(EditableWidget)
   const factory WidgetEntity.switchWidget({
@@ -26,6 +28,7 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required FlexibleTopic topic,
     @required String name,
     @required SwitchConfig config,
+    @required GlobalConfig globalConfig,
   }) = _SwitchWidget;
   @Implements(NonEditableWidget)
   const factory WidgetEntity.valueWidget({
@@ -33,6 +36,7 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required FlexibleTopic topic,
     @required String name,
     @required ValueConfig config,
+    @required GlobalConfig globalConfig,
   }) = _ValueWidget;
   @Implements(EditableWidget)
   const factory WidgetEntity.switchGroupWidget({
@@ -40,19 +44,35 @@ abstract class WidgetEntity with _$WidgetEntity {
     @required FlexibleTopic topic,
     @required String name,
     @required SwitchGroupConfig config,
+    @required GlobalConfig globalConfig,
   }) = _SwitchGroupWidget;
   const factory WidgetEntity.mapWidget({
     @required String id,
     @required FlexibleTopic topic,
     @required String name,
     @required MapConfig config,
+    @required GlobalConfig globalConfig,
   }) = _MapWidget;
   const factory WidgetEntity.failure({
     @required String id,
     @required FlexibleTopic topic,
     @required String name,
     @required LayoutParseFailure failure,
+    @required GlobalConfig globalConfig,
   }) = _FailureWidget;
+}
+
+@freezed
+abstract class GlobalConfig with _$GlobalConfig {
+  const factory GlobalConfig({
+    @required BackgroundConfig background,
+  }) = _GlobalConfig;
+
+  factory GlobalConfig.empty() {
+    return GlobalConfig(
+      background: BackgroundConfig.empty(),
+    );
+  }
 }
 
 @freezed
@@ -64,6 +84,18 @@ abstract class FlexibleTopic with _$FlexibleTopic {
 
   factory FlexibleTopic.plain(String topic) =>
       FlexibleTopic(read: topic, write: topic);
+}
+
+@freezed
+abstract class BackgroundConfig with _$BackgroundConfig {
+  const factory BackgroundConfig({
+    Color color,
+    KtMap<double, Color> colors,
+  }) = _BackgroundConfig;
+
+  factory BackgroundConfig.empty() {
+    return BackgroundConfig(colors: emptyMap());
+  }
 }
 
 extension SliderWidgetExt on _SliderWidget {

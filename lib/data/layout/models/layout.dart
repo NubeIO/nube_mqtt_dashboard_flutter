@@ -13,6 +13,7 @@ abstract class Layout with _$Layout {
     @required List<Page> pages,
     LayoutConfig config,
     LogoConfig logo,
+    @JsonKey(name: 'widget_config') GlobalWidgetConfigDto widgetConfig,
   }) = _Layout;
 
   factory Layout.fromJson(Map<String, dynamic> json) => _$LayoutFromJson(json);
@@ -24,6 +25,7 @@ abstract class Page with _$Page {
     @required String id,
     @required String name,
     PageConfig config,
+    @JsonKey(name: 'widget_config') GlobalWidgetConfigDto widgetConfig,
     @WidgetResponseConverter() @required List<Widget> widgets,
   }) = _Page;
 
@@ -78,12 +80,14 @@ abstract class Widget with _$Widget {
     @required String id,
     @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
+    GlobalWidgetConfigDto config,
   }) = _UnknownFailureWidget;
 
   const factory Widget.invalidParse({
     @required String id,
     @FlexibleTopicConverter() @required FlexibleTopicDto topic,
     @required String name,
+    GlobalWidgetConfigDto config,
   }) = _InvalidParseWidget;
 
   factory Widget.fromJson(Map<String, dynamic> json) => _$WidgetFromJson(json);
@@ -101,6 +105,29 @@ abstract class FlexibleTopicDto with _$FlexibleTopicDto {
 
   factory FlexibleTopicDto.plain(String topic) =>
       FlexibleTopicDto(read: topic, write: topic);
+}
+
+@freezed
+abstract class BackgroundConfigDto with _$BackgroundConfigDto {
+  const factory BackgroundConfigDto({
+    String color,
+    @JsonKey(defaultValue: {}) Map<String, String> colors,
+  }) = _BackgroundConfigDto;
+
+  factory BackgroundConfigDto.fromJson(Map<String, dynamic> json) =>
+      _$BackgroundConfigDtoFromJson(json);
+}
+
+@freezed
+abstract class GlobalWidgetConfigDto with _$GlobalWidgetConfigDto {
+  const factory GlobalWidgetConfigDto({
+    BackgroundConfigDto background,
+  }) = _GlobalWidgetConfigDto;
+
+  factory GlobalWidgetConfigDto.empty() => const GlobalWidgetConfigDto();
+
+  factory GlobalWidgetConfigDto.fromJson(Map<String, dynamic> json) =>
+      _$GlobalWidgetConfigDtoFromJson(json);
 }
 
 class FlexibleTopicConverter
@@ -256,41 +283,49 @@ abstract class PageTimeoutEntity with _$PageTimeoutEntity {
 }
 
 @freezed
-abstract class WidgetConfig with _$WidgetConfig {
-  const factory WidgetConfig.gaugeConfig({
+abstract class WidgetConfigDto with _$WidgetConfigDto {
+  const factory WidgetConfigDto.gaugeConfig({
     @JsonKey(defaultValue: 0) int min,
     @JsonKey(defaultValue: 100) int max,
+    BackgroundConfigDto background,
   }) = GaugeConfigDto;
 
-  const factory WidgetConfig.sliderConfig({
+  const factory WidgetConfigDto.sliderConfig({
     @JsonKey(defaultValue: 0) int min,
     @JsonKey(defaultValue: 100) int max,
     @JsonKey(defaultValue: 1) double step,
     @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
+    BackgroundConfigDto background,
   }) = SliderConfigDto;
 
-  const factory WidgetConfig.switchConfig({
+  const factory WidgetConfigDto.switchConfig({
     @JsonKey(name: 'default', defaultValue: false) bool defaultValue,
+    BackgroundConfigDto background,
   }) = SwitchConfigDto;
 
-  const factory WidgetConfig.valueConfig({
+  const factory WidgetConfigDto.valueConfig({
     @JsonKey(defaultValue: "") String unit,
+    BackgroundConfigDto background,
   }) = ValueConfigDto;
 
-  const factory WidgetConfig.switchGroupConfig({
+  const factory WidgetConfigDto.switchGroupConfig({
     @JsonKey(defaultValue: []) List<SwitchGroupItemDto> items,
     @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
+    BackgroundConfigDto background,
   }) = SwitchGroupConfigDto;
 
-  const factory WidgetConfig.mapConfig({
+  const factory WidgetConfigDto.mapConfig({
     @JsonKey(defaultValue: {}) Map<String, String> maps,
     @JsonKey(defaultValue: {}) Map<String, String> colors,
+    BackgroundConfigDto background,
   }) = MapConfigDto;
 
-  const factory WidgetConfig.emptyConfig() = EmptyConfigDto;
+  const factory WidgetConfigDto.emptyConfig({
+    BackgroundConfigDto background,
+  }) = EmptyConfigDto;
 
-  factory WidgetConfig.fromJson(Map<String, dynamic> json) =>
-      _$WidgetConfigFromJson(json);
+  factory WidgetConfigDto.fromJson(Map<String, dynamic> json) =>
+      _$WidgetConfigDtoFromJson(json);
 }
 
 @freezed

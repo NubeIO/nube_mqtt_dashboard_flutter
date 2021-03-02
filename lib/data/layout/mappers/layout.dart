@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:kt_dart/kt.dart';
 import 'package:nube_mqtt_dashboard/domain/theme/entities.dart';
 import 'package:nube_mqtt_dashboard/utils/hex_color.dart';
@@ -13,7 +14,12 @@ class LayoutMapper {
   LayoutEntity mapToBuilder(Layout layout) => LayoutEntity(
         config: mapToLayoutEntityConfig(layout.config),
         logo: mapToLogo(layout.logo),
-        pages: layout.pages.map(mapToPage).toImmutableList(),
+        pages: layout.pages
+            .map((page) => mapToPage(
+                  page,
+                  layout.widgetConfig ?? GlobalWidgetConfigDto.empty(),
+                ))
+            .toImmutableList(),
       );
 
   Logo mapToLogo(LogoConfig logo) {
@@ -42,11 +48,24 @@ class LayoutMapper {
     );
   }
 
-  PageEntity mapToPage(Page element) => PageEntity(
+  PageEntity mapToPage(
+    Page element,
+    GlobalWidgetConfigDto globalWidgetConfig,
+  ) =>
+      PageEntity(
         id: element.id,
         name: element.name,
         config: mapToPageConfig(element.config),
-        widgets: element.widgets.map(mapToWidget).toImmutableList(),
+        widgets: element.widgets
+            .map(
+              (widget) => mapToWidget(
+                widget,
+                globalConfig: globalWidgetConfig,
+                pageConfig:
+                    element.widgetConfig ?? GlobalWidgetConfigDto.empty(),
+              ),
+            )
+            .toImmutableList(),
       );
 
   Config mapToPageConfig(PageConfig config) {
@@ -64,21 +83,39 @@ class LayoutMapper {
     );
   }
 
-  WidgetEntity mapToWidget(Widget widget) => widget.map(
-        GAUGE: (widget) => WidgetEntity.gaugeWidget(
-          id: widget.id,
-          topic: mapToFlexibleTopic(widget.topic),
-          name: widget.name,
-          config: mapToGaugeConfig(
-            widget.config ?? GaugeConfigDto.fromJson({}),
-          ),
-        ),
+  WidgetEntity mapToWidget(
+    Widget widget, {
+    GlobalWidgetConfigDto globalConfig,
+    GlobalWidgetConfigDto pageConfig,
+  }) =>
+      widget.map(
+        GAUGE: (widget) {
+          final config = widget.config ?? GaugeConfigDto.fromJson({});
+          return WidgetEntity.gaugeWidget(
+            id: widget.id,
+            topic: mapToFlexibleTopic(widget.topic),
+            name: widget.name,
+            config: mapToGaugeConfig(
+              config,
+            ),
+            globalConfig: mapToGlobalConfig(
+              widget.config,
+              global: globalConfig,
+              page: pageConfig,
+            ),
+          );
+        },
         SWITCH: (widget) => WidgetEntity.switchWidget(
           id: widget.id,
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           config: mapToSwitchConfig(
             widget.config ?? SwitchConfigDto.fromJson({}),
+          ),
+          globalConfig: mapToGlobalConfig(
+            widget.config,
+            global: globalConfig,
+            page: pageConfig,
           ),
         ),
         SLIDER: (widget) => WidgetEntity.sliderWidget(
@@ -88,6 +125,11 @@ class LayoutMapper {
           config: mapToSliderConfig(
             widget.config ?? SliderConfigDto.fromJson({}),
           ),
+          globalConfig: mapToGlobalConfig(
+            widget.config,
+            global: globalConfig,
+            page: pageConfig,
+          ),
         ),
         VALUE: (widget) => WidgetEntity.valueWidget(
           id: widget.id,
@@ -95,6 +137,11 @@ class LayoutMapper {
           name: widget.name,
           config: mapToValueConfig(
             widget.config ?? ValueConfigDto.fromJson({}),
+          ),
+          globalConfig: mapToGlobalConfig(
+            widget.config,
+            global: globalConfig,
+            page: pageConfig,
           ),
         ),
         SWITCH_GROUP: (widget) {
@@ -104,6 +151,11 @@ class LayoutMapper {
             name: widget.name,
             config: mapToSwitchGroupConfig(
               widget.config ?? SwitchGroupConfigDto.fromJson({}),
+            ),
+            globalConfig: mapToGlobalConfig(
+              widget.config,
+              global: globalConfig,
+              page: pageConfig,
             ),
           );
         },
@@ -115,6 +167,11 @@ class LayoutMapper {
             config: mapToMapConfig(
               widget.config ?? MapConfigDto.fromJson({}),
             ),
+            globalConfig: mapToGlobalConfig(
+              widget.config,
+              global: globalConfig,
+              page: pageConfig,
+            ),
           );
         },
         invalidParse: (value) => WidgetEntity.failure(
@@ -122,12 +179,22 @@ class LayoutMapper {
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           failure: const LayoutParseFailure.parse(),
+          globalConfig: mapToGlobalConfig(
+            const WidgetConfigDto.emptyConfig(),
+            global: globalConfig,
+            page: pageConfig,
+          ),
         ),
         unknownWidget: (value) => WidgetEntity.failure(
           id: widget.id,
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           failure: const LayoutParseFailure.unknown(),
+          globalConfig: mapToGlobalConfig(
+            const WidgetConfigDto.emptyConfig(),
+            global: globalConfig,
+            page: pageConfig,
+          ),
         ),
       );
 
@@ -135,6 +202,33 @@ class LayoutMapper {
     return FlexibleTopic(
       read: topic.read,
       write: topic.write,
+    );
+  }
+
+  GlobalConfig mapToGlobalConfig(
+    WidgetConfigDto config, {
+    @required GlobalWidgetConfigDto global,
+    @required GlobalWidgetConfigDto page,
+  }) {
+    return GlobalConfig(
+      background: mapToBackground(
+        config.background,
+        global: global.background,
+        page: page.background,
+      ),
+    );
+  }
+
+  BackgroundConfig mapToBackground(
+    BackgroundConfigDto widget, {
+    @required BackgroundConfigDto global,
+    @required BackgroundConfigDto page,
+  }) {
+    final background = widget ?? page ?? global;
+    if (background == null) return BackgroundConfig.empty();
+    return BackgroundConfig(
+      color: HexColor.parseColor(background.color),
+      colors: mapToColorsKeys(background.colors ?? {}),
     );
   }
 
