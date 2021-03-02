@@ -31,8 +31,8 @@ class SliderWidget extends StatelessWidget {
     final sliderColor = Theme.of(context).colorScheme.primary;
     final sliderInactiveColor =
         Theme.of(context).colorScheme.primary.withOpacity(.6);
-    final min = config.min.toDouble();
-    final max = config.max;
+    final minConfig = config.min.toDouble();
+    final maxConfig = config.max.toDouble();
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
         activeTrackColor: sliderColor,
@@ -66,7 +66,7 @@ class SliderWidget extends StatelessWidget {
                   child: IconButton(
                     icon: const Icon(Icons.remove_circle),
                     color: Theme.of(context).colorScheme.secondary,
-                    onPressed: value.value <= min ? null : _onDecrease,
+                    onPressed: value.value <= minConfig ? null : _onDecrease,
                   ),
                 ),
                 Positioned(
@@ -76,8 +76,8 @@ class SliderWidget extends StatelessWidget {
                   right: 32,
                   child: Slider(
                     value: value.value,
-                    min: min,
-                    max: max.toDouble(),
+                    min: min(minConfig, value.value),
+                    max: max(maxConfig, value.value),
                     label: '${value.value}',
                     onChanged: (value) {
                       onChange(WidgetData(value: value));
@@ -91,7 +91,7 @@ class SliderWidget extends StatelessWidget {
                   child: IconButton(
                     icon: const Icon(Icons.add_circle),
                     color: Theme.of(context).colorScheme.secondary,
-                    onPressed: value.value >= max ? null : _onIncrease,
+                    onPressed: value.value >= maxConfig ? null : _onIncrease,
                   ),
                 ),
               ],
