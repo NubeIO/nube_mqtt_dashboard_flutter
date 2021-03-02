@@ -15,10 +15,7 @@ class LayoutMapper {
         config: mapToLayoutEntityConfig(layout.config),
         logo: mapToLogo(layout.logo),
         pages: layout.pages
-            .map((page) => mapToPage(
-                  page,
-                  layout.widgetConfig ?? GlobalWidgetConfigDto.empty(),
-                ))
+            .map((page) => mapToPage(page, layout.widgetConfig))
             .toImmutableList(),
       );
 
@@ -60,9 +57,10 @@ class LayoutMapper {
             .map(
               (widget) => mapToWidget(
                 widget,
-                globalConfig: globalWidgetConfig,
+                globalConfig:
+                    globalWidgetConfig ?? GlobalWidgetConfigDto.empty(),
                 pageConfig:
-                    element.widgetConfig ?? GlobalWidgetConfigDto.empty(),
+                    element?.widgetConfig ?? GlobalWidgetConfigDto.empty(),
               ),
             )
             .toImmutableList(),
@@ -90,13 +88,14 @@ class LayoutMapper {
   }) =>
       widget.map(
         GAUGE: (widget) {
-          final config = widget.config ?? GaugeConfigDto.fromJson({});
           return WidgetEntity.gaugeWidget(
             id: widget.id,
             topic: mapToFlexibleTopic(widget.topic),
             name: widget.name,
             config: mapToGaugeConfig(
-              config,
+              widget.config,
+              global: globalConfig.widget?.gaugeConfig,
+              page: pageConfig.widget?.gaugeConfig,
             ),
             globalConfig: mapToGlobalConfig(
               widget.config,
@@ -110,7 +109,9 @@ class LayoutMapper {
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           config: mapToSwitchConfig(
-            widget.config ?? SwitchConfigDto.fromJson({}),
+            widget.config,
+            global: globalConfig.widget?.switchConfig,
+            page: pageConfig.widget?.switchConfig,
           ),
           globalConfig: mapToGlobalConfig(
             widget.config,
@@ -123,7 +124,9 @@ class LayoutMapper {
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           config: mapToSliderConfig(
-            widget.config ?? SliderConfigDto.fromJson({}),
+            widget.config,
+            global: globalConfig.widget?.sliderConfig,
+            page: pageConfig.widget?.sliderConfig,
           ),
           globalConfig: mapToGlobalConfig(
             widget.config,
@@ -136,7 +139,9 @@ class LayoutMapper {
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
           config: mapToValueConfig(
-            widget.config ?? ValueConfigDto.fromJson({}),
+            widget.config,
+            global: globalConfig.widget?.valueConfig,
+            page: pageConfig.widget?.valueConfig,
           ),
           globalConfig: mapToGlobalConfig(
             widget.config,
@@ -150,7 +155,9 @@ class LayoutMapper {
             topic: mapToFlexibleTopic(widget.topic),
             name: widget.name,
             config: mapToSwitchGroupConfig(
-              widget.config ?? SwitchGroupConfigDto.fromJson({}),
+              widget.config,
+              global: globalConfig.widget?.switchGroupConfig,
+              page: pageConfig.widget?.switchGroupConfig,
             ),
             globalConfig: mapToGlobalConfig(
               widget.config,
@@ -165,7 +172,9 @@ class LayoutMapper {
             topic: mapToFlexibleTopic(widget.topic),
             name: widget.name,
             config: mapToMapConfig(
-              widget.config ?? MapConfigDto.fromJson({}),
+              widget.config,
+              global: globalConfig?.widget?.mapConfig,
+              page: pageConfig?.widget?.mapConfig,
             ),
             globalConfig: mapToGlobalConfig(
               widget.config,
@@ -212,14 +221,14 @@ class LayoutMapper {
   }) {
     return GlobalConfig(
         background: mapToBackground(
-          config.background,
-          global: global.background,
-          page: page.background,
+          config?.background,
+          global: global?.background,
+          page: page?.background,
         ),
         title: mapToTitle(
-          config.title,
-          global: global.title,
-          page: page.title,
+          config?.title,
+          global: global?.title,
+          page: page?.title,
         ));
   }
 
@@ -231,8 +240,9 @@ class LayoutMapper {
     final background = widget ?? page ?? global;
     if (background == null) return BackgroundConfig.empty();
     return BackgroundConfig(
-      color: HexColor.parseColor(background.color),
-      colors: mapToColorsKeys(background.colors ?? {}),
+      color: HexColor.parseColor(widget?.color ?? page?.color ?? global?.color),
+      colors: mapToColorsKeys(
+          widget?.colors ?? page?.colors ?? global?.colors ?? {}),
     );
   }
 
@@ -241,12 +251,13 @@ class LayoutMapper {
     @required TitleConfigDto global,
     @required TitleConfigDto page,
   }) {
-    final title = widget ?? page ?? global;
-    if (title == null) return TitleConfig.empty();
+    final hexColor = widget?.color ?? page?.color ?? global?.color;
     return TitleConfig(
-      fontSize: title.fontSize,
-      align: mapToAlignment(title.align),
-      color: HexColor.parseColor(title.color),
+      fontSize: widget?.fontSize ?? page?.fontSize ?? global?.fontSize,
+      align: mapToAlignment(
+        widget?.align ?? page?.align ?? global?.align,
+      ),
+      color: hexColor != null ? HexColor.parseColor(hexColor) : null,
     );
   }
 
@@ -265,38 +276,84 @@ class LayoutMapper {
     return fallback;
   }
 
-  GaugeConfig mapToGaugeConfig(GaugeConfigDto config) {
+  GaugeConfig mapToGaugeConfig(
+    GaugeConfigDto widget, {
+    @required GaugeConfigDto global,
+    @required GaugeConfigDto page,
+  }) {
     return GaugeConfig(
-      min: config.min,
-      max: config.max,
+      min: widget?.min ?? page?.min ?? global?.min ?? 0,
+      max: widget?.max ?? page?.max ?? global?.max ?? 100,
     );
   }
 
-  SwitchConfig mapToSwitchConfig(SwitchConfigDto config) {
+  SwitchConfig mapToSwitchConfig(
+    SwitchConfigDto widget, {
+    @required SwitchConfigDto global,
+    @required SwitchConfigDto page,
+  }) {
     return SwitchConfig(
-      defaultValue: config.defaultValue,
+      defaultValue: widget?.defaultValue ??
+          page?.defaultValue ??
+          global?.defaultValue ??
+          false,
     );
   }
 
-  SliderConfig mapToSliderConfig(SliderConfigDto config) {
+  SliderConfig mapToSliderConfig(
+    SliderConfigDto widget, {
+    @required SliderConfigDto global,
+    @required SliderConfigDto page,
+  }) {
     return SliderConfig(
-      min: config.min,
-      max: config.max,
-      step: config.step,
-      defaultValue: config.defaultValue,
+      min: widget?.min ?? page?.min ?? global?.min ?? 0,
+      max: widget?.max ?? page?.max ?? global?.max ?? 100,
+      step: widget?.step ?? page?.step ?? global?.step ?? 1,
+      defaultValue: widget?.defaultValue ??
+          page?.defaultValue ??
+          global?.defaultValue ??
+          0,
     );
   }
 
-  ValueConfig mapToValueConfig(ValueConfigDto config) {
+  ValueConfig mapToValueConfig(
+    ValueConfigDto widget, {
+    @required ValueConfigDto global,
+    @required ValueConfigDto page,
+  }) {
     return ValueConfig(
-      unit: config.unit,
+      unit: widget?.unit ?? page?.unit ?? global?.unit ?? "",
     );
   }
 
-  SwitchGroupConfig mapToSwitchGroupConfig(SwitchGroupConfigDto config) {
+  SwitchGroupConfig mapToSwitchGroupConfig(
+    SwitchGroupConfigDto widget, {
+    @required SwitchGroupConfigDto global,
+    @required SwitchGroupConfigDto page,
+  }) {
     return SwitchGroupConfig(
-      items: config.items.map(mapToButtonGroupItem).toImmutableList(),
-      defaultValue: config.defaultValue,
+      items: (widget?.items ?? page?.items ?? global?.items ?? [])
+          .map(mapToButtonGroupItem)
+          .toImmutableList(),
+      defaultValue: widget?.defaultValue ??
+          page?.defaultValue ??
+          global?.defaultValue ??
+          0,
+    );
+  }
+
+  MapConfig mapToMapConfig(
+    MapConfigDto widget, {
+    @required MapConfigDto global,
+    @required MapConfigDto page,
+  }) {
+    return MapConfig(
+      maps: mapToDoubleKeys(
+        widget?.maps ?? page?.maps ?? global?.maps ?? {},
+      ),
+      colors: mapToColorsKeys(
+        widget?.colors ?? page?.colors ?? global?.colors ?? {},
+      ),
     );
   }
 
@@ -305,13 +362,6 @@ class LayoutMapper {
       id: item.id,
       name: item.name,
       value: item.value,
-    );
-  }
-
-  MapConfig mapToMapConfig(MapConfigDto config) {
-    return MapConfig(
-      maps: mapToDoubleKeys(config.maps),
-      colors: mapToColorsKeys(config.colors),
     );
   }
 
