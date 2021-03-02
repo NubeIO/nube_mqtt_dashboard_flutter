@@ -111,7 +111,7 @@ abstract class FlexibleTopicDto with _$FlexibleTopicDto {
 abstract class BackgroundConfigDto with _$BackgroundConfigDto {
   const factory BackgroundConfigDto({
     String color,
-    @JsonKey(defaultValue: {}) Map<String, String> colors,
+    Map<String, String> colors,
   }) = _BackgroundConfigDto;
 
   factory BackgroundConfigDto.fromJson(Map<String, dynamic> json) =>
@@ -144,12 +144,28 @@ abstract class GlobalWidgetConfigDto with _$GlobalWidgetConfigDto {
   const factory GlobalWidgetConfigDto({
     BackgroundConfigDto background,
     TitleConfigDto title,
+    GlobalWidgetTypeConfigDto widget,
   }) = _GlobalWidgetConfigDto;
 
   factory GlobalWidgetConfigDto.empty() => const GlobalWidgetConfigDto();
 
   factory GlobalWidgetConfigDto.fromJson(Map<String, dynamic> json) =>
       _$GlobalWidgetConfigDtoFromJson(json);
+}
+
+@freezed
+abstract class GlobalWidgetTypeConfigDto with _$GlobalWidgetTypeConfigDto {
+  const factory GlobalWidgetTypeConfigDto({
+    @JsonKey(name: 'GAUGE') GaugeConfigDto gaugeConfig,
+    @JsonKey(name: 'SWITCH') SwitchConfigDto switchConfig,
+    @JsonKey(name: 'SLIDER') SliderConfigDto sliderConfig,
+    @JsonKey(name: 'VALUE') ValueConfigDto valueConfig,
+    @JsonKey(name: 'SWITCH_GROUP') SwitchGroupConfigDto switchGroupConfig,
+    @JsonKey(name: 'MAP') MapConfigDto mapConfig,
+  }) = _GlobalWidgetTypeConfigDto;
+
+  factory GlobalWidgetTypeConfigDto.fromJson(Map<String, dynamic> json) =>
+      _$GlobalWidgetTypeConfigDtoFromJson(json);
 }
 
 class FlexibleTopicConverter
@@ -307,43 +323,43 @@ abstract class PageTimeoutEntity with _$PageTimeoutEntity {
 @freezed
 abstract class WidgetConfigDto with _$WidgetConfigDto {
   const factory WidgetConfigDto.gaugeConfig({
-    @JsonKey(defaultValue: 0) int min,
-    @JsonKey(defaultValue: 100) int max,
+    int min,
+    int max,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = GaugeConfigDto;
 
   const factory WidgetConfigDto.sliderConfig({
-    @JsonKey(defaultValue: 0) int min,
-    @JsonKey(defaultValue: 100) int max,
-    @JsonKey(defaultValue: 1) double step,
-    @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
+    int min,
+    int max,
+    double step,
+    @JsonKey(name: 'default') double defaultValue,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = SliderConfigDto;
 
   const factory WidgetConfigDto.switchConfig({
-    @JsonKey(name: 'default', defaultValue: false) bool defaultValue,
+    @JsonKey(name: 'default') bool defaultValue,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = SwitchConfigDto;
 
   const factory WidgetConfigDto.valueConfig({
-    @JsonKey(defaultValue: "") String unit,
+    String unit,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = ValueConfigDto;
 
   const factory WidgetConfigDto.switchGroupConfig({
-    @JsonKey(defaultValue: []) List<SwitchGroupItemDto> items,
-    @JsonKey(name: 'default', defaultValue: 0) double defaultValue,
+    List<SwitchGroupItemDto> items,
+    @JsonKey(name: 'default') double defaultValue,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = SwitchGroupConfigDto;
 
   const factory WidgetConfigDto.mapConfig({
-    @JsonKey(defaultValue: {}) Map<String, String> maps,
-    @JsonKey(defaultValue: {}) Map<String, String> colors,
+    Map<String, String> maps,
+    Map<String, String> colors,
     BackgroundConfigDto background,
     TitleConfigDto title,
   }) = MapConfigDto;
