@@ -15,7 +15,7 @@ class LayoutMapper {
         config: mapToLayoutEntityConfig(layout.config),
         logo: mapToLogo(layout.logo),
         pages: layout.pages
-            .map((page) => mapToPage(page, layout.widgetConfig))
+            .map((page) => mapToPage(page, listOf(layout.widgetConfig)))
             .toImmutableList(),
       );
 
@@ -47,7 +47,7 @@ class LayoutMapper {
 
   PageEntity mapToPage(
     Page element,
-    GlobalWidgetConfigDto globalWidgetConfig,
+    KtList<GlobalWidgetConfigDto> globalWidgetConfig,
   ) =>
       PageEntity(
         id: element.id,
@@ -57,10 +57,7 @@ class LayoutMapper {
             .map(
               (widget) => mapToWidget(
                 widget,
-                globalConfig:
-                    globalWidgetConfig ?? GlobalWidgetConfigDto.empty(),
-                pageConfig:
-                    element?.widgetConfig ?? GlobalWidgetConfigDto.empty(),
+                config: globalWidgetConfig.plusElement(element.widgetConfig),
               ),
             )
             .toImmutableList(),
@@ -83,8 +80,7 @@ class LayoutMapper {
 
   WidgetEntity mapToWidget(
     Widget widget, {
-    GlobalWidgetConfigDto globalConfig,
-    GlobalWidgetConfigDto pageConfig,
+    KtList<GlobalWidgetConfigDto> config,
   }) =>
       widget.map(
         GAUGE: (widget) {
@@ -92,15 +88,12 @@ class LayoutMapper {
             id: widget.id,
             topic: mapToFlexibleTopic(widget.topic),
             name: widget.name,
-            config: mapToGaugeConfig(
-              widget.config,
-              global: globalConfig.widget?.gaugeConfig,
-              page: pageConfig.widget?.gaugeConfig,
-            ),
+            config: mapToGaugeConfig(config
+                .mapNotNull((it) => it?.widget?.gaugeConfig)
+                .plusElement(widget.config)),
             globalConfig: mapToGlobalConfig(
               widget.config,
-              global: globalConfig,
-              page: pageConfig,
+              parentConfig: config,
             ),
           );
         },
@@ -108,45 +101,36 @@ class LayoutMapper {
           id: widget.id,
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
-          config: mapToSwitchConfig(
-            widget.config,
-            global: globalConfig.widget?.switchConfig,
-            page: pageConfig.widget?.switchConfig,
-          ),
+          config: mapToSwitchConfig(config
+              .mapNotNull((it) => it?.widget?.switchConfig)
+              .plusElement(widget.config)),
           globalConfig: mapToGlobalConfig(
             widget.config,
-            global: globalConfig,
-            page: pageConfig,
+            parentConfig: config,
           ),
         ),
         SLIDER: (widget) => WidgetEntity.sliderWidget(
           id: widget.id,
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
-          config: mapToSliderConfig(
-            widget.config,
-            global: globalConfig.widget?.sliderConfig,
-            page: pageConfig.widget?.sliderConfig,
-          ),
+          config: mapToSliderConfig(config
+              .mapNotNull((it) => it?.widget?.sliderConfig)
+              .plusElement(widget.config)),
           globalConfig: mapToGlobalConfig(
             widget.config,
-            global: globalConfig,
-            page: pageConfig,
+            parentConfig: config,
           ),
         ),
         VALUE: (widget) => WidgetEntity.valueWidget(
           id: widget.id,
           topic: mapToFlexibleTopic(widget.topic),
           name: widget.name,
-          config: mapToValueConfig(
-            widget.config,
-            global: globalConfig.widget?.valueConfig,
-            page: pageConfig.widget?.valueConfig,
-          ),
+          config: mapToValueConfig(config
+              .mapNotNull((it) => it?.widget?.valueConfig)
+              .plusElement(widget.config)),
           globalConfig: mapToGlobalConfig(
             widget.config,
-            global: globalConfig,
-            page: pageConfig,
+            parentConfig: config,
           ),
         ),
         SWITCH_GROUP: (widget) {
@@ -154,15 +138,12 @@ class LayoutMapper {
             id: widget.id,
             topic: mapToFlexibleTopic(widget.topic),
             name: widget.name,
-            config: mapToSwitchGroupConfig(
-              widget.config,
-              global: globalConfig.widget?.switchGroupConfig,
-              page: pageConfig.widget?.switchGroupConfig,
-            ),
+            config: mapToSwitchGroupConfig(config
+                .mapNotNull((it) => it?.widget?.switchGroupConfig)
+                .plusElement(widget.config)),
             globalConfig: mapToGlobalConfig(
               widget.config,
-              global: globalConfig,
-              page: pageConfig,
+              parentConfig: config,
             ),
           );
         },
@@ -171,15 +152,12 @@ class LayoutMapper {
             id: widget.id,
             topic: mapToFlexibleTopic(widget.topic),
             name: widget.name,
-            config: mapToMapConfig(
-              widget.config,
-              global: globalConfig?.widget?.mapConfig,
-              page: pageConfig?.widget?.mapConfig,
-            ),
+            config: mapToMapConfig(config
+                .mapNotNull((it) => it?.widget?.mapConfig)
+                .plusElement(widget.config)),
             globalConfig: mapToGlobalConfig(
               widget.config,
-              global: globalConfig,
-              page: pageConfig,
+              parentConfig: config,
             ),
           );
         },
@@ -190,8 +168,7 @@ class LayoutMapper {
           failure: const LayoutParseFailure.parse(),
           globalConfig: mapToGlobalConfig(
             const WidgetConfigDto.emptyConfig(),
-            global: globalConfig,
-            page: pageConfig,
+            parentConfig: config,
           ),
         ),
         unknownWidget: (value) => WidgetEntity.failure(
@@ -201,8 +178,7 @@ class LayoutMapper {
           failure: const LayoutParseFailure.unknown(),
           globalConfig: mapToGlobalConfig(
             const WidgetConfigDto.emptyConfig(),
-            global: globalConfig,
-            page: pageConfig,
+            parentConfig: config,
           ),
         ),
       );
@@ -216,52 +192,50 @@ class LayoutMapper {
 
   GlobalConfig mapToGlobalConfig(
     WidgetConfigDto config, {
-    @required GlobalWidgetConfigDto global,
-    @required GlobalWidgetConfigDto page,
+    @required KtList<GlobalWidgetConfigDto> parentConfig,
   }) {
     return GlobalConfig(
-      background: mapToBackground(
-        config?.background,
-        global: global?.background,
-        page: page?.background,
-      ),
-      title: mapToTitle(
-        config?.title,
-        global: global?.title,
-        page: page?.title,
-      ),
-      initial: config?.initial ?? page?.initial ?? global?.initial,
+      background: mapToBackground(parentConfig
+          .mapNotNull((it) => it?.background)
+          .plusElement(config?.background)),
+      title: mapToTitle(parentConfig
+          .mapNotNull((it) => it?.title)
+          .plusElement(config?.title)),
+      initial: mapToInitial(parentConfig
+          .mapNotNull((it) => it?.initial)
+          .plusElement(config?.initial)),
     );
   }
 
+  double mapToInitial(
+    KtList<double> config,
+  ) {
+    return config.lastOrNull((it) => it != null);
+  }
+
   BackgroundConfig mapToBackground(
-    BackgroundConfigDto widget, {
-    @required BackgroundConfigDto global,
-    @required BackgroundConfigDto page,
-  }) {
-    final background = widget ?? page ?? global;
+    KtList<BackgroundConfigDto> config,
+  ) {
+    final background = config.lastOrNull((it) => it != null);
     if (background == null) return BackgroundConfig.empty();
+    final hexColor = config.mapAndNonNull((it) => it.color);
     return BackgroundConfig(
-      color: HexColor.parseColor(widget?.color ?? page?.color ?? global?.color),
-      colors: mapToColorsKeys(
-          widget?.colors ?? page?.colors ?? global?.colors ?? {}),
+      color: hexColor != null ? HexColor.parseColor(hexColor) : null,
+      colors: mapToColorsKeys(config.mapAndNonNull((it) => it.colors) ?? {}),
     );
   }
 
   TitleConfig mapToTitle(
-    TitleConfigDto widget, {
-    @required TitleConfigDto global,
-    @required TitleConfigDto page,
-  }) {
-    final hexColor = widget?.color ?? page?.color ?? global?.color;
+    KtList<TitleConfigDto> config,
+  ) {
+    final hexColor = config.mapAndNonNull((it) => it.color);
     return TitleConfig(
-      fontSize: widget?.fontSize ?? page?.fontSize ?? global?.fontSize,
+      fontSize: config.mapAndNonNull((it) => it.fontSize),
       align: mapToAlignment(
-        widget?.align ?? page?.align ?? global?.align,
+        config.mapAndNonNull((it) => it.align),
       ),
       color: hexColor != null ? HexColor.parseColor(hexColor) : null,
-      colors: mapToColorsKeys(
-          widget?.colors ?? page?.colors ?? global?.colors ?? {}),
+      colors: mapToColorsKeys(config.mapAndNonNull((it) => it.colors) ?? {}),
     );
   }
 
@@ -281,91 +255,70 @@ class LayoutMapper {
   }
 
   GaugeConfig mapToGaugeConfig(
-    GaugeConfigDto widget, {
-    @required GaugeConfigDto global,
-    @required GaugeConfigDto page,
-  }) {
+    KtList<GaugeConfigDto> config,
+  ) {
     return GaugeConfig(
-      min: widget?.min ?? page?.min ?? global?.min ?? 0,
-      max: widget?.max ?? page?.max ?? global?.max ?? 100,
+      min: config.mapAndNonNull((it) => it.min) ?? 0,
+      max: config.mapAndNonNull((it) => it.max) ?? 100,
     );
   }
 
   SwitchConfig mapToSwitchConfig(
-    SwitchConfigDto widget, {
-    @required SwitchConfigDto global,
-    @required SwitchConfigDto page,
-  }) {
+    KtList<SwitchConfigDto> config,
+  ) {
     return SwitchConfig(
-      defaultValue: widget?.defaultValue ??
-          page?.defaultValue ??
-          global?.defaultValue ??
-          false,
+      defaultValue: config.mapAndNonNull((it) => it.defaultValue) ?? false,
     );
   }
 
   SliderConfig mapToSliderConfig(
-    SliderConfigDto widget, {
-    @required SliderConfigDto global,
-    @required SliderConfigDto page,
-  }) {
+    KtList<SliderConfigDto> config,
+  ) {
     return SliderConfig(
-      min: widget?.min ?? page?.min ?? global?.min ?? 0,
-      max: widget?.max ?? page?.max ?? global?.max ?? 100,
-      step: widget?.step ?? page?.step ?? global?.step ?? 1,
-      defaultValue: widget?.defaultValue ??
-          page?.defaultValue ??
-          global?.defaultValue ??
-          0,
+      min: config.mapAndNonNull((it) => it.min) ?? 0,
+      max: config.mapAndNonNull((it) => it.max) ?? 100,
+      step: config.mapAndNonNull((it) => it.step) ?? 1,
+      defaultValue: config.mapAndNonNull((it) => it.defaultValue) ?? 0,
     );
   }
 
   ValueConfig mapToValueConfig(
-    ValueConfigDto widget, {
-    @required ValueConfigDto global,
-    @required ValueConfigDto page,
-  }) {
+    KtList<ValueConfigDto> config,
+  ) {
     return ValueConfig(
-      unit: widget?.unit ?? page?.unit ?? global?.unit ?? "",
+      unit: config.mapAndNonNull((it) => it.unit) ?? "",
       align: mapToAlignment(
-        widget?.align ?? page?.align ?? global?.align,
+        config.mapAndNonNull((it) => it.align),
       ),
-      fontSize: widget?.fontSize ?? page?.fontSize ?? global?.fontSize,
+      fontSize: config.mapAndNonNull((it) => it.fontSize),
     );
   }
 
   SwitchGroupConfig mapToSwitchGroupConfig(
-    SwitchGroupConfigDto widget, {
-    @required SwitchGroupConfigDto global,
-    @required SwitchGroupConfigDto page,
-  }) {
+    KtList<SwitchGroupConfigDto> config,
+  ) {
     return SwitchGroupConfig(
-      items: (widget?.items ?? page?.items ?? global?.items ?? [])
+      items: (config.mapAndNonNull((it) => it.items) ?? [])
           .map(mapToButtonGroupItem)
           .toImmutableList(),
-      defaultValue: widget?.defaultValue ??
-          page?.defaultValue ??
-          global?.defaultValue ??
-          0,
+      defaultValue: config.mapAndNonNull((it) => it.defaultValue) ?? 0,
     );
   }
 
   MapConfig mapToMapConfig(
-    MapConfigDto widget, {
-    @required MapConfigDto global,
-    @required MapConfigDto page,
-  }) {
+    KtList<MapConfigDto> config,
+  ) {
     return MapConfig(
       maps: mapToDoubleKeys(
-        widget?.maps ?? page?.maps ?? global?.maps ?? {},
+        config.mapAndNonNull((it) => it.maps) ?? {},
       ),
       colors: mapToColorsKeys(
-        widget?.colors ?? page?.colors ?? global?.colors ?? {},
+        config.mapAndNonNull((it) => it.colors) ?? {},
       ),
       align: mapToAlignment(
-        widget?.align ?? page?.align ?? global?.align,
+        config.mapAndNonNull((it) => it.align),
       ),
-      fontSize: widget?.fontSize ?? page?.fontSize ?? global?.fontSize,
+      fontSize: config.mapAndNonNull((it) => it.fontSize),
     );
   }
 
@@ -401,5 +354,13 @@ class LayoutMapper {
       }
     });
     return output.toImmutableMap();
+  }
+}
+
+extension ComparableIterableExtension<T> on KtList<T> {
+  R mapAndNonNull<R>(R Function(T) transform) {
+    final mapped =
+        mapNotNull((it) => it).mapNotNullTo(mutableListOf<R>(), transform);
+    return mapped.lastOrNull((it) => it != null);
   }
 }
