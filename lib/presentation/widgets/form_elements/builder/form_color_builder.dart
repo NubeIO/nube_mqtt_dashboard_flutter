@@ -22,6 +22,7 @@ typedef FormValidatorBuilder = Widget Function(
 
 void emptyValidator(
   ValueObject<int> value,
+  // ignore: avoid_positional_boolean_parameters
   bool valid,
 ) {}
 

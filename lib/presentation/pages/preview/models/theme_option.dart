@@ -40,6 +40,7 @@ class ThemeOption extends FormOption {
     return ThemeOption(supportedTheme, NubeTheme.map(supportedTheme));
   }
 
+  // ignore: prefer_constructors_over_static_methods
   static ThemeOption map(SupportedTheme theme) {
     return theme.map(
         defaultTheme: (_) => ThemeOption.defaultTheme(),
