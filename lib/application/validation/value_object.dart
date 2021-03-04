@@ -7,6 +7,7 @@ class ValueObject<T> {
 
   const ValueObject(this.value);
 
+  // ignore: prefer_constructors_over_static_methods
   static ValueObject<String> emptyString(String input) {
     if (input == null || input.isEmpty) return ValueObject<String>.none();
     return ValueObject<String>(some(input));

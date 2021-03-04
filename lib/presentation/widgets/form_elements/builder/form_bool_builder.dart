@@ -22,6 +22,7 @@ typedef FormValidatorBuilder = Widget Function(
 
 void emptyValidator(
   ValueObject<bool> value,
+  // ignore: avoid_positional_boolean_parameters
   bool valid,
 ) {}
 
@@ -61,7 +62,7 @@ class _FormBooleanBuilderState extends State<FormBooleanBuilder>
 
   Future<void> _onValueChange(BuildContext context, bool value) async {
     _value = ValueObject(dartz.some(value));
-    final result = await widget._validation.validate(value);
+    final result = await widget._validation.validate(input: value);
     final validationState = result.fold(
         (failure) => ValueValidationState.error(
             failure: widget._validation.mapper(failure)),
@@ -100,7 +101,7 @@ abstract class IBoolValidation {
 
   const IBoolValidation(this.mapper);
 
-  Future<dartz.Either<BooleanInputFailure, bool>> validate(bool input);
+  Future<dartz.Either<BooleanInputFailure, bool>> validate({bool input});
 }
 
 class EitherBooleanValidation extends IBoolValidation {
@@ -111,7 +112,7 @@ class EitherBooleanValidation extends IBoolValidation {
       : super(mapper);
 
   @override
-  Future<dartz.Either<BooleanInputFailure, bool>> validate(bool input) async {
+  Future<dartz.Either<BooleanInputFailure, bool>> validate({bool input}) async {
     if (onValue(input)) {
       return dartz.right(input);
     } else {
@@ -126,7 +127,7 @@ class AnyBooleanValidation extends IBoolValidation {
   const AnyBooleanValidation() : super(emptyValidation);
 
   @override
-  Future<dartz.Either<BooleanInputFailure, bool>> validate(bool input) async {
+  Future<dartz.Either<BooleanInputFailure, bool>> validate({bool input}) async {
     return dartz.right(input);
   }
 }

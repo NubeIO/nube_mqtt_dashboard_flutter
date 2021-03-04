@@ -9,6 +9,7 @@ part 'pages_state.dart';
 
 @injectable
 class PageCubit extends Cubit<PageState> {
+  // ignore: unused_field
   final PageEntity _page;
   PageCubit._(this._page) : super(const PageState.initial());
 

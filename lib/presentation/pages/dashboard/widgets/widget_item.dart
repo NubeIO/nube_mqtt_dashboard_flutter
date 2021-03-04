@@ -6,7 +6,6 @@ import 'package:nube_mqtt_dashboard/domain/core/internal_state.dart';
 import '../../../../application/layout/widget/widget_cubit.dart';
 import '../../../../domain/layout/entities.dart';
 import '../../../../domain/layout/layout_repository_interface.dart';
-import '../../../../domain/mqtt/mqtt_repository.dart';
 import '../../../../domain/widget_data/entities.dart';
 import '../../../../domain/widget_data/failures.dart';
 import '../../../../generated/i18n.dart';
@@ -52,21 +51,6 @@ class WidgetItem extends StatelessWidget {
       width: ResponsiveSize.twoWidth(context),
     );
     Scaffold.of(context).showSnackBar(snackbar);
-  }
-
-  Color _subscriptionColor(
-    BuildContext context,
-    MqttSubscriptionState subscriptionState,
-  ) {
-    switch (subscriptionState) {
-      case MqttSubscriptionState.IDLE:
-        return Colors.grey;
-      case MqttSubscriptionState.SUBSCRIBED:
-        return Colors.green;
-      case MqttSubscriptionState.PENDING:
-        return Colors.amber;
-    }
-    return Colors.grey;
   }
 
   Widget _buildWidgets(
@@ -163,25 +147,6 @@ class WidgetItem extends StatelessWidget {
           Icons.error,
           color: errorColor,
         ),
-      ),
-    );
-  }
-
-  Widget _buildFooter(BuildContext context) {
-    final normalColor = Theme.of(context).colorScheme.onSurface;
-    final errorColor = Theme.of(context).colorScheme.onError;
-    final textColor = _buildErrorState<Color>(
-      context,
-      normal: normalColor,
-      error: errorColor,
-    ).withOpacity(.6);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-      child: Text(
-        widgetEntity.topic.read,
-        style: Theme.of(context).textTheme.caption.copyWith(
-              color: textColor,
-            ),
       ),
     );
   }
