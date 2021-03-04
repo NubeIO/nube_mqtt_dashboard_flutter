@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kt_dart/kt.dart';
 import 'package:nube_mqtt_dashboard/domain/core/internal_state.dart';
 
 import '../../../../application/layout/widget/widget_cubit.dart';
@@ -129,14 +130,14 @@ class WidgetItem extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(BuildContext context, WidgetData data) {
+  Widget _buildTitle(BuildContext context, @nullable WidgetData data) {
     final title = widgetEntity.globalConfig.title;
 
     final normalColor = Theme.of(context).colorScheme.onSurface.withOpacity(.6);
     final errorColor = Theme.of(context).colorScheme.onError.withOpacity(.6);
     final textColor = _buildErrorState<Color>(
       context,
-      normal: title.colors[data.value] ?? title.color ?? normalColor,
+      normal: title.colors[data?.value] ?? title.color ?? normalColor,
       error: errorColor,
     );
 
@@ -265,7 +266,10 @@ class WidgetItem extends StatelessWidget {
         );
       },
       initial: () {
-        return widgetEntity.globalConfig.initial == null ? error : normal;
+        return widgetEntity is! EditableWidget &&
+                widgetEntity.globalConfig.initial == null
+            ? error
+            : normal;
       },
       orElse: () => normal,
     );
@@ -273,10 +277,10 @@ class WidgetItem extends StatelessWidget {
 
   Color _getWidgetBackground(
     BuildContext context,
-    WidgetData data,
+    @nullable WidgetData data,
   ) {
     final background = widgetEntity.globalConfig.background;
-    return background.colors[data.value] ??
+    return background.colors[data?.value] ??
         background.color ??
         NubeTheme.surfaceOverlay(context, 2);
   }
@@ -288,7 +292,7 @@ class WidgetItem extends StatelessWidget {
     final value = loadState.maybeWhen(initial: () => true, orElse: () => false)
         ? widgetEntity.globalConfig.initial
         : data.value;
-    return WidgetData(value: value);
+    return value == null ? null : WidgetData(value: value);
   }
 
   @override
