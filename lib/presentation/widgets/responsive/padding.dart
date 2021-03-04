@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 import '../../extensions/device_screen_type.dart';
 import '../../models/device_screen_type.dart';
