@@ -15,7 +15,11 @@ class LayoutMapper {
         config: mapToLayoutEntityConfig(layout.config),
         logo: mapToLogo(layout.logo),
         pages: layout.pages
-            .map((page) => mapToPage(page, listOf(layout.widgetConfig)))
+            .map((page) => mapToPage(
+                  page,
+                  relativePath: "/",
+                  parentConfig: listOf(layout.widgetConfig),
+                ))
             .toImmutableList(),
       );
 
@@ -46,22 +50,33 @@ class LayoutMapper {
   }
 
   PageEntity mapToPage(
-    Page element,
-    KtList<GlobalWidgetConfigDto> globalWidgetConfig,
-  ) =>
-      PageEntity(
-        id: element.id,
-        name: element.name,
-        config: mapToPageConfig(element.config),
-        widgets: element.widgets
-            .map(
-              (widget) => mapToWidget(
-                widget,
-                config: globalWidgetConfig.plusElement(element.widgetConfig),
-              ),
-            )
-            .toImmutableList(),
-      );
+    Page element, {
+    @required KtList<GlobalWidgetConfigDto> parentConfig,
+    @required String relativePath,
+  }) {
+    final config = parentConfig.plusElement(element.widgetConfig);
+    return PageEntity(
+      id: element.id,
+      relativePath: "$relativePath${element.id}/",
+      name: element.name,
+      config: mapToPageConfig(element.config),
+      widgets: element.widgets
+          .map(
+            (widget) => mapToWidget(
+              widget,
+              config: config,
+            ),
+          )
+          .toImmutableList(),
+      pages: element.pages
+          .map((page) => mapToPage(
+                page,
+                relativePath: "$relativePath${element.id}/",
+                parentConfig: config.plusElement(page.widgetConfig),
+              ))
+          .toImmutableList(),
+    );
+  }
 
   Config mapToPageConfig(PageConfig config) {
     if (config == null) return const Config(protected: false);
