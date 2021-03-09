@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
-import 'package:kt_dart/collection.dart' as dartz;
+import 'package:kt_dart/collection.dart';
 import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 import 'package:nube_mqtt_dashboard/utils/timer/timeout_helper.dart';
 import 'package:nube_mqtt_dashboard/utils/timer/timer_status.dart';
@@ -95,6 +95,7 @@ class LayoutCubit extends Cubit<LayoutState> {
         );
         emit(state.copyWith(
           layout: layout,
+          pages: nestedPages(layout.pages),
           selectedPage: currentPage,
           layoutState: const InternalState.success(),
           layoutConnection: const InternalState.success(),
@@ -138,15 +139,30 @@ class LayoutCubit extends Cubit<LayoutState> {
     }
   }
 
-  PageEntity _getPageFromId(@nullable String id, {LayoutEntity layout}) {
-    final dartz.KtList<PageEntity> pages = layout?.pages ?? state.layout.pages;
+  PageEntity _getPageFromId(
+    String id, {
+    LayoutEntity layout,
+  }) {
+    final KtList<PageEntity> pages = nestedPages(layout?.pages ?? emptyList())
+        .plus(nestedPages(state.layout.pages));
     return pages.asList().firstWhere(
           (element) => element.id == id,
-          orElse: () => pages.firstOrNull(),
+          orElse: () => nestedPages(pages).firstOrNull(),
         );
   }
 
   void setSelected(PageEntity page) {
     emit(state.copyWith(selectedPage: page));
   }
+}
+
+// Remove all empty pages
+KtList<PageEntity> nestedPages(KtList<PageEntity> pages) {
+  return pages.fold(
+    mutableListOf(),
+    (acc, it) => acc
+        .plusElement(it)
+        .plus(nestedPages(it.pages))
+        .filter((it) => it.widgets.isNotEmpty()),
+  );
 }

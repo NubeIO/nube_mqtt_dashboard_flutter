@@ -4,8 +4,10 @@ part of entities;
 abstract class PageEntity with _$PageEntity {
   const factory PageEntity({
     @required String id,
+    @required String relativePath,
     @required String name,
     @required Config config,
+    @required KtList<PageEntity> pages,
     @required KtList<WidgetEntity> widgets,
   }) = _PageEntity;
 }
