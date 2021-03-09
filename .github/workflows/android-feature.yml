@@ -1,0 +1,77 @@
+name: Android Feature Pull Request
+
+on:
+  pull_request:
+    branches:
+      - develop
+jobs:
+  unit_tests:
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: '1.22.4'
+      # Get flutter dependencies.
+      - run: flutter pub get
+      # Check for any formatting issues in the code.
+      - run: flutter format --set-exit-if-changed .
+      # Run build_runner to generate necessary code.
+      - run: flutter pub run build_runner build --delete-conflicting-outputs
+      # Statically analyze the Dart code for any errors.
+      - run: flutter analyze .
+      # Run widget tests for our flutter project.
+      - run: flutter test
+
+  build:
+    name: generate-apk
+    runs-on: ubuntu-18.04
+    needs: [ unit_tests ]
+    steps:
+      # Setup Java environment in order to build the Android app.
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - name: Release Config 
+        env:  
+          RELEASE_CONFIG: ${{secrets.RELEASE_CONFIG}}
+          RELEASE_KEYSTORE: ${{secrets.RELEASE_KEYSTORE}}
+        run: |
+          echo $RELEASE_CONFIG > android/app/keystore/release.keystore.properties
+          echo $RELEASE_KEYSTORE > android/app/keystore/release.b64
+          base64 -d  --input android/app/keystore/release.b64 > android/app/keystore/release.jks
+      # Setup the flutter environment.
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: '1.22.4'       
+      # Get flutter dependencies.
+      - run: flutter pub get
+      # Run build_runner to generate necessary code.
+      - run: flutter pub run build_runner build --delete-conflicting-outputs
+      # Build apk.
+      - run: flutter build apk
+      - name: Upload Artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: app-release.apk
+          path: build/app/outputs/apk/release/app-release.apk
+
+  deploy-play-store:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: app-release.apk
+      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: testers
+          file: app-release.apk
+          releaseNotes: ${{ github.event.pull_request.body }}
