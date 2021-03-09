@@ -26,7 +26,8 @@ abstract class Page with _$Page {
     @required String name,
     PageConfig config,
     @JsonKey(name: 'widget_config') GlobalWidgetConfigDto widgetConfig,
-    @WidgetResponseConverter() @required List<Widget> widgets,
+    @WidgetResponseConverter() @JsonKey(defaultValue: []) List<Widget> widgets,
+    @JsonKey(defaultValue: []) List<Page> pages,
   }) = _Page;
 
   factory Page.fromJson(Map<String, dynamic> json) => _$PageFromJson(json);

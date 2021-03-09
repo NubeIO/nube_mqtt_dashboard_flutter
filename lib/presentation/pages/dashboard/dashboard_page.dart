@@ -6,6 +6,7 @@ import 'package:nube_mqtt_dashboard/domain/layout/entities.dart';
 import 'package:nube_mqtt_dashboard/domain/theme/entities.dart';
 import 'package:nube_mqtt_dashboard/presentation/widgets/logo_widget.dart';
 import 'package:nube_mqtt_dashboard/presentation/widgets/responsive/padding.dart';
+import 'package:nube_mqtt_dashboard/presentation/widgets/variable_menu_item.dart';
 
 import '../../../application/layout/layout_cubit.dart';
 import '../../../domain/layout/failures.dart';
@@ -184,7 +185,7 @@ class _DashboardPageState extends State<DashboardPage>
             );
           },
           builder: (context, state) {
-            final list = state.layout.pages;
+            final rootList = state.layout.pages;
             final logo = state.layout.logo;
             final selectedPage = state.selectedPage;
             return DrawerDetailLayout(
@@ -208,18 +209,15 @@ class _DashboardPageState extends State<DashboardPage>
                     )
                   : Container(),
               itemBuilder: (context, index) {
-                final currentItem = list[index];
-                final selected = selectedPage?.id == currentItem.id;
-                return ListTile(
-                  selected: selected,
-                  onTap: () => _onProtectedNavigation(
-                    context,
-                    page: currentItem,
-                  ),
-                  title: Text(currentItem.name),
+                final currentItem = rootList[index];
+                return VariableMenuItem(
+                  page: currentItem,
+                  selectedId: selectedPage?.id,
+                  onSelected: (context, page) =>
+                      _onProtectedNavigation(context, page: page),
                 );
               },
-              itemCount: list.size,
+              itemCount: rootList.size,
               footer: _buildFooter(context),
             );
           },

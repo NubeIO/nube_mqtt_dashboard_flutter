@@ -4,7 +4,8 @@ part of 'layout_cubit.dart';
 abstract class LayoutState with _$LayoutState {
   const factory LayoutState({
     @required LayoutEntity layout,
-    @required @nullable PageEntity selectedPage,
+    @required KtList<PageEntity> pages,
+    PageEntity selectedPage,
     @required InternalState<LayoutSubscribeFailure> layoutConnection,
     @required InternalState<LayoutFailure> layoutState,
     @required TimerStatus<PageEntity> pageTimeout,
@@ -12,7 +13,7 @@ abstract class LayoutState with _$LayoutState {
 
   factory LayoutState.initial() => LayoutState(
         layout: LayoutEntity.empty(),
-        selectedPage: null,
+        pages: emptyList(),
         layoutConnection: const InternalState.initial(),
         layoutState: const InternalState.initial(),
         pageTimeout: const TimerStatus.initial(),

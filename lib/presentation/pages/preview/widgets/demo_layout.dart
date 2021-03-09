@@ -66,9 +66,11 @@ class DemoWidget extends StatelessWidget {
       detailBuilder: WidgetsScreen(
         page: PageEntity(
           id: "1",
+          relativePath: "",
           name: "Demo Page",
           config: const Config(protected: false),
           widgets: widgets.toImmutableList(),
+          pages: emptyList(),
         ),
       ),
       itemBuilder: (BuildContext context, int index) {
