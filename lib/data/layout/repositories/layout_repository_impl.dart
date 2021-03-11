@@ -12,6 +12,8 @@ import '../../../domain/mqtt/mqtt_repository.dart';
 import '../mappers/layout.dart';
 import '../models/layout.dart';
 
+const _TAG = "LayoutRepository";
+
 @LazySingleton(as: ILayoutRepository)
 class LayoutRepositoryImpl extends ILayoutRepository {
   final IMqttRepository _mqttRepository;
@@ -39,7 +41,7 @@ class LayoutRepositoryImpl extends ILayoutRepository {
           return Right(LayoutEntity.empty());
         } else {
           final result = await _mapToLayoutBuilder(message);
-          Log.d("Restoring layout $result");
+          Log.d("Restoring layout $result", tag: _TAG);
           return result.fold(
             (l) => Right(LayoutEntity.empty()),
             (layout) => Right(layout),
@@ -101,7 +103,7 @@ class LayoutRepositoryImpl extends ILayoutRepository {
   Future<Either<LayoutFailure, LayoutEntity>> _onErrorCatch(
     Object error,
   ) async {
-    Log.e("Layout Failure", ex: error);
+    Log.e("Layout Failure", tag: _TAG, ex: error);
     if (error is FormatException) {
       return left(const LayoutFailure.invalidLayout());
     } else {

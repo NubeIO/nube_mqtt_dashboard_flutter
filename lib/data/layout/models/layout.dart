@@ -7,6 +7,8 @@ import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 part 'layout.freezed.dart';
 part 'layout.g.dart';
 
+const _TAG = "LayoutModel";
+
 @freezed
 abstract class Layout with _$Layout {
   const factory Layout({
@@ -218,15 +220,15 @@ class WidgetResponseConverter
       if (type != null && isValidType(type)) {
         return Widget.fromJson(json);
       } else {
-        Log.e("Unknown Widget type: $type");
+        Log.e("Unknown Widget type: $type", tag: _TAG);
         return Widget.unknownWidget(
           id: id,
           topic: const FlexibleTopicConverter().fromJson(topic),
           name: name,
         );
       }
-    } catch (e) {
-      Log.e("Error Parsing Widget", ex: e);
+    } catch (e, stack) {
+      Log.e("Error Parsing Widget", tag: _TAG, ex: e, stacktrace: stack);
       return Widget.invalidParse(
         id: id ?? "unknown_id",
         topic: e is InvalidTopicException

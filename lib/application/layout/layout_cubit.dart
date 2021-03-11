@@ -17,6 +17,8 @@ import '../../domain/layout/layout_repository_interface.dart';
 part 'layout_cubit.freezed.dart';
 part 'layout_state.dart';
 
+const _TAG = "LayoutCubit";
+
 @injectable
 class LayoutCubit extends Cubit<LayoutState> {
   final ILayoutRepository _layoutRepository;
@@ -112,7 +114,7 @@ class LayoutCubit extends Cubit<LayoutState> {
   }
 
   void startTimeout(Config config) {
-    Log.d("Page Timeout started with ${config.timeout}");
+    Log.d("Page Timeout started with ${config.timeout}", tag: _TAG);
     if (config.timeout != null) {
       final duration = config.timeout.duration;
       _timeOutHelper.startCounter(
