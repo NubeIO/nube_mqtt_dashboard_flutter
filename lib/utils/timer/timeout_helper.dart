@@ -5,6 +5,8 @@ import 'package:nube_mqtt_dashboard/domain/session/session_repository_interface.
 import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 import 'package:nube_mqtt_dashboard/utils/timer/timer_status.dart';
 
+const _TAG = "TimeOutHelper";
+
 class TimeOutHelper {
   @nullable
   final Duration _interval;
@@ -17,7 +19,7 @@ class TimeOutHelper {
   }) : _interval = interval;
 
   void _onComplete() {
-    Log.d("Timer Completed");
+    Log.i("Timer Completed", tag: _TAG);
     if (_timer != null) {
       _timer.cancel();
       _timer = null;
@@ -25,7 +27,7 @@ class TimeOutHelper {
   }
 
   void cancel() {
-    Log.d("Timer Cancelled");
+    Log.i("Timer Cancelled", tag: _TAG);
     _onComplete();
   }
 
@@ -38,7 +40,7 @@ class TimeOutHelper {
       _timer = null;
     }
     final durationInMicro = duration;
-    Log.d("Timer started for ${durationInMicro.inSeconds} seconds");
+    Log.i("Timer started for ${durationInMicro.inSeconds} seconds", tag: _TAG);
 
     _currentDuration = duration;
     callback(TimerStatus.running(_currentDuration));
@@ -46,11 +48,11 @@ class TimeOutHelper {
     _timer = Timer.periodic(_interval, (timer) {
       _currentDuration = durationInMicro - _interval * timer.tick;
       if (_currentDuration.isNegative) {
-        Log.d("Timer Completed");
+        Log.i("Timer Completed", tag: _TAG);
         _onComplete();
         callback(const TimerStatus.completed(unit));
       } else {
-        Log.d("Timer Running $_currentDuration");
+        Log.i("Timer Running $_currentDuration", tag: _TAG);
       }
     });
   }

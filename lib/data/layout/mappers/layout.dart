@@ -10,6 +10,8 @@ import '../../../domain/layout/entities.dart';
 import '../../../domain/layout/layout_repository_interface.dart';
 import '../models/layout.dart';
 
+const _TAG = "LayoutMapper";
+
 class LayoutMapper {
   LayoutEntity mapToBuilder(Layout layout) => LayoutEntity(
         config: mapToLayoutEntityConfig(layout.config),
@@ -352,7 +354,7 @@ class LayoutMapper {
         final intKey = double.parse(key);
         output.putIfAbsent(intKey, () => HexColor.parseColor(value));
       } catch (e) {
-        Log.e("Skipping mapping for key: $key $value");
+        Log.e("Skipping mapping for key: $key $value", tag: _TAG);
       }
     });
     return output.toImmutableMap();
@@ -365,7 +367,7 @@ class LayoutMapper {
         final intKey = double.parse(key);
         output.putIfAbsent(intKey, () => value);
       } catch (e) {
-        Log.e("Skipping mapping for key: $key $value");
+        Log.e("Skipping mapping for key: $key $value", tag: _TAG);
       }
     });
     return output.toImmutableMap();
