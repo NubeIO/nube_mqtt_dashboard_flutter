@@ -2,22 +2,22 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:framy_annotation/framy_annotation.dart';
-import 'package:nube_mqtt_dashboard/domain/layout/entities.dart';
-import 'package:nube_mqtt_dashboard/domain/theme/entities.dart';
-import 'package:nube_mqtt_dashboard/presentation/widgets/logo_widget.dart';
-import 'package:nube_mqtt_dashboard/presentation/widgets/responsive/padding.dart';
-import 'package:nube_mqtt_dashboard/presentation/widgets/variable_menu_item.dart';
 
 import '../../../application/layout/layout_cubit.dart';
+import '../../../domain/layout/entities.dart';
 import '../../../domain/layout/failures.dart';
 import '../../../domain/session/entities.dart';
+import '../../../domain/theme/entities.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
 import '../../routes/router.dart';
 import '../../themes/nube_theme.dart';
+import '../../widgets/logo_widget.dart';
 import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/drawer_detail_layout.dart';
+import '../../widgets/responsive/padding.dart';
 import '../../widgets/responsive/snackbar.dart';
+import '../../widgets/variable_menu_item.dart';
 import 'widgets/page_screen.dart';
 
 @FramyWidget(isPage: true)
@@ -71,6 +71,13 @@ class _DashboardPageState extends State<DashboardPage>
     if (result == null) return;
 
     cubit.init(shouldReconnect: result);
+  }
+
+  Future<void> _navigateToLogs(BuildContext context) async {
+    final result = await ExtendedNavigator.of(context).pushValidatePinPage();
+    if (result == UserType.ADMIN) {
+      await ExtendedNavigator.of(context).pushLogsPage();
+    }
   }
 
   void _onFailure(
@@ -151,6 +158,11 @@ class _DashboardPageState extends State<DashboardPage>
   Widget _buildFooter(BuildContext context) {
     return Column(
       children: [
+        ListTile(
+          onTap: () => _navigateToLogs(context),
+          leading: const Icon(Icons.dns),
+          title: const Text("Logs"),
+        ),
         ListTile(
           onTap: () => _navigateToVerifyAdminPin(context),
           leading: const Icon(Icons.settings),
