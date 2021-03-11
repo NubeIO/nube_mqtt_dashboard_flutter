@@ -5,6 +5,8 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../../domain/connection/connection_data_source_interface.dart';
+import '../../../domain/connection/connection_repository_interface.dart';
 import '../../../domain/mqtt/exceptions/mqtt.dart';
 import '../../../domain/mqtt/mqtt_data_source.dart';
 import '../../../utils/logger/log.dart';
@@ -13,7 +15,14 @@ const _TAG = "MQTTDataSource";
 
 @LazySingleton(as: IMqttDataSource)
 class MqttDataSource extends IMqttDataSource {
-  MqttDataSource();
+  MqttDataSource(IConnectionDataSource connectionRepository) {
+    connectionRepository.layoutStream.listen((event) async {
+      if (_client != null && event.isConnected) {
+        await Future.delayed(const Duration(seconds: 5));
+        await _login();
+      }
+    });
+  }
 
   ConnectionConfig _mqttConfig;
   MqttServerClient _client;
@@ -194,7 +203,7 @@ Loggin in with:
 
   void _onDisconnected() {
     Log.d(
-        'OnDisconnected client callback - Client disconnection ${_client.connectionStatus.returnCode}',
+        'OnDisconnected client callback - Client disconnection ${_client?.connectionStatus?.returnCode}',
         tag: _TAG);
     _connectionState.add(ServerConnectionState.DISCONNECTED);
   }
@@ -214,6 +223,8 @@ Loggin in with:
       return unit;
     }
     Log.i("Subscribing to $topicName", tag: _TAG);
+    await _connectionState
+        .firstWhere((element) => element == ServerConnectionState.CONNECTED);
     try {
       _client.subscribe(topicName, MqttQos.atMostOnce);
     } catch (e, stack) {
