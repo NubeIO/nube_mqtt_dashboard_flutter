@@ -1,6 +1,8 @@
 import 'package:injectable/injectable.dart';
 
+import '../application/logger/log_screen_logger.dart';
 import '../domain/core/dependencies.dart';
+import '../injectable/injection.dart';
 import 'logger/debug_tree.dart';
 import 'logger/log.dart';
 
@@ -9,5 +11,6 @@ class DebugDependencies extends Dependencies {
   @override
   void plantLogTree() {
     Log.plantTree(DebugTree());
+    Log.plantTree(getIt<ScreenLogger>());
   }
 }
