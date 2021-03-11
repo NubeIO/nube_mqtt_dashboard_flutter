@@ -4,6 +4,8 @@ import '../../domain/configuration/configuration_repository_interface.dart';
 import '../../injectable/injection.dart';
 import '../../utils/logger/log.dart';
 
+const _TAG = "ConfigGuard";
+
 class ConfigGuard extends RouteGuard {
   final configRepository = getIt<IConfigurationRepository>();
 
@@ -14,7 +16,7 @@ class ConfigGuard extends RouteGuard {
     Object arguments,
   ) async {
     final result = await configRepository.getConfiguration();
-    Log.i("canNavigate to $routeName ${result.isSome()}");
+    Log.i("canNavigate to $routeName ${result.isSome()}", tag: _TAG);
     return result.isSome();
   }
 }

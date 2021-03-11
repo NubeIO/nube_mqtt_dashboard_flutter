@@ -7,6 +7,7 @@ import '../../utils/logger/log.dart';
 import 'nube_theme.dart';
 import 'theme_interface.dart';
 
+const _TAG = "ThemeChangeBuilder";
 typedef ThemeChangeBuilder = Widget Function(
     BuildContext context, ITheme theme);
 
@@ -20,7 +21,7 @@ class ThemeBuilder extends StatelessWidget {
       create: (context) => getIt<ThemeCubit>(),
       child: BlocConsumer<ThemeCubit, ThemeState>(
         listener: (context, state) {
-          Log.i("Theme changed sucessfully");
+          Log.i("Theme changed sucessfully", tag: _TAG);
         },
         builder: (context, state) => builder(
           context,

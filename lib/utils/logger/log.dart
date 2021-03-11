@@ -1,3 +1,5 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'closable_tree.dart';
 import 'log_level.dart';
 import 'log_tree.dart';
@@ -8,32 +10,57 @@ class Log {
 
   /// Logs VERBOSE level [message]
   /// with optional exception and stacktrace
-  static void v(String message, {dynamic ex, StackTrace stacktrace}) {
-    log(const LogLevel.v(), message, ex: ex, stacktrace: stacktrace);
+  static void v(
+    String message, {
+    String tag,
+    dynamic ex,
+    StackTrace stacktrace,
+  }) {
+    log(const LogLevel.v(), message, tag: tag, ex: ex, stacktrace: stacktrace);
   }
 
   /// Logs DEBUG level [message]
   /// with optional exception and stacktrace
-  static void d(String message, {dynamic ex, StackTrace stacktrace}) {
-    log(const LogLevel.d(), message, ex: ex, stacktrace: stacktrace);
+  static void d(
+    String message, {
+    @required String tag,
+    dynamic ex,
+    StackTrace stacktrace,
+  }) {
+    log(const LogLevel.d(), message, tag: tag, ex: ex, stacktrace: stacktrace);
   }
 
   /// Logs INFO level [message]
   /// with optional exception and stacktrace
-  static void i(String message, {dynamic ex, StackTrace stacktrace}) {
-    log(const LogLevel.i(), message, ex: ex, stacktrace: stacktrace);
+  static void i(
+    String message, {
+    String tag,
+    dynamic ex,
+    StackTrace stacktrace,
+  }) {
+    log(const LogLevel.i(), message, tag: tag, ex: ex, stacktrace: stacktrace);
   }
 
   /// Logs WARNING level [message]
   /// with optional exception and stacktrace
-  static void w(String message, {dynamic ex, StackTrace stacktrace}) {
-    log(const LogLevel.w(), message, ex: ex, stacktrace: stacktrace);
+  static void w(
+    String message, {
+    @required String tag,
+    dynamic ex,
+    StackTrace stacktrace,
+  }) {
+    log(const LogLevel.w(), message, tag: tag, ex: ex, stacktrace: stacktrace);
   }
 
   /// Logs ERROR level [message]
   /// with optional exception and stacktrace
-  static void e(String message, {dynamic ex, StackTrace stacktrace}) {
-    log(const LogLevel.e(), message, ex: ex, stacktrace: stacktrace);
+  static void e(
+    String message, {
+    @required String tag,
+    dynamic ex,
+    StackTrace stacktrace,
+  }) {
+    log(const LogLevel.e(), message, tag: tag, ex: ex, stacktrace: stacktrace);
   }
 
   /// Mute a log [level] for logging.
@@ -57,7 +84,14 @@ class Log {
     }
     final List<LogTree> loggersForTree = _trees[level];
     for (final LogTree logger in loggersForTree ?? []) {
-      logger.log(level, message, tag: tag, ex: ex, stacktrace: stacktrace);
+      logger.log(
+        level,
+        message,
+        tag: tag,
+        ex: ex,
+        stacktrace: stacktrace ??
+            (level == const LogLevel.e() ? StackTrace.current : null),
+      );
     }
   }
 
