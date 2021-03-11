@@ -3,6 +3,7 @@ import 'package:auto_route/auto_route_annotations.dart';
 import '../../domain/session/entities.dart';
 import '../pages/connect/connect_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
+import '../pages/logs/logs_page.dart';
 import '../pages/pin_create/pin_create_page.dart';
 import '../pages/pin_validate/pin_validate_page.dart';
 import '../pages/preview/preview_page.dart';
@@ -19,6 +20,7 @@ export 'router.gr.dart';
     AdaptiveRoute<bool>(page: ConnectPage),
     AdaptiveRoute(page: DashboardPage, guards: [ConfigGuard]),
     AdaptiveRoute(page: PreviewPage),
+    AdaptiveRoute(page: LogsPage),
   ],
   generateNavigationHelperExtension: true,
 )
