@@ -1,17 +1,26 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:nube_mqtt_dashboard/data/mqtt/datasources/mqtt_data_source_impl.dart';
+import 'package:nube_mqtt_dashboard/domain/connection/connection_data_source_interface.dart';
 import 'package:nube_mqtt_dashboard/domain/mqtt/entities.dart';
 
 import 'package:uuid/uuid.dart';
 
+class ConnectionDataSourceMock extends Mock implements IConnectionDataSource {}
+
 void main() {
   MqttDataSource _mqttDataSource;
   ConnectionConfig _validConfig;
+  ConnectionDataSourceMock _connectionDataSourceMock;
   const topicName = "testtopic/ritesh";
 
   setUp(() {
-    _mqttDataSource = MqttDataSource();
+    _connectionDataSourceMock = ConnectionDataSourceMock();
+    when(_connectionDataSourceMock.layoutStream)
+        .thenAnswer((_) => const Stream.empty());
+
+    _mqttDataSource = MqttDataSource(_connectionDataSourceMock);
     _validConfig = ConnectionConfig(
       host: "broker.mqttdashboard.com",
       port: 1883,
