@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:kt_dart/collection.dart';
@@ -20,6 +22,25 @@ class MqttDataSource extends IMqttDataSource {
       if (_client != null && event.isConnected) {
         await Future.delayed(const Duration(seconds: 5));
         await _login();
+      }
+    });
+
+    Timer.periodic(const Duration(minutes: 5), (timer) async {
+      final event = await connectionRepository.layoutStream.first;
+      if (_client != null && event.isConnected) {
+        Log.d("Running periodic connection check", tag: _TAG);
+        try {
+          final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
+          builder.addBool(val: event.isConnected);
+          _client.publishMessage(
+            "${_client.server}/connection",
+            MqttQos.exactlyOnce,
+            builder.payload,
+            retain: true,
+          );
+        } catch (e) {
+          await _login();
+        }
       }
     });
   }
@@ -202,7 +223,7 @@ Loggin in with:
   }
 
   void _onDisconnected() {
-    Log.d(
+    Log.e(
         'OnDisconnected client callback - Client disconnection ${_client?.connectionStatus?.returnCode}',
         tag: _TAG);
     _connectionState.add(ServerConnectionState.DISCONNECTED);
