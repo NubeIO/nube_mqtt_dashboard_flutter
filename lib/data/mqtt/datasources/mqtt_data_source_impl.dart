@@ -19,16 +19,18 @@ const _TAG = "MQTTDataSource";
 class MqttDataSource extends IMqttDataSource {
   MqttDataSource(IConnectionDataSource connectionRepository) {
     connectionRepository.layoutStream.listen((event) async {
-      if (_client != null && event.isConnected) {
+      if (_client != null &&
+          _client.state != MqttConnectionState.connected &&
+          event.isConnected) {
+        Log.d("Connection resumed trying to resume", tag: _TAG);
         await Future.delayed(const Duration(seconds: 5));
-        await _login();
+        _client = await clear().then((value) => _login());
       }
     });
 
-    Timer.periodic(const Duration(minutes: 5), (timer) async {
+    Timer.periodic(const Duration(seconds: 15), (timer) async {
       final event = await connectionRepository.layoutStream.first;
-      if (_client != null && event.isConnected) {
-        Log.d("Running periodic connection check", tag: _TAG);
+      if (event.isConnected) {
         try {
           final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
           builder.addBool(val: event.isConnected);
@@ -38,9 +40,14 @@ class MqttDataSource extends IMqttDataSource {
             builder.payload,
             retain: true,
           );
-        } catch (e) {
-          await _login();
+          Log.d("Periodic connection check valid", tag: _TAG);
+        } catch (e, stack) {
+          Log.e("Periodic connection check invalid",
+              tag: _TAG, ex: e, stacktrace: stack);
+          _client = await clear().then((value) => _login());
         }
+      } else {
+        Log.d("Active connection not detected on periodic check", tag: _TAG);
       }
     });
   }
@@ -189,7 +196,7 @@ Loggin in with:
   }
 
   void _listenToTopics() {
-    _client.updates.listen((event) {
+    _client?.updates?.listen((event) {
       for (final element in event) {
         final MqttPublishMessage recMess =
             element.payload as MqttPublishMessage;
@@ -271,7 +278,7 @@ Loggin in with:
       return unit;
     }
     Log.i("Unsubscribing to $topicName", tag: _TAG);
-    _client.unsubscribe(topicName);
+    _client?.unsubscribe(topicName);
     return _topicSubscriptionStream
         .firstWhere(
             (element) => element[topicName] == MqttSubscriptionState.IDLE)
@@ -301,12 +308,15 @@ Loggin in with:
 
   @override
   Future<Unit> clear() {
-    _client.disconnect();
+    _client?.disconnect();
     _client = null;
     lastMessage.clear();
-    return _connectionState
-        .firstWhere((element) => element == ServerConnectionState.DISCONNECTED)
-        .then((value) => unit);
+    _connectionState.add(ServerConnectionState.DISCONNECTED);
+    Log.d('Clearing connections', tag: _TAG);
+    return Future.value(unit).then((value) {
+      Log.d('Cleared Connections', tag: _TAG);
+      return value;
+    });
   }
 }
 
