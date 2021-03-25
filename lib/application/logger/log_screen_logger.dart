@@ -26,7 +26,9 @@ class ScreenLogger extends LogTree {
     _logRepository.addLog(LogItem(
       title: tag,
       message: message,
-      detail: "${ex?.toString() ?? ""}\n${stacktrace?.toString() ?? ""}",
+      detail: (ex == null && stacktrace == null)
+          ? ""
+          : "${ex?.toString() ?? ""}\n${stacktrace?.toString() ?? ""}",
       logLevel: level,
       date: DateTime.now(),
     ));

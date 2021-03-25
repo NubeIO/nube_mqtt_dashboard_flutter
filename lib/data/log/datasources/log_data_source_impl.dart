@@ -12,7 +12,8 @@ class LogDataSource extends ILogDataSource {
     final logs = _logStream.value;
     if (logs.isNotEmpty &&
         logs.first.title == log.title &&
-        logs.first.message == log.message) return;
+        logs.first.message == log.message &&
+        logs.first.date.second == log.date.second) return;
 
     _logStream.add(logs
       ..insert(0, log)
