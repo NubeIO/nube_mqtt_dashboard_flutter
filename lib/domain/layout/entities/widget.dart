@@ -70,10 +70,13 @@ abstract class GlobalConfig with _$GlobalConfig {
     double initial,
   }) = _GlobalConfig;
 
-  factory GlobalConfig.empty() {
+  factory GlobalConfig.empty({
+    double initial,
+  }) {
     return GlobalConfig(
       background: BackgroundConfig.empty(),
       title: TitleConfig.empty(),
+      initial: initial,
     );
   }
 }
