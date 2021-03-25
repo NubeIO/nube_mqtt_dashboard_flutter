@@ -28,7 +28,7 @@ class MqttDataSource extends IMqttDataSource {
       }
     });
 
-    Timer.periodic(const Duration(seconds: 15), (timer) async {
+    Timer.periodic(const Duration(seconds: 30), (timer) async {
       final event = await connectionRepository.layoutStream.first;
       if (event.isConnected) {
         try {
