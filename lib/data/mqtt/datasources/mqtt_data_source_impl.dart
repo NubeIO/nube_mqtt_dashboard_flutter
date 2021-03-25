@@ -19,6 +19,7 @@ const _TAG = "MQTTDataSource";
 class MqttDataSource extends IMqttDataSource {
   MqttDataSource(IConnectionDataSource connectionRepository) {
     connectionRepository.layoutStream.listen((event) async {
+      Log.d("Connection status changed $event", tag: _TAG);
       if (_client != null &&
           _client.state != MqttConnectionState.connected &&
           event.isConnected) {
@@ -29,6 +30,7 @@ class MqttDataSource extends IMqttDataSource {
     });
 
     Timer.periodic(const Duration(seconds: 30), (timer) async {
+      Log.d("Periodic block started", tag: _TAG);
       final event = await connectionRepository.layoutStream.first;
       if (event.isConnected) {
         try {
@@ -122,6 +124,7 @@ class MqttDataSource extends IMqttDataSource {
     } else {
       _client = await _login();
       if (_client == null) {
+        Log.i("Login couldn't proceed", tag: _TAG);
         throw MqttConnectionException();
       }
     }
