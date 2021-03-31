@@ -20,12 +20,10 @@ class MqttDataSource extends IMqttDataSource {
   MqttDataSource(IConnectionDataSource connectionRepository) {
     connectionRepository.layoutStream.listen((event) async {
       Log.d("Connection status changed $event", tag: _TAG);
-      if (_client != null &&
-          _client.state != MqttConnectionState.connected &&
-          event.isConnected) {
-        Log.d("Connection resumed trying to resume", tag: _TAG);
+      if (_client != null && event.isConnected) {
+        Log.d("Connection resumed trying to resume MQTT", tag: _TAG);
         await Future.delayed(const Duration(seconds: 5));
-        _client = await clear().then((value) => _login());
+        _client.doAutoReconnect(force: true);
       }
     });
 
@@ -46,7 +44,11 @@ class MqttDataSource extends IMqttDataSource {
         } catch (e, stack) {
           Log.e("Periodic connection check invalid",
               tag: _TAG, ex: e, stacktrace: stack);
-          _client = await clear().then((value) => _login());
+          if (_client == null) {
+            _client = await clear().then((value) => _login());
+          } else {
+            _client.doAutoReconnect(force: true);
+          }
         }
       } else {
         Log.d("Active connection not detected on periodic check", tag: _TAG);
@@ -85,8 +87,9 @@ class MqttDataSource extends IMqttDataSource {
 
     if (_mqttConfig != null &&
         (mqttConfig.host != _mqttConfig.host ||
-            mqttConfig.port != _mqttConfig.port)) {
-      await clear();
+            mqttConfig.port != _mqttConfig.port ||
+            mqttConfig.clientId != _mqttConfig.clientId)) {
+      await clear(force: true);
     }
     _mqttConfig = mqttConfig;
     return _connectToClient();
@@ -114,6 +117,7 @@ class MqttDataSource extends IMqttDataSource {
           .map((event) => event[topicName] ?? MqttSubscriptionState.IDLE)
           .doOnEach((message) {
         Log.i("Subscription Status for $topicName ${message.value}", tag: _TAG);
+        subscribe(topicName);
       });
 
   Future<Unit> _connectToClient() async {
@@ -159,6 +163,10 @@ Loggin in with:
     _client.onConnected = _onConnected;
     _client.onSubscribed = _onSubscribed;
     _client.onUnsubscribed = _onUnsubscribed;
+    _client.onAutoReconnect = _onAutoReconnect;
+    _client.onAutoReconnected = _onAutoReconnected;
+    _client.autoReconnect = true;
+
     final MqttConnectMessage connMess = MqttConnectMessage()
         .withClientIdentifier(_mqttConfig.clientId)
         .keepAliveFor(60)
@@ -245,6 +253,17 @@ Loggin in with:
         tag: _TAG);
   }
 
+  void _onAutoReconnect() {
+    _connectionState.add(ServerConnectionState.CONNECTING);
+    Log.d('OnAutoReconnect Something went wrong, trying to autoconnect',
+        tag: _TAG);
+  }
+
+  void _onAutoReconnected() {
+    _connectionState.add(ServerConnectionState.CONNECTED);
+    Log.d('PnAutoReconnected auto reconnect was sucessful.', tag: _TAG);
+  }
+
   @override
   Future<Unit> subscribe(String topicName) async {
     final topics = _topicSubscriptionStream.value;
@@ -310,11 +329,12 @@ Loggin in with:
   }
 
   @override
-  Future<Unit> clear() {
+  Future<Unit> clear({bool force}) {
     _client?.disconnect();
     _client = null;
-    lastMessage.clear();
     _connectionState.add(ServerConnectionState.DISCONNECTED);
+    lastMessage.clear();
+    _topicSubscriptionStream.add(KtHashMap.empty());
     Log.d('Clearing connections', tag: _TAG);
     return Future.value(unit).then((value) {
       Log.d('Cleared Connections', tag: _TAG);
