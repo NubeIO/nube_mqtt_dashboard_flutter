@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
@@ -12,6 +13,7 @@ import '../../../domain/connection/connection_repository_interface.dart';
 import '../../../domain/mqtt/exceptions/mqtt.dart';
 import '../../../domain/mqtt/mqtt_data_source.dart';
 import '../../../utils/logger/log.dart';
+import '../models/connection_status_dto.dart';
 
 const _TAG = "MQTTDataSource";
 
@@ -33,9 +35,10 @@ class MqttDataSource extends IMqttDataSource {
       if (event.isConnected) {
         try {
           final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
-          builder.addBool(val: event.isConnected);
+          builder.addString(jsonEncode(
+              ConnectionStatusDto.simple(lastMessage.keys.toList()).toJson()));
           _client.publishMessage(
-            "${_client.server}/connection",
+            "${_mqttConfig?.clientId}/connection",
             MqttQos.exactlyOnce,
             builder.payload,
             retain: true,
