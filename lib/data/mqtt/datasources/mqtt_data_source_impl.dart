@@ -45,7 +45,10 @@ class MqttDataSource extends IMqttDataSource {
           Log.e("Periodic connection check invalid",
               tag: _TAG, ex: e, stacktrace: stack);
           if (_client == null) {
-            _client = await clear().then((value) => _login());
+            _client =
+                await clear().then((value) => _login()).catchError((error) {
+              Log.e("Periodic connection _login invalid", tag: _TAG, ex: error);
+            });
           } else {
             _client.doAutoReconnect(force: true);
           }
@@ -90,6 +93,7 @@ class MqttDataSource extends IMqttDataSource {
             mqttConfig.port != _mqttConfig.port ||
             mqttConfig.clientId != _mqttConfig.clientId)) {
       await clear(force: true);
+      lastMessage.clear();
     }
     _mqttConfig = mqttConfig;
     return _connectToClient();
@@ -193,12 +197,13 @@ Loggin in with:
     if (_client.state == MqttConnectionState.connected) {
       _connectionState.add(ServerConnectionState.CONNECTED);
       _listenToTopics();
+      await _subscribeToPrevious();
       Log.d('Client connected', tag: _TAG);
     } else {
       Log.e('''
-     Client connection failed - disconnecting,
-     status is ${_client.connectionStatus}
-     ''', tag: _TAG);
+           Client connection failed - disconnecting,
+           status is ${_client.connectionStatus}
+           ''', tag: _TAG);
       _connectionState.add(ServerConnectionState.ERROR_WHEN_CONNECTING);
       _client.disconnect();
       _client = null;
@@ -222,6 +227,13 @@ Loggin in with:
         );
       }
     });
+  }
+
+  Future<void> _subscribeToPrevious() async {
+    Log.d("Subscribing to ${lastMessage.keys}", tag: _TAG);
+    for (final topicId in lastMessage.keys) {
+      await subscribe(topicId);
+    }
   }
 
   void _onUnsubscribed(String topic) {
@@ -266,9 +278,8 @@ Loggin in with:
 
   @override
   Future<Unit> subscribe(String topicName) async {
-    final topics = _topicSubscriptionStream.value;
-    final topicSubscription = topics[topicName] ?? MqttSubscriptionState.IDLE;
-    if (topicSubscription == MqttSubscriptionState.SUBSCRIBED) {
+    if (_client.getSubscriptionsStatus(topicName) ==
+        MqttSubscriptionStatus.active) {
       Log.i("Subscription to $topicName exists", tag: _TAG);
       return unit;
     }
@@ -292,9 +303,8 @@ Loggin in with:
 
   @override
   Future<Unit> unsubscribe(String topicName) async {
-    final topics = _topicSubscriptionStream.value;
-    final topicSubscription = topics[topicName] ?? MqttSubscriptionState.IDLE;
-    if (topicSubscription == MqttSubscriptionState.IDLE) {
+    if (_client.getSubscriptionsStatus(topicName) !=
+        MqttSubscriptionStatus.active) {
       Log.i("Subscription to $topicName doesn't exists. Can't unsubscribe",
           tag: _TAG);
       return unit;
@@ -333,7 +343,6 @@ Loggin in with:
     _client?.disconnect();
     _client = null;
     _connectionState.add(ServerConnectionState.DISCONNECTED);
-    lastMessage.clear();
     _topicSubscriptionStream.add(KtHashMap.empty());
     Log.d('Clearing connections', tag: _TAG);
     return Future.value(unit).then((value) {
