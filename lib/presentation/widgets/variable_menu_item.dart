@@ -50,7 +50,6 @@ class VariableMenuItem extends StatelessWidget {
     } else {
       if (page.widgets.isEmpty()) {
         return ExpansionTile(
-          initiallyExpanded: true,
           childrenPadding: const EdgeInsets.only(left: 16),
           title: Text(page.name),
           children: _buildChildrens(),
