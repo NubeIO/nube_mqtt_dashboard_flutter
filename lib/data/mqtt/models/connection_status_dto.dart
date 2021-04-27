@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:nube_mqtt_dashboard/utils/date_utils.dart';
 
 part 'connection_status_dto.freezed.dart';
 part 'connection_status_dto.g.dart';
@@ -13,7 +14,7 @@ abstract class ConnectionStatusDto with _$ConnectionStatusDto {
   factory ConnectionStatusDto.simple(List<String> subscriptions) =>
       ConnectionStatusDto(
         subscriptions: subscriptions,
-        timestamp: DateTime.now().toIso8601String(),
+        timestamp: DateUtils.getISOTimeString(),
       );
 
   factory ConnectionStatusDto.fromJson(Map<String, dynamic> json) =>
