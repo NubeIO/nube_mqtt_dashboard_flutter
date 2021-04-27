@@ -19,6 +19,11 @@ const _TAG = "MQTTDataSource";
 
 @LazySingleton(as: IMqttDataSource)
 class MqttDataSource extends IMqttDataSource {
+  ConnectionConfig _mqttConfig;
+  MqttServerClient _client;
+
+  String get _connectionTopic => "${_mqttConfig?.clientId}/connection";
+
   MqttDataSource(IConnectionDataSource connectionRepository) {
     connectionRepository.layoutStream.listen((event) async {
       Log.d("Connection status changed $event", tag: _TAG);
@@ -33,37 +38,30 @@ class MqttDataSource extends IMqttDataSource {
       Log.d("Periodic block started", tag: _TAG);
       final event = await connectionRepository.layoutStream.first;
       if (event.isConnected) {
-        try {
-          final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
-          builder.addString(jsonEncode(
-              ConnectionStatusDto.simple(lastMessage.keys.toList()).toJson()));
-          _client.publishMessage(
-            "${_mqttConfig?.clientId}/connection",
-            MqttQos.exactlyOnce,
-            builder.payload,
-            retain: true,
-          );
-          Log.d("Periodic connection check valid", tag: _TAG);
-        } catch (e, stack) {
-          Log.e("Periodic connection check invalid",
-              tag: _TAG, ex: e, stacktrace: stack);
-          if (_client == null) {
-            _client =
-                await clear().then((value) => _login()).catchError((error) {
-              Log.e("Periodic connection _login invalid", tag: _TAG, ex: error);
+        final message = jsonEncode(
+            ConnectionStatusDto.simple(lastMessage.keys.toList()).toJson());
+        writeVerified(_connectionTopic, message)
+            .then((value) {
+              Log.d("Periodic connection check valid", tag: _TAG);
+            })
+            .timeout(const Duration(seconds: 5))
+            .catchError((e) async {
+              Log.e("Periodic connection check invalid", tag: _TAG, ex: e);
+              if (_client == null) {
+                _client =
+                    await clear().then((value) => _login()).catchError((error) {
+                  Log.e("Periodic connection _login invalid",
+                      tag: _TAG, ex: error);
+                });
+              } else {
+                _client.doAutoReconnect(force: true);
+              }
             });
-          } else {
-            _client.doAutoReconnect(force: true);
-          }
-        }
       } else {
         Log.d("Active connection not detected on periodic check", tag: _TAG);
       }
     });
   }
-
-  ConnectionConfig _mqttConfig;
-  MqttServerClient _client;
 
   final BehaviorSubject<ServerConnectionState> _connectionState =
       BehaviorSubject.seeded(ServerConnectionState.IDLE)
@@ -217,6 +215,7 @@ Loggin in with:
   void _listenToTopics() {
     _client?.updates?.listen((event) {
       for (final element in event) {
+        if (element.topic == _connectionTopic) return;
         final MqttPublishMessage recMess =
             element.payload as MqttPublishMessage;
         final message = TopicMessage(
@@ -237,6 +236,7 @@ Loggin in with:
     for (final topicId in lastMessage.keys) {
       await subscribe(topicId);
     }
+    await subscribe(_connectionTopic);
   }
 
   void _onUnsubscribed(String topic) {
@@ -339,6 +339,34 @@ Loggin in with:
           tag: _TAG, stacktrace: stack, ex: e);
       throw UnexpectedWriteException();
     }
+  }
+
+  Future<Unit> writeVerified(String topicName, String message) async {
+    final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
+    builder.addString(message);
+    final completer = Completer<Unit>();
+    try {
+      _client?.updates?.listen((event) {
+        for (final element in event) {
+          if (element.topic == topicName && !completer.isCompleted) {
+            Log.d('Published message $message to topic $topicName', tag: _TAG);
+            completer.complete(unit);
+          }
+        }
+      });
+      Log.i('Publishing message $message to topic $topicName', tag: _TAG);
+      _client.publishMessage(
+        topicName,
+        MqttQos.exactlyOnce,
+        builder.payload,
+        retain: true,
+      );
+    } catch (e, stack) {
+      Log.e("Failed to write to $topicName",
+          tag: _TAG, stacktrace: stack, ex: e);
+      completer.completeError(UnexpectedWriteException());
+    }
+    return completer.future;
   }
 
   @override
