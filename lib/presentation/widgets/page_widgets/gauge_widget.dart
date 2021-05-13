@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:nube_mqtt_dashboard/presentation/widgets/form_elements/styles/input_types.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../../domain/layout/entities.dart';
 import '../../../domain/widget_data/entities.dart';
+import '../form_elements/styles/input_types.dart';
 
 class GaugeWidget extends StatelessWidget {
   final WidgetData value;

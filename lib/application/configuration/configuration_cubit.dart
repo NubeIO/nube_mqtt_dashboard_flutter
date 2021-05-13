@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../domain/configuration/configuration_repository_interface.dart';
-import '../../domain/core/extensions/option_ext.dart';
 import '../../domain/core/internal_state.dart';
 import '../../domain/mqtt/failures.dart';
 import '../../domain/mqtt/mqtt_repository.dart';

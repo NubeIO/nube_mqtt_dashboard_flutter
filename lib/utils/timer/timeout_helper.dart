@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:nube_mqtt_dashboard/domain/session/session_repository_interface.dart';
-import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
-import 'package:nube_mqtt_dashboard/utils/timer/timer_status.dart';
+
+import '../../domain/session/session_repository_interface.dart';
+import '../logger/log.dart';
+import 'timer_status.dart';
 
 const _TAG = "TimeOutHelper";
 

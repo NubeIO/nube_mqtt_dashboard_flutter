@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:framy_annotation/framy_annotation.dart';
-import 'package:nube_mqtt_dashboard/presentation/themes/nube_theme.dart';
 
 import '../../../constants/framy_constants.dart';
+import '../../themes/nube_theme.dart';
 import 'styles/input_types.dart';
 
 @FramyWidget(groupName: FramyConstants.FORM_INPUTS)

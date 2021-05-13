@@ -2,12 +2,12 @@ import 'dart:ui';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:kt_dart/kt.dart';
-import 'package:nube_mqtt_dashboard/domain/theme/entities.dart';
-import 'package:nube_mqtt_dashboard/utils/hex_color.dart';
-import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 import '../../../domain/layout/entities.dart';
 import '../../../domain/layout/layout_repository_interface.dart';
+import '../../../domain/theme/entities.dart';
+import '../../../utils/hex_color.dart';
+import '../../../utils/logger/log.dart';
 import '../models/layout.dart';
 
 const _TAG = "LayoutMapper";

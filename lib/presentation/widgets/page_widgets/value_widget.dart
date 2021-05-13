@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:nube_mqtt_dashboard/domain/layout/entities.dart';
 
+import '../../../domain/layout/entities.dart';
 import '../../../domain/widget_data/entities.dart';
 
 class ValueWidget extends StatelessWidget {

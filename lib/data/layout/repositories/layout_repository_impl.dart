@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import 'package:nube_mqtt_dashboard/data/layout/managers/layout_data_preference.dart';
-import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 import '../../../domain/configuration/configuration_repository_interface.dart';
 import '../../../domain/core/extensions/option_ext.dart';
 import '../../../domain/layout/layout_repository_interface.dart';
 import '../../../domain/mqtt/mqtt_repository.dart';
+import '../../../utils/logger/log.dart';
+import '../managers/layout_data_preference.dart';
 import '../mappers/layout.dart';
 import '../models/layout.dart';
 

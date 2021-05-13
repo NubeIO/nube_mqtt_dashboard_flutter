@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:nube_mqtt_dashboard/domain/theme/entities.dart';
+
+import '../../domain/theme/entities.dart';
 
 class LogoWidget extends StatelessWidget {
   final Size size;

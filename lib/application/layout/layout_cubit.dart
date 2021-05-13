@@ -5,14 +5,14 @@ import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:kt_dart/collection.dart';
-import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
-import 'package:nube_mqtt_dashboard/utils/timer/timeout_helper.dart';
-import 'package:nube_mqtt_dashboard/utils/timer/timer_status.dart';
 
 import '../../domain/core/internal_state.dart';
 import '../../domain/layout/entities.dart';
 import '../../domain/layout/failures.dart';
 import '../../domain/layout/layout_repository_interface.dart';
+import '../../utils/logger/log.dart';
+import '../../utils/timer/timeout_helper.dart';
+import '../../utils/timer/timer_status.dart';
 
 part 'layout_cubit.freezed.dart';
 part 'layout_state.dart';

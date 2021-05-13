@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kt_dart/kt.dart';
-import 'package:nube_mqtt_dashboard/domain/core/internal_state.dart';
 
 import '../../../../application/layout/widget/widget_cubit.dart';
+import '../../../../domain/core/internal_state.dart';
 import '../../../../domain/layout/entities.dart';
 import '../../../../domain/layout/layout_repository_interface.dart';
 import '../../../../domain/widget_data/entities.dart';

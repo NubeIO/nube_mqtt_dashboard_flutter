@@ -1,5 +1,5 @@
-import 'package:nube_mqtt_dashboard/data/mqtt/models/topic_message_dto.dart';
-import 'package:nube_mqtt_dashboard/domain/mqtt/entities.dart';
+import '../../../domain/mqtt/entities.dart';
+import '../models/topic_message_dto.dart';
 
 class TopicMessageMapper {
   TopicMessage mapToTopicMesage(TopicMessageDto topicMessageDto) {

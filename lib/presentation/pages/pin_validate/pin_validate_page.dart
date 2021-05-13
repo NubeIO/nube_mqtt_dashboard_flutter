@@ -5,7 +5,6 @@ import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/session/validate_pin/validate_pin_cubit.dart';
 import '../../../domain/core/internal_state.dart';
-import '../../../domain/session/entities.dart';
 import '../../../domain/session/failures.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';

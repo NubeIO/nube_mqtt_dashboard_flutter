@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:nube_mqtt_dashboard/domain/layout/entities.dart';
-import 'package:nube_mqtt_dashboard/domain/widget_data/entities.dart';
-import 'package:nube_mqtt_dashboard/presentation/widgets/responsive/padding.dart';
+
+import '../../../domain/layout/entities.dart';
+import '../../../domain/widget_data/entities.dart';
+import '../responsive/padding.dart';
 
 class SwitchGroupWidget extends StatelessWidget {
   final WidgetData value;

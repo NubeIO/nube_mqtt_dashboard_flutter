@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'package:nube_mqtt_dashboard/domain/layout/entities.dart';
 import 'package:kt_dart/collection.dart';
+
+import '../../domain/layout/entities.dart';
 
 class VariableMenuItem extends StatelessWidget {
   final PageEntity page;

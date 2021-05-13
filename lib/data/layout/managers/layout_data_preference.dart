@@ -1,10 +1,11 @@
 import 'dart:convert';
 
 import 'package:injectable/injectable.dart';
-import 'package:nube_mqtt_dashboard/data/mqtt/mappers/topic_message.dart';
-import 'package:nube_mqtt_dashboard/data/mqtt/models/topic_message_dto.dart';
-import 'package:nube_mqtt_dashboard/domain/mqtt/entities.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../domain/mqtt/entities.dart';
+import '../../mqtt/mappers/topic_message.dart';
+import '../../mqtt/models/topic_message_dto.dart';
 
 @injectable
 class LayoutPreferenceManager {
