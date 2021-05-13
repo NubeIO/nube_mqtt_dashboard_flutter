@@ -135,22 +135,22 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
   }
 
   Future<void> _savePins() async {
-    emit(state.copyWith(savePinState: const InternalState.loading()));
+    // emit(state.copyWith(savePinState: const InternalState.loading()));
 
-    final adminPin = state.adminPin.getOrCrash();
-    final userPin = state.userPin.getOrElse("");
+    // final adminPin = state.adminPin.getOrCrash();
+    // final userPin = state.userPin.getOrElse("");
 
-    final result = await _sessionRepository.createPins(
-        adminPin: adminPin, userPin: userPin);
+    // final result = await _sessionRepository.createPins(
+    //     adminPin: adminPin, userPin: userPin);
 
-    result.fold(
-      (failure) => emit(
-        state.copyWith(savePinState: InternalState.failure(failure)),
-      ),
-      (_) => emit(
-        state.copyWith(savePinState: const InternalState.success()),
-      ),
-    );
+    // result.fold(
+    //   (failure) => emit(
+    //     state.copyWith(savePinState: InternalState.failure(failure)),
+    //   ),
+    //   (_) => emit(
+    //     state.copyWith(savePinState: const InternalState.success()),
+    //   ),
+    // );
   }
 
   Future<void> _connect() async {
@@ -181,35 +181,35 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
   }
 
   Future<void> _prefillData() async {
-    final resultConfigs = await _configurationRepository.getConfiguration();
-    final resultPins = await _sessionRepository.getPinConfiguration();
+    // final resultConfigs = await _configurationRepository.getConfiguration();
+    // final resultPins = await _sessionRepository.getPinConfiguration();
 
-    if (resultPins.isSome() && resultPins.isSome()) {
-      final config = resultConfigs.getOrCrash();
-      final pins = resultPins.getOrCrash();
-      emit(
-        state.copyWith(
-          dataReady: true,
-          connectState: const InternalState.initial(),
-          host: ValueObject(some(config.host)),
-          port: ValueObject(some(config.port)),
-          clientId: ValueObject(some(config.clientId)),
-          layoutTopic: ValueObject(some(config.layoutTopic)),
-          username: ValueObject(some(config.username)),
-          password: ValueObject(some(config.password)),
-          adminPin: ValueObject(some(pins.adminPin)),
-          userPin: ValueObject(some(pins.userPin)),
-        ),
-      );
-    } else {
-      emit(
-        state.copyWith(dataReady: true),
-      );
-    }
+    // if (resultPins.isSome() && resultPins.isSome()) {
+    //   final config = resultConfigs.getOrCrash();
+    //   final pins = resultPins.getOrCrash();
+    //   emit(
+    //     state.copyWith(
+    //       dataReady: true,
+    //       connectState: const InternalState.initial(),
+    //       host: ValueObject(some(config.host)),
+    //       port: ValueObject(some(config.port)),
+    //       clientId: ValueObject(some(config.clientId)),
+    //       layoutTopic: ValueObject(some(config.layoutTopic)),
+    //       username: ValueObject(some(config.username)),
+    //       password: ValueObject(some(config.password)),
+    //       adminPin: ValueObject(some(pins.adminPin)),
+    //       userPin: ValueObject(some(pins.userPin)),
+    //     ),
+    //   );
+    // } else {
+    //   emit(
+    //     state.copyWith(dataReady: true),
+    //   );
+    // }
 
-    subscription = _themeRepository.getThemeStream().listen((event) {
-      event.fold((_) {}, (theme) => emit(state.copyWith(currentTheme: theme)));
-    });
+    // subscription = _themeRepository.getThemeStream().listen((event) {
+    //   event.fold((_) {}, (theme) => emit(state.copyWith(currentTheme: theme)));
+    // });
   }
 
   @override

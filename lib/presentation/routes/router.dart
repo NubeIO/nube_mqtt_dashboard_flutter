@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route_annotations.dart';
+import 'package:dartz/dartz.dart';
 
-import '../../domain/session/entities.dart';
 import '../pages/connect/connect_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
 import '../pages/logs/logs_page.dart';
@@ -15,7 +15,7 @@ export 'router.gr.dart';
 @AdaptiveAutoRouter(
   routes: <AutoRoute>[
     AdaptiveRoute(page: SplashPage, initial: true),
-    AdaptiveRoute<UserType>(page: ValidatePinPage),
+    AdaptiveRoute<Unit>(page: ValidatePinPage),
     AdaptiveRoute<String>(page: CreatePinPage),
     AdaptiveRoute<bool>(page: ConnectPage),
     AdaptiveRoute(page: DashboardPage, guards: [ConfigGuard]),

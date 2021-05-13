@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../domain/session/session_repository_interface.dart';
@@ -11,7 +10,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   bool _hasValidated = false;
 
   ProwdlySessionRepositoryImpl(this._sessionPreferenceManager) {
-    _hasValidated = _sessionPreferenceManager.isUserPinSet;
+    _hasValidated = _sessionPreferenceManager.isPinSet;
   }
 
   @override
@@ -20,43 +19,14 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   @override
-  Future<SessionType> getSessionType() async {
-    return _sessionPreferenceManager.status;
+  Future<bool> isPinProtected() async {
+    return _sessionPreferenceManager.isPinSet;
   }
 
   @override
-  Future<bool> isUserPinSet() async {
-    return _sessionPreferenceManager.isUserPinSet;
-  }
-
-  @override
-  Future<bool> isAdminPinSet() async {
-    return _sessionPreferenceManager.isAdminPinSet;
-  }
-
-  @override
-  Future<Option<PinConfiguration>> getPinConfiguration() async {
-    if (_sessionPreferenceManager.adminPin.isEmpty &&
-        _sessionPreferenceManager.pin.isEmpty) {
-      return const None();
-    }
-    return Some(
-      PinConfiguration(
-        adminPin: _sessionPreferenceManager.adminPin,
-        userPin: _sessionPreferenceManager.pin,
-      ),
-    );
-  }
-
-  @override
-  Future<Either<CreatePinFailure, Unit>> createPins({
-    @required String adminPin,
-    @required String userPin,
-  }) async {
+  Future<Either<CreatePinFailure, Unit>> createPin(String pin) async {
     try {
-      _sessionPreferenceManager.status = SessionType.REQUIRES_PIN;
-      _sessionPreferenceManager.adminPin = adminPin;
-      _sessionPreferenceManager.pin = userPin;
+      _sessionPreferenceManager.pin = pin;
       return const Right(unit);
     } catch (e) {
       return const Left(CreatePinFailure.unexpected());
@@ -64,40 +34,11 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   @override
-  Future<Either<CreatePinFailure, Unit>> createUserPin(
-    Option<String> pin,
-  ) async {
+  Future<Either<ValidatePinFailure, Unit>> validatePin(String pin) async {
     try {
-      _sessionPreferenceManager.status = SessionType.REQUIRES_PIN;
-      _sessionPreferenceManager.pin = pin.getOrElse(() => "");
-      return const Right(unit);
-    } catch (e) {
-      return const Left(CreatePinFailure.unexpected());
-    }
-  }
-
-  @override
-  Future<Either<CreatePinFailure, Unit>> createAdminPin(String pin) async {
-    try {
-      _sessionPreferenceManager.status = SessionType.REQUIRES_PIN;
-      _sessionPreferenceManager.adminPin = pin;
-      return const Right(unit);
-    } catch (e) {
-      return const Left(CreatePinFailure.unexpected());
-    }
-  }
-
-  @override
-  Future<Either<ValidatePinFailure, UserType>> validatePin(String pin) async {
-    try {
-      if (_sessionPreferenceManager.adminPin == pin) {
-        _sessionPreferenceManager.status = SessionType.REQUIRES_PIN;
+      if (_sessionPreferenceManager.pin == pin) {
         _hasValidated = true;
-        return const Right(UserType.ADMIN);
-      } else if (_sessionPreferenceManager.pin == pin) {
-        _sessionPreferenceManager.status = SessionType.REQUIRES_PIN;
-        _hasValidated = true;
-        return const Right(UserType.USER);
+        return const Right(unit);
       }
     } catch (e) {
       return const Left(ValidatePinFailure.unexpected());
@@ -114,5 +55,24 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     } catch (e) {
       return const Left(LogoutFailure.unexpected());
     }
+  }
+
+  @override
+  Future<Either<CreateUserFailure, Unit>> createUser(CreateUserEntity entity) {
+    // TODO: implement createUser
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ProfileStatusType> getLoginStatus() {
+    // TODO: implement getLoginStatus
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<LoginUserFailure, Unit>> loginUser(
+      String email, String password) {
+    // TODO: implement loginUser
+    throw UnimplementedError();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:framy_annotation/framy_annotation.dart';
@@ -23,7 +24,7 @@ class ValidatePinPage extends StatelessWidget {
     this.subtitle = "Please enter your pin so you can access the application. ",
   }) : super(key: key);
 
-  void _navigateOnSuccess(BuildContext context, UserType type) {
+  void _navigateOnSuccess(BuildContext context, Unit type) {
     ExtendedNavigator.of(context).pop(type);
   }
 
@@ -47,7 +48,7 @@ class ValidatePinPage extends StatelessWidget {
 
   void _onValidateState(
     BuildContext context,
-    InternalStateValue<ValidatePinFailure, UserType> validateState,
+    InternalStateValue<ValidatePinFailure, Unit> validateState,
   ) {
     validateState.maybeWhen(
         success: (type) {

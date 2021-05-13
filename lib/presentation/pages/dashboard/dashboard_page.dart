@@ -6,7 +6,6 @@ import 'package:framy_annotation/framy_annotation.dart';
 import '../../../application/layout/layout_cubit.dart';
 import '../../../domain/layout/entities.dart';
 import '../../../domain/layout/failures.dart';
-import '../../../domain/session/entities.dart';
 import '../../../domain/theme/entities.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
@@ -54,15 +53,8 @@ class _DashboardPageState extends State<DashboardPage>
 
   Future<void> _navigateToVerifyAdminPin(BuildContext context) async {
     final result = await ExtendedNavigator.of(context).pushValidatePinPage();
-    switch (result) {
-      case UserType.USER:
-        _onFailureMessage(
-            context, "Sorry you need don't have access to settings");
-        break;
-      case UserType.ADMIN:
-        _navigateToSettings(context);
-        break;
-      default:
+    if (result != null) {
+      _navigateToSettings(context);
     }
   }
 
@@ -75,7 +67,7 @@ class _DashboardPageState extends State<DashboardPage>
 
   Future<void> _navigateToLogs(BuildContext context) async {
     final result = await ExtendedNavigator.of(context).pushValidatePinPage();
-    if (result == UserType.ADMIN) {
+    if (result != null) {
       await ExtendedNavigator.of(context).pushLogsPage();
     }
   }
@@ -129,12 +121,8 @@ class _DashboardPageState extends State<DashboardPage>
 
     if (page.config.protected) {
       final result = await ExtendedNavigator.of(context).pushValidatePinPage();
-      switch (result) {
-        case UserType.USER:
-        case UserType.ADMIN:
-          navigate();
-          break;
-        default:
+      if (result != null) {
+        navigate();
       }
     } else {
       navigate();
