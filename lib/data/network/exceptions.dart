@@ -37,3 +37,8 @@ class GeneralException implements NetworkException {
   @override
   NetworkFailureCase get asFailure => NetworkFailureCase.general(message);
 }
+
+class NoHostException implements NetworkException {
+  @override
+  NetworkFailureCase get asFailure => const NetworkFailureCase.noHost();
+}

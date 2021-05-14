@@ -19,9 +19,10 @@ abstract class ISessionRepository {
 
   Future<Either<ValidatePinFailure, Unit>> validatePin(String pin);
 
-  Future<Either<CreateUserFailure, Unit>> createUser(CreateUserEntity entity);
+  Future<Either<CreateUserFailure, ProfileStatusType>> createUser(
+      CreateUserEntity entity);
 
-  Future<Either<LoginUserFailure, Unit>> loginUser(
+  Future<Either<LoginUserFailure, ProfileStatusType>> loginUser(
     String email,
     String password,
   );

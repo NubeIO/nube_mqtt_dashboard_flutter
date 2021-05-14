@@ -17,7 +17,11 @@ abstract class ISessionDataSource {
     @required String deviceId,
   });
 
-  Future<JwtModel> loginUser(String email, String password);
+  Future<JwtModel> loginUser(
+    String username,
+    String password,
+    String deviceId,
+  );
 
   Future<Unit> logout();
 }
