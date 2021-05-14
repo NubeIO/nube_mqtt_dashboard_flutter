@@ -37,8 +37,11 @@ class SessionDataRepositoryImpl extends ISessionDataSource {
   }
 
   @override
-  Future<JwtModel> loginUser(
-      String username, String password, String deviceId) {
+  Future<JwtModel> loginUser({
+    String username,
+    String password,
+    String deviceId,
+  }) {
     return _apiRepository.sessionApi
         .then((api) => api.loginUser(LoginRequest(
               username: username,

@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 
 import '../../../domain/core/future_failure_helper.dart';
+import '../../../domain/notifications/notification_repository_interface.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../domain/session/session_repository_interface.dart';
 import '../managers/pin_preference.dart';
@@ -10,12 +11,14 @@ import '../managers/session_preference.dart';
 class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final PinPreferenceManager _pinPreferenceManager;
   final SessionPreferenceManager _sessionPreferenceManager;
+  final INotificationRepository _notificationRepository;
   final ISessionDataSource _sessionDataSource;
   bool _hasValidated = false;
 
   ProwdlySessionRepositoryImpl(
     this._pinPreferenceManager,
     this._sessionPreferenceManager,
+    this._notificationRepository,
     this._sessionDataSource,
   ) {
     _hasValidated = _pinPreferenceManager.isPinSet;
@@ -66,13 +69,24 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   ) async {
     return futureFailureHelper(
       request: () async {
+        final tokenId = await _notificationRepository.getToken();
+
+        if (tokenId.isLeft()) {
+          return const Left(CreateUserFailure.invalidToken());
+        }
+
+        final deviceId = tokenId.fold(
+          (_) => throw AssertionError(),
+          (deviceId) => deviceId,
+        );
+
         final jwtModel = await _sessionDataSource.createUser(
           firstName: entity.firstName,
           lastName: entity.lastName,
           email: entity.email,
           password: entity.password,
           username: entity.username,
-          deviceId: "",
+          deviceId: deviceId,
         );
         _storeSession(jwtModel);
 
@@ -95,10 +109,21 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   ) async {
     return futureFailureHelper(
       request: () async {
+        final tokenId = await _notificationRepository.getToken();
+
+        if (tokenId.isLeft()) {
+          return const Left(LoginUserFailure.invalidToken());
+        }
+
+        final deviceId = tokenId.fold(
+          (_) => throw AssertionError(),
+          (deviceId) => deviceId,
+        );
+
         final jwtModel = await _sessionDataSource.loginUser(
-          username,
-          password,
-          "",
+          username: username,
+          password: password,
+          deviceId: deviceId,
         );
         _storeSession(jwtModel);
         // Get Validation Status
