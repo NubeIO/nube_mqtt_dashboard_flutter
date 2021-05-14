@@ -1,12 +1,13 @@
 import 'package:dartz/dartz.dart';
 
+import '../core/interfaces/repository.dart';
 import 'entities.dart';
 import 'failures.dart';
 
 export 'entities.dart';
 export 'failures.dart';
 
-abstract class IMqttRepository {
+abstract class IMqttRepository implements IRepository {
   Future<Either<ConnectFailure, Unit>> login(ConnectionConfig mqttConfig);
 
   Stream<ServerConnectionState> get connectionStream;

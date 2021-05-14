@@ -1,10 +1,11 @@
 import 'package:dartz/dartz.dart';
 
+import '../core/interfaces/datasource.dart';
 import 'entities.dart';
 
 export 'entities.dart';
 
-abstract class IMqttDataSource {
+abstract class IMqttDataSource implements IDataSource {
   Future<Unit> login(ConnectionConfig mqttConfig);
 
   Stream<ServerConnectionState> get connectionStream;

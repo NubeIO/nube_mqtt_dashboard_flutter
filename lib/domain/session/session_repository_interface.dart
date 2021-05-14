@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 
+import '../core/interfaces/repository.dart';
 import 'entities.dart';
 import 'failures.dart';
 
@@ -8,7 +9,7 @@ export 'package:dartz/dartz.dart';
 export 'entities.dart';
 export 'failures.dart';
 
-abstract class ISessionRepository {
+abstract class ISessionRepository implements IRepository {
   Future<bool> hasValidated();
 
   Future<bool> isPinProtected();
