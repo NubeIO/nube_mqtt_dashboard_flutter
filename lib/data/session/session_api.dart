@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:nube_mqtt_dashboard/data/core/models/base_response.dart';
 import 'package:retrofit/retrofit.dart';

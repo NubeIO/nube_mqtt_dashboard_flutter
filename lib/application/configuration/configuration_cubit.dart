@@ -207,9 +207,9 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
     //   );
     // }
 
-    // subscription = _themeRepository.getThemeStream().listen((event) {
-    //   event.fold((_) {}, (theme) => emit(state.copyWith(currentTheme: theme)));
-    // });
+    subscription = _themeRepository.getThemeStream().listen((event) {
+      event.fold((_) {}, (theme) => emit(state.copyWith(currentTheme: theme)));
+    });
   }
 
   @override
