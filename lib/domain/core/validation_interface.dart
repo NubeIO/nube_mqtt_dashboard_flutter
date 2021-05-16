@@ -3,6 +3,8 @@ import 'package:meta/meta.dart';
 
 import 'failure.dart';
 
+export 'failure.dart';
+
 typedef ValidationMapper<T> = String Function(T value);
 
 abstract class IValidation<T extends Failure, O> {

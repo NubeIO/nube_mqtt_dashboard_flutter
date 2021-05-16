@@ -1,8 +1,4 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-import '../../core/failure.dart';
-
-part 'length.freezed.dart';
+part of failures;
 
 @freezed
 abstract class LengthFailure extends Failure with _$LengthFailure {

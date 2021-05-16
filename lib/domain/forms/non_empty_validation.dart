@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../core/validation_interface.dart';
-import 'failures/empty.dart';
+import 'failures.dart';
 
 class NonEmptyValidation extends IValidation<EmptyFailure, String> {
   NonEmptyValidation({

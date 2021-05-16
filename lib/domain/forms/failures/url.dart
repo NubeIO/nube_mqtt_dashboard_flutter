@@ -1,11 +1,7 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-import '../../core/failure.dart';
-
-part 'url.freezed.dart';
+part of failures;
 
 @freezed
 abstract class UrlFailure extends Failure with _$UrlFailure {
   const factory UrlFailure.invalidUrl() = _InvalidUrl;
-  const factory UrlFailure.unexpected() = _Unexpected;
+  const factory UrlFailure.unexpected() = _UnexpectedUrl;
 }

@@ -2,7 +2,9 @@ import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../core/validation_interface.dart';
-import 'failures/url.dart';
+import 'failures.dart';
+
+export 'failures.dart';
 
 class UrlValidation extends IValidation<UrlFailure, String> {
   UrlValidation({

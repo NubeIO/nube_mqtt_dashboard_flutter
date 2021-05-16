@@ -2,8 +2,9 @@ import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../core/validation_interface.dart';
-import 'failures/empty.dart';
-import 'failures/layout_topic.dart';
+import 'failures.dart';
+
+export 'failures.dart';
 
 class LayoutTopicValidation extends IValidation<LayoutTopicFailure, String> {
   LayoutTopicValidation({

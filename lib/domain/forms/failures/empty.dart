@@ -1,8 +1,4 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-import '../../core/failure.dart';
-
-part 'empty.freezed.dart';
+part of failures;
 
 @freezed
 abstract class EmptyFailure extends Failure with _$EmptyFailure {
