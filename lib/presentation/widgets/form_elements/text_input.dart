@@ -16,6 +16,7 @@ class TextInput extends StatelessWidget {
   final String label;
   final String initialValue;
   final String helperText;
+  final bool obscureText;
 
   const TextInput({
     Key key,
@@ -27,6 +28,7 @@ class TextInput extends StatelessWidget {
     TextInputAction textInputAction,
     VoidCallback onEditingComplete,
     TextInputType keyboardType,
+    this.obscureText = false,
   })  : _onValueChanged = onValueChanged,
         _validationState = validationState,
         _textInputAction = textInputAction,
@@ -54,6 +56,7 @@ class TextInput extends StatelessWidget {
             ),
           ),
         ),
+        obscureText: obscureText,
         textInputAction: _textInputAction,
         style: InputStyles.textStyle(context),
         autovalidateMode: AutovalidateMode.always,

@@ -70,6 +70,7 @@ class FormStringInput extends StatelessWidget {
   final TextInputAction textInputAction;
   final TextInputType keyboardType;
   final bool isRequired;
+  final bool obscureText;
 
   const FormStringInput({
     Key key,
@@ -81,6 +82,7 @@ class FormStringInput extends StatelessWidget {
     this.textInputAction = TextInputAction.next,
     this.keyboardType = TextInputType.text,
     this.isRequired = true,
+    this.obscureText = false,
   }) : super(key: key);
 
   @override
@@ -88,7 +90,6 @@ class FormStringInput extends StatelessWidget {
     return FormTextBuilder<String>(
       validation: validation,
       builder: (context, state, onValueChanged) {
-        Log.i(state.toString());
         return FormPadding(
           child: TextInput(
             initialValue: initialValue.getOrElse(""),
@@ -98,6 +99,7 @@ class FormStringInput extends StatelessWidget {
             label: label,
             keyboardType: keyboardType,
             onEditingComplete: onEditingComplete,
+            obscureText: obscureText,
             helperText: isRequired
                 ? state.isValid
                     ? null

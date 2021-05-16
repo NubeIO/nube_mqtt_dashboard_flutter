@@ -24,7 +24,7 @@ abstract class ISessionRepository implements IRepository {
       CreateUserEntity entity);
 
   Future<Either<LoginUserFailure, ProfileStatusType>> loginUser(
-    String email,
+    String username,
     String password,
   );
 
