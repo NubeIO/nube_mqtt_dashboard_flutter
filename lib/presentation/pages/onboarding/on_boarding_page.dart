@@ -1,10 +1,21 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:nube_mqtt_dashboard/presentation/widgets/animated/illustration_onboarding.dart';
-import 'package:nube_mqtt_dashboard/presentation/widgets/text/clickable_text_span.dart';
-import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
+
+import '../../routes/router.dart';
+import '../../widgets/animated/illustration_onboarding.dart';
+import '../../widgets/responsive/padding.dart';
+import '../../widgets/text/clickable_text_span.dart';
 
 class OnBoardingPage extends StatelessWidget {
   const OnBoardingPage({Key key}) : super(key: key);
+
+  void _onNavigateToRegister(BuildContext context) {
+    ExtendedNavigator.of(context).pushHostPage();
+  }
+
+  void _onNavigateToLogin(BuildContext context) {
+    ExtendedNavigator.of(context).pushHostPage(isRegistrationStep: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +48,14 @@ class OnBoardingPage extends StatelessWidget {
             "IoT Solutions For The Build Environment",
             style: theme.caption,
           ),
-          const SizedBox(height: 48.0),
+          SizedBox(
+            height: ResponsiveSize.padding(
+              context,
+              size: PaddingSize.xlarge,
+            ),
+          ),
           TextButton(
-            onPressed: () {},
+            onPressed: () => _onNavigateToRegister(context),
             style: ButtonStyle(
               foregroundColor: MaterialStateProperty.all(Colors.white),
               backgroundColor: MaterialStateProperty.all(accentColor),
@@ -54,15 +70,18 @@ class OnBoardingPage extends StatelessWidget {
               child: Text("Start Registration"),
             ),
           ),
-          const SizedBox(height: 16.0),
+          SizedBox(
+            height: ResponsiveSize.padding(
+              context,
+              size: PaddingSize.medium,
+            ),
+          ),
           ClickableTextSpan(
               textSelection: const TextSelection(
                 baseOffset: 29,
                 extentOffset: 39,
               ),
-              onTap: () {
-                Log.i('Tap Here Double onTap');
-              },
+              onTap: () => _onNavigateToLogin(context),
               text: TextSpan(
                 children: [
                   TextSpan(
@@ -78,7 +97,12 @@ class OnBoardingPage extends StatelessWidget {
                   ),
                 ],
               )),
-          const SizedBox(height: 24.0),
+          SizedBox(
+            height: ResponsiveSize.padding(
+              context,
+              size: PaddingSize.xlarge,
+            ),
+          ),
         ],
       ),
     );

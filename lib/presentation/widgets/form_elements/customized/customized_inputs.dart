@@ -7,6 +7,7 @@ import '../../../../application/validation/value_validation_state.dart';
 import '../../../../constants/app_constants.dart';
 import '../../../../domain/core/validation_interface.dart';
 import '../../../../domain/forms/length_validation.dart';
+import '../../../../utils/logger/log.dart';
 import '../../responsive/padding.dart';
 import '../builder/form_text_builder.dart';
 import '../checkbox_input.dart';
@@ -87,13 +88,8 @@ class FormStringInput extends StatelessWidget {
     return FormTextBuilder<String>(
       validation: validation,
       builder: (context, state, onValueChanged) {
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: ResponsiveSize.padding(
-              context,
-              size: PaddingSize.medium,
-            ),
-          ),
+        Log.i(state.toString());
+        return FormPadding(
           child: TextInput(
             initialValue: initialValue.getOrElse(""),
             validationState: state,
@@ -144,13 +140,7 @@ class FormPinInput extends StatelessWidget {
         ),
       ),
       builder: (context, state, onValueChanged) {
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: ResponsiveSize.padding(
-              context,
-              size: PaddingSize.medium,
-            ),
-          ),
+        return FormPadding(
           child: SwitchInput(
             label: label,
             onValueChanged: (value) async {
@@ -209,13 +199,8 @@ class FormIntInput extends StatelessWidget {
     return FormTextBuilder<int>(
       validation: validation,
       builder: (context, state, onValueChanged) {
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: ResponsiveSize.padding(
-              context,
-              size: PaddingSize.medium,
-            ),
-          ),
+        Log.i(state.toString());
+        return FormPadding(
           child: TextInput(
             initialValue: defaultValue.toString(),
             validationState: state,
@@ -232,6 +217,28 @@ class FormIntInput extends StatelessWidget {
       validityListener: (value, valid) {
         onChanged(value);
       },
+    );
+  }
+}
+
+class FormPadding extends StatelessWidget {
+  final Widget child;
+
+  const FormPadding({
+    Key key,
+    @required this.child,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveSize.padding(
+          context,
+          size: PaddingSize.medium,
+        ),
+      ),
+      child: child,
     );
   }
 }
