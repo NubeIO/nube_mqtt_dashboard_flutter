@@ -57,6 +57,6 @@ extension on _Model {
 
 extension on String {
   ProfileStatusType toProfileStatus() =>
-      ProfileStatusType.values.firstWhere((element) => element.name == this) ??
-      ProfileStatusType.LOGGED_OUT;
+      ProfileStatusType.values.firstWhere((element) => element.name == this,
+          orElse: () => ProfileStatusType.LOGGED_OUT);
 }

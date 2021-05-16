@@ -14,11 +14,15 @@ class SplashPage extends StatelessWidget {
         .pushAndRemoveUntil(Routes.dashboardPage, (route) => false);
   }
 
-  void _navigateToConnectScreen(BuildContext context) {
+  void _navigateToVerificatonScreen(BuildContext context) {
+    ExtendedNavigator.of(context)
+        .pushAndRemoveUntil(Routes.dashboardPage, (route) => false);
+  }
+
+  void _navigateToOnboardingScreen(BuildContext context) {
     ExtendedNavigator.of(context).pushAndRemoveUntil(
-      Routes.connectPage,
+      Routes.onBoardingPage,
       (route) => false,
-      arguments: ConnectPageArguments(isInitalConfig: true),
     );
   }
 
@@ -39,9 +43,10 @@ class SplashPage extends StatelessWidget {
       listener: (_, state) {
         state.when(
           initial: () {},
-          createConfig: () => _navigateToConnectScreen(context),
-          validatePin: () => _navigateToEnterPinScreen(context),
           authenticated: () => _navigateToHomeScreen(context),
+          validatePin: () => _navigateToEnterPinScreen(context),
+          needsVerification: () => _navigateToVerificatonScreen(context),
+          loggedOut: () => _navigateToOnboardingScreen(context),
         );
       },
       builder: (context, state) => const _SplashWidget(),

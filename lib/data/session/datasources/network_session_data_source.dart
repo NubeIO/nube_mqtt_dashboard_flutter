@@ -56,6 +56,7 @@ class SessionDataRepositoryImpl extends ISessionDataSource {
   Future<Unit> logout() {
     return _apiRepository.sessionApi
         .then((api) => api.logout())
+        .then((value) => unit)
         .catchDioException();
   }
 }

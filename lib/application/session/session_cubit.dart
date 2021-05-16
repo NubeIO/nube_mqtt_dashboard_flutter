@@ -14,5 +14,23 @@ class SessionCubit extends Cubit<SessionState> {
     getSession();
   }
 
-  Future<void> getSession() async {}
+  Future<void> getSession() async {
+    final statusType = await _sessionRepository.getLoginStatus();
+    switch (statusType) {
+      case ProfileStatusType.LOGGED_OUT:
+        emit(const SessionState.loggedOut());
+        break;
+      case ProfileStatusType.NEEDS_VERIFICATION:
+        emit(const SessionState.needsVerification());
+        break;
+      case ProfileStatusType.PROFILE_EXISTS:
+        final needsPin = await _sessionRepository.isPinProtected();
+        if (needsPin) {
+          emit(const SessionState.validatePin());
+        } else {
+          emit(const SessionState.authenticated());
+        }
+        break;
+    }
+  }
 }
