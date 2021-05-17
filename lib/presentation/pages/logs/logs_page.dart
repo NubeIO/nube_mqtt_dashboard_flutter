@@ -9,32 +9,25 @@ import '../../../domain/log/entities.dart';
 import '../../../domain/log/failures.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/message_mixin.dart';
 import '../../widgets/expandable_text.dart';
 import '../../widgets/responsive/master_layout.dart';
 import '../../widgets/responsive/screen_type_layout.dart';
-import '../../widgets/responsive/snackbar.dart';
 
 @FramyWidget(isPage: true)
-class LogsPage extends StatelessWidget {
+class LogsPage extends StatelessWidget with MessageMixin {
   const LogsPage({Key key}) : super(key: key);
 
   void _onStreamFailure(
     BuildContext context,
     LogStreamFailure failure,
   ) {
-    final snackbar = ResponsiveSnackbar.build(
+    onFailureMessage(
       context,
-      content: Text(
-        failure.when(
-          unknown: () => I18n.of(context).failureGeneric,
-        ),
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(color: Theme.of(context).colorScheme.error),
+      failure.when(
+        unknown: () => I18n.of(context).failureGeneric,
       ),
     );
-    Scaffold.of(context).showSnackBar(snackbar);
   }
 
   Widget _buildScaffold(

@@ -11,6 +11,7 @@ import '../../../domain/forms/url_validation.dart';
 import '../../../domain/mqtt/mqtt_repository.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../themes/nube_theme.dart';
 import '../../themes/theme_interface.dart';
@@ -20,7 +21,6 @@ import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/master_layout.dart';
 import '../../widgets/responsive/padding.dart';
 import '../../widgets/responsive/screen_type_layout.dart';
-import '../../widgets/responsive/snackbar.dart';
 
 @FramyWidget(isPage: true)
 class ConnectPage extends StatefulWidget {
@@ -34,7 +34,7 @@ class ConnectPage extends StatefulWidget {
   _ConnectPageState createState() => _ConnectPageState();
 }
 
-class _ConnectPageState extends State<ConnectPage> {
+class _ConnectPageState extends State<ConnectPage> with MessageMixin {
   ConfigurationCubit cubit;
   final FocusScopeNode _node = FocusScopeNode();
 
@@ -48,21 +48,12 @@ class _ConnectPageState extends State<ConnectPage> {
     BuildContext context,
     ConnectFailure failure,
   ) {
-    final snackbar = ResponsiveSnackbar.build(
+    onFailureMessage(
       context,
-      content: Text(
-        failure.when(
-          unexpected: () => I18n.of(context).failureGeneric,
-        ),
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(color: Theme.of(context).colorScheme.error),
+      failure.when(
+        unexpected: () => I18n.of(context).failureGeneric,
       ),
-      direction: Direction.left,
-      width: ResponsiveSize.twoWidth(context),
     );
-    Scaffold.of(context).showSnackBar(snackbar);
   }
 
   void _onConnectionSuccess(BuildContext context, bool shouldReconnect) {

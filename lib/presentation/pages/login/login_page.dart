@@ -1,18 +1,20 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nube_mqtt_dashboard/domain/forms/non_empty_validation.dart';
-import 'package:nube_mqtt_dashboard/domain/session/session_data_source_interface.dart';
 
 import '../../../application/login/login_cubit.dart';
+import '../../../domain/forms/non_empty_validation.dart';
 import '../../../domain/session/failures.dart';
+import '../../../domain/session/session_data_source_interface.dart';
+import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
 import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/padding.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatelessWidget with MessageMixin {
   final FocusScopeNode _node = FocusScopeNode();
   final bool isRegistrationStep;
 
@@ -21,7 +23,18 @@ class LoginPage extends StatelessWidget {
     this.isRegistrationStep = true,
   }) : super(key: key);
 
-  void _onLoginFailure(BuildContext context, LoginUserFailure failure) {}
+  void _onLoginFailure(BuildContext context, LoginUserFailure failure) {
+    onFailureMessage(
+      context,
+      failure.when(
+        unexpected: () => I18n.of(context).failureGeneric,
+        connection: () => I18n.of(context).failureConnection,
+        invalidToken: () => "Something went wrong with generating a token.",
+        server: () => I18n.of(context).failureServer,
+        general: (message) => message,
+      ),
+    );
+  }
 
   void _onLoginSuccess(
     BuildContext context,
@@ -110,7 +123,7 @@ class LoginPage extends StatelessWidget {
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
           state.loginState.maybeWhen(
-            loading: () => overlay.showText("Connecting..."),
+            loading: () => overlay.showText("Logging In..."),
             failure: (failure) {
               overlay.hide();
               _onLoginFailure(context, failure);

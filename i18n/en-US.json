@@ -1,5 +1,7 @@
 {
     "failure": {
-        "generic": "Sorry, Something went wrong please try again later."
+        "generic": "Sorry, Something went wrong please try again later.",
+        "server": "Sorry, Something went wrong with our servers, please try again later.",
+        "connection": "Something seems to be wrong with the connection. Please check your connection."
     }
 }

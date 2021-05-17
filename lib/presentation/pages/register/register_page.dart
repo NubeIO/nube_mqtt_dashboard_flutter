@@ -1,13 +1,19 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nube_mqtt_dashboard/presentation/pages/register/register_form_last_page.dart';
-import 'package:nube_mqtt_dashboard/presentation/pages/register/register_form_second_page.dart';
 
 import '../../../application/register/register_cubit.dart';
+import '../../../domain/session/failures.dart';
+import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/message_mixin.dart';
+import '../../routes/router.dart';
+import '../../widgets/overlays/loading.dart';
 import 'register_form_first_page.dart';
+import 'register_form_last_page.dart';
+import 'register_form_second_page.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatelessWidget with MessageMixin {
   final _formsPageViewController = PageController();
 
   RegisterPage({Key key}) : super(key: key);
@@ -50,6 +56,28 @@ class RegisterPage extends StatelessWidget {
     return false;
   }
 
+  void _onRegisterFailure(BuildContext context, CreateUserFailure failure) {
+    onFailureMessage(
+      context,
+      failure.when(
+        unexpected: () => I18n.of(context).failureGeneric,
+        connection: () => I18n.of(context).failureConnection,
+        invalidToken: () => "Something went wrong with generating a token.",
+        server: () => I18n.of(context).failureServer,
+        general: (message) => message,
+      ),
+    );
+  }
+
+  void _onRegisterSuccess(
+    BuildContext context,
+  ) {
+    ExtendedNavigator.of(context).pushAndRemoveUntil(
+      Routes.verificationPage,
+      (route) => false,
+    );
+  }
+
   Widget _buildBackButton(BuildContext context) {
     return context.watch<RegisterCubit>().state.currentPage.maybeWhen(
           first: () => BackButton(
@@ -63,10 +91,25 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final overlay = LoadingOverlay.of(context);
+
     return BlocProvider(
       create: (context) => getIt<RegisterCubit>(),
       child: BlocConsumer<RegisterCubit, RegisterState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          state.registerState.maybeWhen(
+            loading: () => overlay.showText("Registering..."),
+            success: () {
+              overlay.hide();
+              _onRegisterSuccess(context);
+            },
+            failure: (failure) {
+              overlay.hide();
+              _onRegisterFailure(context, failure);
+            },
+            orElse: () => overlay.hide(),
+          );
+        },
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(

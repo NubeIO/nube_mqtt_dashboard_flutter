@@ -8,12 +8,13 @@ import '../../../domain/forms/url_validation.dart';
 import '../../../domain/network/host_repository_interface.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
 import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/padding.dart';
 
-class HostPage extends StatelessWidget {
+class HostPage extends StatelessWidget with MessageMixin {
   final FocusScopeNode _node = FocusScopeNode();
   final bool isRegistrationStep;
 
@@ -22,7 +23,12 @@ class HostPage extends StatelessWidget {
     this.isRegistrationStep = true,
   }) : super(key: key);
 
-  void _onConnectionFailure(BuildContext context, SetHostFailure failure) {}
+  void _onConnectionFailure(BuildContext context, SetHostFailure failure) {
+    onFailureMessage(
+      context,
+      failure.when(unexpected: () => I18n.of(context).failureGeneric),
+    );
+  }
 
   void _onConnectionSuccess(BuildContext context) {
     if (isRegistrationStep) {

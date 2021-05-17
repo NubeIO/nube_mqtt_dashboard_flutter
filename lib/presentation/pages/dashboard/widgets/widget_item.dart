@@ -9,6 +9,7 @@ import '../../../../domain/layout/layout_repository_interface.dart';
 import '../../../../domain/widget_data/entities.dart';
 import '../../../../domain/widget_data/failures.dart';
 import '../../../../generated/i18n.dart';
+import '../../../mixins/message_mixin.dart';
 import '../../../themes/nube_theme.dart';
 import '../../../widgets/page_widgets/button_group_widget.dart';
 import '../../../widgets/page_widgets/gauge_widget.dart';
@@ -17,10 +18,8 @@ import '../../../widgets/page_widgets/map_widget.dart';
 import '../../../widgets/page_widgets/slider_widget.dart';
 import '../../../widgets/page_widgets/switch_widget.dart';
 import '../../../widgets/page_widgets/value_widget.dart';
-import '../../../widgets/responsive/padding.dart';
-import '../../../widgets/responsive/snackbar.dart';
 
-class WidgetItem extends StatelessWidget {
+class WidgetItem extends StatelessWidget with MessageMixin {
   final WidgetEntity widgetEntity;
 
   const WidgetItem({
@@ -36,21 +35,12 @@ class WidgetItem extends StatelessWidget {
     BuildContext context,
     WidgetSetFailure failure,
   ) {
-    final snackbar = ResponsiveSnackbar.build(
+    onFailureMessage(
       context,
-      content: Text(
-        failure.when(
-          unexpected: () => I18n.of(context).failureGeneric,
-        ),
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(color: Theme.of(context).colorScheme.error),
+      failure.when(
+        unexpected: () => I18n.of(context).failureGeneric,
       ),
-      direction: Direction.left,
-      width: ResponsiveSize.twoWidth(context),
     );
-    Scaffold.of(context).showSnackBar(snackbar);
   }
 
   Widget _buildWidgets(

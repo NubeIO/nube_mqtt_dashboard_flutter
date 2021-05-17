@@ -9,11 +9,11 @@ import '../../../domain/core/internal_state.dart';
 import '../../../domain/session/failures.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
-import '../../widgets/responsive/snackbar.dart';
+import '../../mixins/message_mixin.dart';
 import '../../widgets/screens/pin_screen.dart';
 
 @FramyWidget(isPage: true)
-class ValidatePinPage extends StatelessWidget {
+class ValidatePinPage extends StatelessWidget with MessageMixin {
   final cubit = getIt<ValidatePinCubit>();
   final String title;
   final String subtitle;
@@ -29,21 +29,13 @@ class ValidatePinPage extends StatelessWidget {
   }
 
   void _onValidateFailure(BuildContext context, ValidatePinFailure failure) {
-    final snackbar = ResponsiveSnackbar.build(
+    onFailureMessage(
       context,
-      content: Text(
-        failure.when(
-          invalidPin: () => "Sorry the pin didn't match please try again. ",
-          unexpected: () => I18n.of(context).failureGeneric,
-        ),
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(color: Theme.of(context).colorScheme.error),
+      failure.when(
+        invalidPin: () => "Sorry the pin didn't match please try again. ",
+        unexpected: () => I18n.of(context).failureGeneric,
       ),
-      direction: Direction.left,
     );
-    Scaffold.of(context).showSnackBar(snackbar);
   }
 
   void _onValidateState(

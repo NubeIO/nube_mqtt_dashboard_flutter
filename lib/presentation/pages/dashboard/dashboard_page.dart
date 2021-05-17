@@ -9,13 +9,13 @@ import '../../../domain/layout/failures.dart';
 import '../../../domain/theme/entities.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../themes/nube_theme.dart';
 import '../../widgets/logo_widget.dart';
 import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/drawer_detail_layout.dart';
 import '../../widgets/responsive/padding.dart';
-import '../../widgets/responsive/snackbar.dart';
 import '../../widgets/variable_menu_item.dart';
 import 'widgets/page_screen.dart';
 
@@ -28,7 +28,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, MessageMixin {
   final cubit = getIt<LayoutCubit>();
 
   @override
@@ -76,7 +76,7 @@ class _DashboardPageState extends State<DashboardPage>
     BuildContext context,
     LayoutFailure failure,
   ) {
-    _onFailureMessage(
+    onFailureMessage(
       context,
       failure.when(
           unexpected: () => I18n.of(context).failureGeneric,
@@ -91,7 +91,7 @@ class _DashboardPageState extends State<DashboardPage>
     BuildContext context,
     LayoutSubscribeFailure failure,
   ) {
-    _onFailureMessage(
+    onFailureMessage(
       context,
       failure.when(
         unexpected: () => I18n.of(context).failureGeneric,
@@ -127,20 +127,6 @@ class _DashboardPageState extends State<DashboardPage>
     } else {
       navigate();
     }
-  }
-
-  void _onFailureMessage(BuildContext context, String message) {
-    final snackbar = ResponsiveSnackbar.build(
-      context,
-      content: Text(
-        message,
-        style: Theme.of(context)
-            .textTheme
-            .bodyText1
-            .copyWith(color: Theme.of(context).colorScheme.error),
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackbar);
   }
 
   Widget _buildFooter(BuildContext context) {
