@@ -33,7 +33,7 @@ class LoginCubit extends Cubit<LoginState> {
       );
 
   Future<void> login() async {
-    emit(state.copyWith(loginState: const InternalState.loading()));
+    emit(state.copyWith(loginState: const InternalStateValue.loading()));
 
     final username = state.username.getOrCrash();
     final password = state.password.getOrCrash();
@@ -42,10 +42,13 @@ class LoginCubit extends Cubit<LoginState> {
 
     result.fold(
       (failue) => emit(
-        state.copyWith(loginState: InternalState.failure(failue)),
+        state.copyWith(
+          loginState: InternalStateValue.failure(failue),
+        ),
       ),
-      (_) => emit(
-        state.copyWith(loginState: const InternalState.success()),
+      (profileStatusType) => emit(
+        state.copyWith(
+            loginState: InternalStateValue.success(profileStatusType)),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nube_mqtt_dashboard/domain/forms/non_empty_validation.dart';
+import 'package:nube_mqtt_dashboard/domain/session/session_data_source_interface.dart';
 
 import '../../../application/login/login_cubit.dart';
 import '../../../domain/session/failures.dart';
@@ -22,8 +23,18 @@ class LoginPage extends StatelessWidget {
 
   void _onLoginFailure(BuildContext context, LoginUserFailure failure) {}
 
-  void _onLoginSuccess(BuildContext context) {
-    ExtendedNavigator.of(context).pushConnectPage(isInitalConfig: true);
+  void _onLoginSuccess(
+    BuildContext context,
+    ProfileStatusType profileStatusType,
+  ) {
+    if (profileStatusType == ProfileStatusType.PROFILE_EXISTS) {
+      ExtendedNavigator.of(context).pushConnectPage(isInitalConfig: true);
+    } else if (profileStatusType == ProfileStatusType.NEEDS_VERIFICATION) {
+      ExtendedNavigator.of(context).pushAndRemoveUntil(
+        Routes.verificationPage,
+        (route) => false,
+      );
+    }
   }
 
   Widget _formUsernameInput(BuildContext context) {
@@ -67,7 +78,7 @@ class LoginPage extends StatelessWidget {
       if (cubit.isValid) {
         return state.loginState.maybeWhen(
           initial: () => fab,
-          success: () => fab,
+          success: (_) => fab,
           orElse: () => Container(),
         );
       }
@@ -104,9 +115,9 @@ class LoginPage extends StatelessWidget {
               overlay.hide();
               _onLoginFailure(context, failure);
             },
-            success: () {
+            success: (profileStatusType) {
               overlay.hide();
-              _onLoginSuccess(context);
+              _onLoginSuccess(context, profileStatusType);
             },
             orElse: () => overlay.hide(),
           );
