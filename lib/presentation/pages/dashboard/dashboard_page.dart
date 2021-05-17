@@ -177,6 +177,13 @@ class _DashboardPageState extends State<DashboardPage>
             final logo = state.layout.logo;
             final selectedPage = state.selectedPage;
             return DrawerDetailLayout(
+              defaultAppBar: AppBar(
+                elevation: 4,
+                backgroundColor: NubeTheme.backgroundOverlay(context),
+                actions: appbarActions(
+                  onNotificationPressed: () => _onNavigateToAlerts(context),
+                ),
+              ),
               appBarBuilder: (context, state) => dashboardAppBar(context,
                   state: state,
                   logo: logo,

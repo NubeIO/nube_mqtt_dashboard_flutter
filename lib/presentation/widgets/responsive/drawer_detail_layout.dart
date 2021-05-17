@@ -13,6 +13,7 @@ class DrawerDetailLayout extends StatefulWidget {
   final IndexedWidgetBuilder _itemBuilder;
   final PreferredSizeWidget Function(BuildContext context, ScaffoldState state)
       _appBarBuilder;
+  final PreferredSizeWidget defaultAppBar;
 
   const DrawerDetailLayout({
     Key key,
@@ -23,6 +24,7 @@ class DrawerDetailLayout extends StatefulWidget {
     @required IndexedWidgetBuilder itemBuilder,
     PreferredSizeWidget Function(BuildContext context, ScaffoldState state)
         appBarBuilder,
+    this.defaultAppBar,
   })  : assert(detailBuilder != null),
         assert(itemCount != null),
         assert(itemBuilder != null),
@@ -88,10 +90,11 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
     if (widget.itemCount > 0) {
       return widget._appBarBuilder(context, state);
     } else {
-      return AppBar(
-        elevation: 4,
-        backgroundColor: NubeTheme.backgroundOverlay(context),
-      );
+      return widget.defaultAppBar ??
+          AppBar(
+            elevation: 4,
+            backgroundColor: NubeTheme.backgroundOverlay(context),
+          );
     }
   }
 
