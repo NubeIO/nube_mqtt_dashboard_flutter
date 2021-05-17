@@ -12,6 +12,7 @@ class OnBoardingIllustration extends LottieWidget {
   }) : super(
           key: key,
           asset: path,
+          darkAsset: pathDark,
           size: size,
         );
 }

@@ -16,6 +16,8 @@ abstract class ISessionRepository implements IRepository {
 
   Future<ProfileStatusType> getLoginStatus();
 
+  Stream<ProfileStatusType> get loginStatusStream;
+
   Future<Either<CreatePinFailure, Unit>> createPin(String pin);
 
   Future<Either<ValidatePinFailure, Unit>> validatePin(String pin);

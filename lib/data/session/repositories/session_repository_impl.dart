@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../../domain/core/future_failure_helper.dart';
 import '../../../domain/notifications/notification_repository_interface.dart';
@@ -15,6 +16,9 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final ISessionDataSource _sessionDataSource;
   bool _hasValidated = false;
 
+  final BehaviorSubject<ProfileStatusType> _profileTypeStream =
+      BehaviorSubject();
+
   ProwdlySessionRepositoryImpl(
     this._pinPreferenceManager,
     this._sessionPreferenceManager,
@@ -22,6 +26,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     this._sessionDataSource,
   ) {
     _hasValidated = _pinPreferenceManager.isPinSet;
+    _profileTypeStream.add(_sessionPreferenceManager.status);
   }
 
   @override
@@ -64,6 +69,9 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   @override
+  Stream<ProfileStatusType> get loginStatusStream => _profileTypeStream.stream;
+
+  @override
   Future<Either<CreateUserFailure, ProfileStatusType>> createUser(
     CreateUserEntity entity,
   ) async {
@@ -90,7 +98,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
         );
         _storeSession(jwtModel);
 
-        _sessionPreferenceManager.status = ProfileStatusType.NEEDS_VERIFICATION;
+        _setProfileStatus(ProfileStatusType.NEEDS_VERIFICATION);
 
         return const Right(ProfileStatusType.NEEDS_VERIFICATION);
       },
@@ -100,6 +108,11 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
         orElse: () => const CreateUserFailure.server(),
       ),
     );
+  }
+
+  void _setProfileStatus(ProfileStatusType status) {
+    _sessionPreferenceManager.status = status;
+    _profileTypeStream.add(status);
   }
 
   @override
@@ -128,7 +141,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
         _storeSession(jwtModel);
         // Get Validation Status
 
-        _sessionPreferenceManager.status = ProfileStatusType.NEEDS_VERIFICATION;
+        _setProfileStatus(ProfileStatusType.NEEDS_VERIFICATION);
 
         return Right(_sessionPreferenceManager.status);
       },
