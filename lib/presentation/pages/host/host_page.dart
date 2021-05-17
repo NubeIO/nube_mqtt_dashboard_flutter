@@ -58,9 +58,9 @@ class HostPage extends StatelessWidget {
         ),
       ),
       label: "Port",
+      textInputAction: TextInputAction.done,
       initialValue: context.watch<HostCubit>().state.port,
       onChanged: context.watch<HostCubit>().setPort,
-      onEditingComplete: _node.nextFocus,
     );
   }
 

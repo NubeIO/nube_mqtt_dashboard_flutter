@@ -1,10 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nube_mqtt_dashboard/domain/forms/non_empty_validation.dart';
 
 import '../../../application/login/login_cubit.dart';
-import '../../../domain/forms/password_validation.dart';
-import '../../../domain/forms/username_validation.dart';
 import '../../../domain/session/failures.dart';
 import '../../../injectable/injection.dart';
 import '../../routes/router.dart';
@@ -29,10 +28,9 @@ class LoginPage extends StatelessWidget {
 
   Widget _formUsernameInput(BuildContext context) {
     return FormStringInput(
-      validation: UsernameValidation(
+      validation: NonEmptyValidation(
         mapper: (failure) => failure.when(
-          usernameTaken: () => "",
-          usernameInvalid: () => "",
+          empty: () => "Username is required and can't be empty",
         ),
       ),
       label: "Username",
@@ -44,14 +42,14 @@ class LoginPage extends StatelessWidget {
 
   Widget _formPasswordInput(BuildContext context) {
     return FormStringInput(
-      validation: PasswordValidation(
+      validation: NonEmptyValidation(
         mapper: (failure) => failure.when(
-          tooShort: () => "",
-          passwordMismatch: () => "",
+          empty: () => "Password is required and can't be empty",
         ),
       ),
       obscureText: true,
       label: "Password",
+      textInputAction: TextInputAction.done,
       initialValue: context.watch<LoginCubit>().state.password,
       onChanged: context.watch<LoginCubit>().setPassword,
     );
