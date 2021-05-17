@@ -65,6 +65,10 @@ class _DashboardPageState extends State<DashboardPage>
     cubit.init(shouldReconnect: result);
   }
 
+  void _onNavigateToAlerts(BuildContext context) {
+    ExtendedNavigator.of(context).pushAlertsPage();
+  }
+
   Future<void> _navigateToLogs(BuildContext context) async {
     final result = await ExtendedNavigator.of(context).pushValidatePinPage();
     if (result != null) {
@@ -175,12 +179,11 @@ class _DashboardPageState extends State<DashboardPage>
             final logo = state.layout.logo;
             final selectedPage = state.selectedPage;
             return DrawerDetailLayout(
-              appBarBuilder: (context, state) => dashboardAppBar(
-                context,
-                state: state,
-                logo: logo,
-                name: selectedPage?.name,
-              ),
+              appBarBuilder: (context, state) => dashboardAppBar(context,
+                  state: state,
+                  logo: logo,
+                  name: selectedPage?.name,
+                  onNotificationPressed: () => _onNavigateToAlerts(context)),
               header: Padding(
                 padding: EdgeInsets.all(ResponsiveSize.padding(context)),
                 child: LogoWidget(
@@ -218,6 +221,7 @@ AppBar dashboardAppBar(
   ScaffoldState state,
   @required Logo logo,
   @required String name,
+  @required void Function() onNotificationPressed,
 }) {
   final iconSize = logo.size;
   final smallPadding =
@@ -229,13 +233,11 @@ AppBar dashboardAppBar(
     return AppBar(
       titleSpacing: 0,
       centerTitle: false,
-      backgroundColor: NubeTheme.backgroundOverlay(context, 0),
-      title: Text(
-        name ?? "No Layout",
-        style: Theme.of(context).textTheme.headline1.copyWith(
-              color: NubeTheme.colorText200(context),
-            ),
+      actions: appbarActions(
+        onNotificationPressed: () => onNotificationPressed(),
       ),
+      backgroundColor: NubeTheme.backgroundOverlay(context, 0),
+      title: appbarTitle(name, context),
     );
   }
   return AppBar(
@@ -262,14 +264,32 @@ AppBar dashboardAppBar(
         ),
       ),
     ),
+    actions: appbarActions(
+      onNotificationPressed: () => onNotificationPressed(),
+    ),
     titleSpacing: 0,
     centerTitle: false,
     backgroundColor: NubeTheme.backgroundOverlay(context, 0),
-    title: Text(
-      name ?? "No Layout",
-      style: Theme.of(context).textTheme.headline1.copyWith(
-            color: NubeTheme.colorText200(context),
-          ),
-    ),
+    title: appbarTitle(name, context),
   );
+}
+
+Text appbarTitle(String name, BuildContext context) {
+  return Text(
+    name ?? "No Layout",
+    style: Theme.of(context).textTheme.headline1.copyWith(
+          color: NubeTheme.colorText200(context),
+        ),
+  );
+}
+
+List<Widget> appbarActions({
+  @required void Function() onNotificationPressed,
+}) {
+  return [
+    IconButton(
+      icon: const Icon(Icons.notifications_outlined),
+      onPressed: () => onNotificationPressed(),
+    )
+  ];
 }

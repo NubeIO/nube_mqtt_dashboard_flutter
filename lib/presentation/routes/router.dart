@@ -1,18 +1,19 @@
 import 'package:auto_route/auto_route_annotations.dart';
 import 'package:dartz/dartz.dart';
-import 'package:nube_mqtt_dashboard/presentation/pages/host/host_page.dart';
-import 'package:nube_mqtt_dashboard/presentation/pages/login/login_page.dart';
-import 'package:nube_mqtt_dashboard/presentation/pages/onboarding/on_boarding_page.dart';
-import 'package:nube_mqtt_dashboard/presentation/pages/register/register_page.dart';
-import 'package:nube_mqtt_dashboard/presentation/pages/verification/verification_page.dart';
 
+import '../pages/alerts/alerts_page.dart';
 import '../pages/connect/connect_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
+import '../pages/host/host_page.dart';
+import '../pages/login/login_page.dart';
 import '../pages/logs/logs_page.dart';
+import '../pages/onboarding/on_boarding_page.dart';
 import '../pages/pin_create/pin_create_page.dart';
 import '../pages/pin_validate/pin_validate_page.dart';
 import '../pages/preview/preview_page.dart';
+import '../pages/register/register_page.dart';
 import '../pages/splash/splash_page.dart';
+import '../pages/verification/verification_page.dart';
 import '../rotue_guards/config_guard.dart';
 
 export 'router.gr.dart';
@@ -31,6 +32,7 @@ export 'router.gr.dart';
     AdaptiveRoute(page: HostPage),
     AdaptiveRoute(page: LoginPage),
     AdaptiveRoute(page: RegisterPage),
+    AdaptiveRoute(page: AlertsPage),
   ],
   generateNavigationHelperExtension: true,
 )
