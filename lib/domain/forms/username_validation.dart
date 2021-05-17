@@ -14,7 +14,7 @@ class UsernameValidation extends IValidation<UsernameFailure, String> {
   @override
   Future<Either<UsernameFailure, String>> validate(String input) async {
     if (input.length < 8) {
-      return left(const UsernameFailure.usernameInvalid());
+      return left(const UsernameFailure.tooShort());
     } else {
       return right(input.trim());
     }
