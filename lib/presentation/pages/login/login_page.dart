@@ -8,13 +8,14 @@ import '../../../domain/session/failures.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../../utils/logger/log.dart';
+import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
-import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/padding.dart';
 
-class LoginPage extends StatelessWidget with MessageMixin {
+class LoginPage extends StatelessWidget with MessageMixin, LoadingMixin {
   final FocusScopeNode _node = FocusScopeNode();
   final bool isRegistrationStep;
 
@@ -40,11 +41,12 @@ class LoginPage extends StatelessWidget with MessageMixin {
     BuildContext context,
     ProfileStatusType profileStatusType,
   ) {
+    Log.i("$profileStatusType");
     if (profileStatusType == ProfileStatusType.PROFILE_EXISTS) {
-      ExtendedNavigator.of(context).pushConnectPage(isInitalConfig: true);
+      ExtendedNavigator.of(context).pushDashboardPage();
     } else if (profileStatusType == ProfileStatusType.NEEDS_VERIFICATION) {
       ExtendedNavigator.of(context).pushAndRemoveUntil(
-        Routes.verificationPage,
+        Routes.alertsPage,
         (route) => false,
       );
     }
@@ -116,23 +118,23 @@ class LoginPage extends StatelessWidget with MessageMixin {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final overlay = LoadingOverlay.of(context);
 
     return BlocProvider(
       create: (context) => getIt<LoginCubit>(),
       child: BlocConsumer<LoginCubit, LoginState>(
         listener: (context, state) {
+          Log.i("$state");
           state.loginState.maybeWhen(
-            loading: () => overlay.showText("Logging In..."),
+            loading: () => showLoading(context, message: "Logging In..."),
             failure: (failure) {
-              overlay.hide();
+              hideLoading(context);
               _onLoginFailure(context, failure);
             },
             success: (profileStatusType) {
-              overlay.hide();
+              hideLoading(context);
               _onLoginSuccess(context, profileStatusType);
             },
-            orElse: () => overlay.hide(),
+            orElse: () => hideLoading(context),
           );
         },
         builder: (context, state) {

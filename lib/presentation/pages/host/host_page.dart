@@ -8,13 +8,13 @@ import '../../../domain/forms/url_validation.dart';
 import '../../../domain/network/host_repository_interface.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
-import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/padding.dart';
 
-class HostPage extends StatelessWidget with MessageMixin {
+class HostPage extends StatelessWidget with MessageMixin, LoadingMixin {
   final FocusScopeNode _node = FocusScopeNode();
   final bool isRegistrationStep;
 
@@ -107,23 +107,22 @@ class HostPage extends StatelessWidget with MessageMixin {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final overlay = LoadingOverlay.of(context);
 
     return BlocProvider(
       create: (context) => getIt<HostCubit>(),
       child: BlocConsumer<HostCubit, HostState>(
         listener: (context, state) {
           state.saveConfigState.maybeWhen(
-            loading: () => overlay.showText("Connecting..."),
+            loading: () => showLoading(context, message: "Connecting..."),
             failure: (failure) {
-              overlay.hide();
+              hideLoading(context);
               _onConnectionFailure(context, failure);
             },
             success: () {
-              overlay.hide();
+              hideLoading(context);
               _onConnectionSuccess(context);
             },
-            orElse: () => overlay.hide(),
+            orElse: () => hideLoading(context),
           );
         },
         builder: (context, state) {

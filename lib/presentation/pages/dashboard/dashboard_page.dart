@@ -9,11 +9,11 @@ import '../../../domain/layout/failures.dart';
 import '../../../domain/theme/entities.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../themes/nube_theme.dart';
 import '../../widgets/logo_widget.dart';
-import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/drawer_detail_layout.dart';
 import '../../widgets/responsive/padding.dart';
 import '../../widgets/variable_menu_item.dart';
@@ -28,7 +28,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage>
-    with WidgetsBindingObserver, MessageMixin {
+    with WidgetsBindingObserver, MessageMixin, LoadingMixin {
   final cubit = getIt<LayoutCubit>();
 
   @override
@@ -152,8 +152,6 @@ class _DashboardPageState extends State<DashboardPage>
 
   @override
   Widget build(BuildContext context) {
-    final overlay = LoadingOverlay.of(context);
-
     return Scaffold(
       body: BlocProvider(
         create: (context) => cubit,
@@ -167,11 +165,11 @@ class _DashboardPageState extends State<DashboardPage>
 
             state.layoutConnection.maybeWhen(
               failure: (failure) {
-                overlay.hide();
+                hideLoading(context);
                 _onConnectFailure(context, failure);
               },
-              success: () => overlay.hide(),
-              orElse: () => overlay.show(),
+              success: () => hideLoading(context),
+              orElse: () => showLoading(context),
             );
           },
           builder: (context, state) {

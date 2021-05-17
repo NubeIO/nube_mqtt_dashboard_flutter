@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nube_mqtt_dashboard/presentation/mixins/loading_mixin.dart';
 
 import '../../../application/register/register_cubit.dart';
 import '../../../domain/session/failures.dart';
@@ -8,12 +9,11 @@ import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
-import '../../widgets/overlays/loading.dart';
 import 'register_form_first_page.dart';
 import 'register_form_last_page.dart';
 import 'register_form_second_page.dart';
 
-class RegisterPage extends StatelessWidget with MessageMixin {
+class RegisterPage extends StatelessWidget with MessageMixin, LoadingMixin {
   final _formsPageViewController = PageController();
 
   RegisterPage({Key key}) : super(key: key);
@@ -91,23 +91,21 @@ class RegisterPage extends StatelessWidget with MessageMixin {
 
   @override
   Widget build(BuildContext context) {
-    final overlay = LoadingOverlay.of(context);
-
     return BlocProvider(
       create: (context) => getIt<RegisterCubit>(),
       child: BlocConsumer<RegisterCubit, RegisterState>(
         listener: (context, state) {
           state.registerState.maybeWhen(
-            loading: () => overlay.showText("Registering..."),
+            loading: () => showLoading(context, message: "Registering..."),
             success: () {
-              overlay.hide();
+              hideLoading(context);
               _onRegisterSuccess(context);
             },
             failure: (failure) {
-              overlay.hide();
+              hideLoading(context);
               _onRegisterFailure(context, failure);
             },
-            orElse: () => overlay.hide(),
+            orElse: () => hideLoading(context),
           );
         },
         builder: (context, state) {

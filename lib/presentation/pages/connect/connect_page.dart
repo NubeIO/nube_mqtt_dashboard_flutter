@@ -11,13 +11,13 @@ import '../../../domain/forms/url_validation.dart';
 import '../../../domain/mqtt/mqtt_repository.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../themes/nube_theme.dart';
 import '../../themes/theme_interface.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
 import '../../widgets/form_elements/theme_input.dart';
-import '../../widgets/overlays/loading.dart';
 import '../../widgets/responsive/master_layout.dart';
 import '../../widgets/responsive/padding.dart';
 import '../../widgets/responsive/screen_type_layout.dart';
@@ -34,7 +34,8 @@ class ConnectPage extends StatefulWidget {
   _ConnectPageState createState() => _ConnectPageState();
 }
 
-class _ConnectPageState extends State<ConnectPage> with MessageMixin {
+class _ConnectPageState extends State<ConnectPage>
+    with MessageMixin, LoadingMixin {
   ConfigurationCubit cubit;
   final FocusScopeNode _node = FocusScopeNode();
 
@@ -348,7 +349,6 @@ class _ConnectPageState extends State<ConnectPage> with MessageMixin {
 
   @override
   Widget build(BuildContext context) {
-    final overlay = LoadingOverlay.of(context);
     return Scaffold(
       body: BlocProvider(
         create: (context) => cubit,
@@ -356,16 +356,16 @@ class _ConnectPageState extends State<ConnectPage> with MessageMixin {
           cubit: cubit,
           listener: (context, state) {
             state.connectState.maybeWhen(
-              loading: () => overlay.showText("Connecting..."),
+              loading: () => showLoading(context, message: "Connecting..."),
               failure: (failure) {
-                overlay.hide();
+                hideLoading(context);
                 _onConnectionFailure(context, failure);
               },
               success: () {
-                overlay.hide();
+                hideLoading(context);
                 _onConnectionSuccess(context, state.shouldReconnect);
               },
-              orElse: () => overlay.hide(),
+              orElse: () => hideLoading(context),
             );
           },
           builder: (context, state) {
