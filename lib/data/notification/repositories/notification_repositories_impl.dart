@@ -1,14 +1,19 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../domain/notifications/alerts_data_source_interface.dart';
 import '../../../domain/notifications/notification_data_source_interface.dart';
 import '../../../domain/notifications/notification_repository_interface.dart';
 
 @LazySingleton(as: INotificationRepository)
 class NotificationRepositoryImpl extends INotificationRepository {
   final INotificationDataSource _notificationDataSource;
+  final IAlertsDataSource _alertsDataSource;
 
-  NotificationRepositoryImpl(this._notificationDataSource);
+  NotificationRepositoryImpl(
+    this._notificationDataSource,
+    this._alertsDataSource,
+  );
 
   @override
   Future<Either<GetTokenFailure, String>> getToken() async {
