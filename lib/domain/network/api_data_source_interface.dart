@@ -1,10 +1,17 @@
 import 'package:dartz/dartz.dart';
 
 import '../../data/session/session_api.dart';
+import '../../data/user/user_api.dart';
 import '../core/interfaces/datasource.dart';
+
+export '../../data/session/session_api.dart';
+export '../../data/user/user_api.dart';
+export '../core/interfaces/datasource.dart';
 
 abstract class IApiDataSource implements IDataSource {
   Future<SessionApi> get sessionApi;
+
+  Future<UserApi> get userApi;
 
   Future<Unit> logout();
 }
