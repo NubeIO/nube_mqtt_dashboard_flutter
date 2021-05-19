@@ -22,12 +22,14 @@ class HostCubit extends Cubit<HostState> {
   void setHost(ValueObject<String> value) => emit(
         state.copyWith(
           host: value,
+          saveConfigState: const InternalState.initial(),
         ),
       );
 
   void setPort(ValueObject<int> value) => emit(
         state.copyWith(
           port: value,
+          saveConfigState: const InternalState.initial(),
         ),
       );
 

@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 import '../exceptions.dart';
 
@@ -23,7 +22,7 @@ class ErrorInterceptor extends Interceptor {
             request: err.request,
             error: RefreshException(),
             response: err.response);
-      } else if (kReleaseMode) {
+      } else {
         final rawMessage = err.response.data["message"];
         String message = "";
         if (rawMessage is String) {

@@ -23,12 +23,14 @@ class LoginCubit extends Cubit<LoginState> {
   void setUsername(ValueObject<String> username) => emit(
         state.copyWith(
           username: username,
+          loginState: const InternalStateValue.initial(),
         ),
       );
 
   void setPassword(ValueObject<String> password) => emit(
         state.copyWith(
           password: password,
+          loginState: const InternalStateValue.initial(),
         ),
       );
 

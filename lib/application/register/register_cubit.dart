@@ -16,27 +16,45 @@ class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit(this._sessionRepository) : super(RegisterState.initial());
 
   void setFirstName(ValueObject<String> value) {
-    emit(state.copyWith(firstName: value));
+    emit(state.copyWith(
+      firstName: value,
+      registerState: const InternalState.initial(),
+    ));
   }
 
   void setLastName(ValueObject<String> value) {
-    emit(state.copyWith(lastName: value));
+    emit(state.copyWith(
+      lastName: value,
+      registerState: const InternalState.initial(),
+    ));
   }
 
   void setUsername(ValueObject<String> value) {
-    emit(state.copyWith(username: value));
+    emit(state.copyWith(
+      username: value,
+      registerState: const InternalState.initial(),
+    ));
   }
 
   void setEmail(ValueObject<String> value) {
-    emit(state.copyWith(email: value));
+    emit(state.copyWith(
+      email: value,
+      registerState: const InternalState.initial(),
+    ));
   }
 
   void setPassword(ValueObject<String> value) {
-    emit(state.copyWith(password: value));
+    emit(state.copyWith(
+      password: value,
+      registerState: const InternalState.initial(),
+    ));
   }
 
   void setConfirmPassword(ValueObject<String> value) {
-    emit(state.copyWith(confirmPassword: value));
+    emit(state.copyWith(
+      confirmPassword: value,
+      registerState: const InternalState.initial(),
+    ));
   }
 
   void onPageChanged(int value) {
