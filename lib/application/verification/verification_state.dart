@@ -6,7 +6,7 @@ abstract class VerificationState with _$VerificationState {
     @required ProfileStatusType status,
   }) = _Initial;
 
-  factory VerificationState.initial() => VerificationState(
+  factory VerificationState.initial() => const VerificationState(
         status: ProfileStatusType.NEEDS_VERIFICATION,
       );
 }

@@ -15,7 +15,12 @@ class HostDataSourceImpl extends IHostDataSource {
     String host,
     int port,
   ) {
-    _hostPreferenceManager.url = "$host:$port";
+    String _host = host;
+    // ignore: unnecessary_raw_strings
+    if (!host.startsWith(RegExp(r"http?:"))) {
+      _host = "http://$host";
+    }
+    _hostPreferenceManager.url = "$_host:$port/";
     return Future.value(unit);
   }
 

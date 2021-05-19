@@ -1,10 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
-import 'package:nube_mqtt_dashboard/domain/session/session_repository_interface.dart';
 
 import '../../domain/core/internal_state.dart';
-import '../../domain/session/failures.dart';
+import '../../domain/session/session_repository_interface.dart';
 import '../validation/value_object.dart';
 
 part 'register_cubit.freezed.dart';
