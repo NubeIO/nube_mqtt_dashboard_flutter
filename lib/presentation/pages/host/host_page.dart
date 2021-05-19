@@ -108,62 +108,65 @@ class HostPage extends StatelessWidget with MessageMixin, LoadingMixin {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return BlocProvider(
-      create: (context) => getIt<HostCubit>(),
-      child: BlocConsumer<HostCubit, HostState>(
-        listener: (context, state) {
-          state.saveConfigState.maybeWhen(
-            loading: () => showLoading(context, message: "Connecting..."),
-            failure: (failure) {
-              hideLoading(context);
-              _onConnectionFailure(context, failure);
-            },
-            success: () {
-              hideLoading(context);
-              _onConnectionSuccess(context);
-            },
-            orElse: () => hideLoading(context),
-          );
-        },
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              centerTitle: true,
-            ),
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: ResponsiveSize.padding(
-                    context,
-                    size: PaddingSize.small,
+    return Scaffold(
+      body: BlocProvider(
+        create: (context) => getIt<HostCubit>(),
+        child: BlocConsumer<HostCubit, HostState>(
+          listener: (context, state) {
+            state.saveConfigState.maybeWhen(
+              loading: () => showLoading(context, message: "Connecting..."),
+              failure: (failure) {
+                hideLoading(context);
+                _onConnectionFailure(context, failure);
+              },
+              success: () {
+                hideLoading(context);
+                _onConnectionSuccess(context);
+              },
+              orElse: () => hideLoading(context),
+            );
+          },
+          builder: (context, state) {
+            return Scaffold(
+              appBar: AppBar(
+                centerTitle: true,
+              ),
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: ResponsiveSize.padding(
+                      context,
+                      size: PaddingSize.small,
+                    ),
                   ),
-                ),
-                FormPadding(
-                  child: Text(
-                    "Server Configuration",
-                    style: textTheme.headline1,
+                  FormPadding(
+                    child: Text(
+                      "Server Configuration",
+                      style: textTheme.headline1,
+                    ),
                   ),
-                ),
-                FormPadding(
-                  child: Text(
-                    "Enter the server IP and Port Address",
-                    style: textTheme.bodyText1,
+                  FormPadding(
+                    child: Text(
+                      "Enter the server IP and Port Address",
+                      style: textTheme.bodyText1,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: ResponsiveSize.padding(
-                    context,
-                    size: PaddingSize.large,
+                  SizedBox(
+                    height: ResponsiveSize.padding(
+                      context,
+                      size: PaddingSize.large,
+                    ),
                   ),
-                ),
-                _buildMainInputs(context)
-              ],
-            ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            floatingActionButton: _buildFab(context),
-          );
-        },
+                  _buildMainInputs(context)
+                ],
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.endFloat,
+              floatingActionButton: _buildFab(context),
+            );
+          },
+        ),
       ),
     );
   }

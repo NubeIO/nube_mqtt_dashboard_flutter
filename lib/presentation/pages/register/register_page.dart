@@ -91,65 +91,67 @@ class RegisterPage extends StatelessWidget with MessageMixin, LoadingMixin {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<RegisterCubit>(),
-      child: BlocConsumer<RegisterCubit, RegisterState>(
-        listener: (context, state) {
-          state.registerState.maybeWhen(
-            loading: () => showLoading(context, message: "Registering..."),
-            success: () {
-              hideLoading(context);
-              _onRegisterSuccess(context);
-            },
-            failure: (failure) {
-              hideLoading(context);
-              _onRegisterFailure(context, failure);
-            },
-            orElse: () => hideLoading(context),
-          );
-        },
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              leading: _buildBackButton(context),
-            ),
-            body: PageView.builder(
-              controller: _formsPageViewController,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 3,
-              onPageChanged: (value) {
-                context.read<RegisterCubit>().onPageChanged(value);
+    return Scaffold(
+      body: BlocProvider(
+        create: (context) => getIt<RegisterCubit>(),
+        child: BlocConsumer<RegisterCubit, RegisterState>(
+          listener: (context, state) {
+            state.registerState.maybeWhen(
+              loading: () => showLoading(context, message: "Registering..."),
+              success: () {
+                hideLoading(context);
+                _onRegisterSuccess(context);
               },
-              itemBuilder: (context, index) {
-                return [
-                  WillPopScope(
-                    onWillPop: () => Future.sync(_onWillPop),
-                    child: const RegisterFormFirstPage(),
-                  ),
-                  WillPopScope(
-                    onWillPop: () => Future.sync(_onWillPop),
-                    child: const RegisterFormSecondPage(),
-                  ),
-                  WillPopScope(
-                    onWillPop: () => Future.sync(_onWillPop),
-                    child: const RegisterFormLastPage(),
-                  ),
-                ][index];
+              failure: (failure) {
+                hideLoading(context);
+                _onRegisterFailure(context, failure);
               },
-            ),
-            floatingActionButton: context.watch<RegisterCubit>().isValid
-                ? FloatingActionButton(
-                    onPressed: () => _onFabClick(context, state),
-                    child: Icon(
-                      state.currentPage.maybeWhen(
-                        last: () => Icons.check,
-                        orElse: () => Icons.chevron_right_rounded,
-                      ),
+              orElse: () => hideLoading(context),
+            );
+          },
+          builder: (context, state) {
+            return Scaffold(
+              appBar: AppBar(
+                leading: _buildBackButton(context),
+              ),
+              body: PageView.builder(
+                controller: _formsPageViewController,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 3,
+                onPageChanged: (value) {
+                  context.read<RegisterCubit>().onPageChanged(value);
+                },
+                itemBuilder: (context, index) {
+                  return [
+                    WillPopScope(
+                      onWillPop: () => Future.sync(_onWillPop),
+                      child: const RegisterFormFirstPage(),
                     ),
-                  )
-                : const SizedBox.shrink(),
-          );
-        },
+                    WillPopScope(
+                      onWillPop: () => Future.sync(_onWillPop),
+                      child: const RegisterFormSecondPage(),
+                    ),
+                    WillPopScope(
+                      onWillPop: () => Future.sync(_onWillPop),
+                      child: const RegisterFormLastPage(),
+                    ),
+                  ][index];
+                },
+              ),
+              floatingActionButton: context.watch<RegisterCubit>().isValid
+                  ? FloatingActionButton(
+                      onPressed: () => _onFabClick(context, state),
+                      child: Icon(
+                        state.currentPage.maybeWhen(
+                          last: () => Icons.check,
+                          orElse: () => Icons.chevron_right_rounded,
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            );
+          },
+        ),
       ),
     );
   }

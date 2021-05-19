@@ -119,63 +119,65 @@ class LoginPage extends StatelessWidget with MessageMixin, LoadingMixin {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return BlocProvider(
-      create: (context) => getIt<LoginCubit>(),
-      child: BlocConsumer<LoginCubit, LoginState>(
-        listener: (context, state) {
-          Log.i("$state");
-          state.loginState.maybeWhen(
-            loading: () => showLoading(context, message: "Logging In..."),
-            failure: (failure) {
-              hideLoading(context);
-              _onLoginFailure(context, failure);
-            },
-            success: (profileStatusType) {
-              hideLoading(context);
-              _onLoginSuccess(context, profileStatusType);
-            },
-            orElse: () => hideLoading(context),
-          );
-        },
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              centerTitle: true,
-            ),
-            body: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: ResponsiveSize.padding(
-                    context,
-                    size: PaddingSize.small,
+    return Scaffold(
+      body: BlocProvider(
+        create: (context) => getIt<LoginCubit>(),
+        child: BlocConsumer<LoginCubit, LoginState>(
+          listener: (context, state) {
+            state.loginState.maybeWhen(
+              loading: () => showLoading(context, message: "Logging In..."),
+              failure: (failure) {
+                hideLoading(context);
+                _onLoginFailure(context, failure);
+              },
+              success: (profileStatusType) {
+                hideLoading(context);
+                _onLoginSuccess(context, profileStatusType);
+              },
+              orElse: () => hideLoading(context),
+            );
+          },
+          builder: (context, state) {
+            return Scaffold(
+              appBar: AppBar(
+                centerTitle: true,
+              ),
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: ResponsiveSize.padding(
+                      context,
+                      size: PaddingSize.small,
+                    ),
                   ),
-                ),
-                FormPadding(
-                  child: Text(
-                    "Welcome Back",
-                    style: textTheme.headline1,
+                  FormPadding(
+                    child: Text(
+                      "Welcome Back",
+                      style: textTheme.headline1,
+                    ),
                   ),
-                ),
-                FormPadding(
-                  child: Text(
-                    "Sign in to continue.",
-                    style: textTheme.bodyText1,
+                  FormPadding(
+                    child: Text(
+                      "Sign in to continue.",
+                      style: textTheme.bodyText1,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: ResponsiveSize.padding(
-                    context,
-                    size: PaddingSize.large,
+                  SizedBox(
+                    height: ResponsiveSize.padding(
+                      context,
+                      size: PaddingSize.large,
+                    ),
                   ),
-                ),
-                _buildMainInputs(context)
-              ],
-            ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-            floatingActionButton: _buildFab(context),
-          );
-        },
+                  _buildMainInputs(context)
+                ],
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.endFloat,
+              floatingActionButton: _buildFab(context),
+            );
+          },
+        ),
       ),
     );
   }
