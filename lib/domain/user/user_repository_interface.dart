@@ -7,4 +7,6 @@ export 'entities.dart';
 
 abstract class IUserRepository {
   Future<Either<GetUserFailure, UserModel>> getUser();
+
+  Future<Either<SetTokenFailure, String>> setDeviceToken();
 }

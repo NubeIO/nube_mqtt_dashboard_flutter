@@ -17,7 +17,7 @@ abstract class SessionApi {
   @POST("um/api/users")
   Future<JWTResponse> registerUser(@Body() RegisterRequest request);
 
-  @POST("um/api/user/login")
+  @POST("um/api/users/login")
   Future<JWTResponse> loginUser(@Body() LoginRequest request);
 
   @POST("um/user")

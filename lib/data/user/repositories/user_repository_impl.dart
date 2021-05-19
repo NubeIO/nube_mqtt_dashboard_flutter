@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 
 import '../../../domain/core/future_failure_helper.dart';
+import '../../../domain/notifications/notification_repository_interface.dart';
 import '../../../domain/user/failures.dart';
 import '../../../domain/user/user_data_source_interface.dart';
 import '../../../domain/user/user_repository_interface.dart';
@@ -8,7 +9,8 @@ import '../../../domain/user/user_repository_interface.dart';
 @LazySingleton(as: IUserRepository)
 class UserRepositoryImpl extends IUserRepository {
   final IUserDataSource _userDataSource;
-  UserRepositoryImpl(this._userDataSource);
+  final INotificationRepository _notificationRepository;
+  UserRepositoryImpl(this._userDataSource, this._notificationRepository);
 
   @override
   Future<Either<GetUserFailure, UserModel>> getUser() {
@@ -22,6 +24,29 @@ class UserRepositoryImpl extends IUserRepository {
         connection: () => const GetUserFailure.connection(),
         general: (message) => GetUserFailure.general(message),
         orElse: () => const GetUserFailure.server(),
+      ),
+    );
+  }
+
+  @override
+  Future<Either<SetTokenFailure, String>> setDeviceToken() {
+    return futureFailureHelper(
+      request: () async {
+        final tokenResult = await _notificationRepository.getToken();
+        if (tokenResult.isLeft()) {
+          return const Left(SetTokenFailure.unexpected());
+        }
+        final token = tokenResult.fold(
+          (l) => throw AssertionError(),
+          (token) => token,
+        );
+        await _userDataSource.setDeviceToken(token);
+        return Right(token);
+      },
+      failureMapper: (cases) => cases.maybeWhen(
+        connection: () => const SetTokenFailure.connection(),
+        general: (message) => SetTokenFailure.general(message),
+        orElse: () => const SetTokenFailure.server(),
       ),
     );
   }

@@ -2,10 +2,10 @@ import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../domain/core/future_failure_helper.dart';
-import '../../../domain/notifications/notification_repository_interface.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../domain/session/session_repository_interface.dart';
 import '../../../domain/user/user_repository_interface.dart';
+import '../../../utils/logger/log.dart';
 import '../managers/pin_preference.dart';
 import '../managers/session_preference.dart';
 
@@ -14,7 +14,6 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final PinPreferenceManager _pinPreferenceManager;
   final SessionPreferenceManager _sessionPreferenceManager;
   final IUserRepository _userRepository;
-  final INotificationRepository _notificationRepository;
   final ISessionDataSource _sessionDataSource;
   bool _hasValidated = false;
 
@@ -24,7 +23,6 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   ProwdlySessionRepositoryImpl(
     this._pinPreferenceManager,
     this._sessionPreferenceManager,
-    this._notificationRepository,
     this._sessionDataSource,
     this._userRepository,
   ) {
@@ -90,6 +88,23 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
 
         _storeSession(jwtModel);
 
+        final tokenResult = await _userRepository.setDeviceToken();
+        Log.i(tokenResult.toString());
+
+        if (tokenResult.isLeft()) {
+          return tokenResult.fold(
+            (failure) => Left(
+              failure.when(
+                unexpected: () => const CreateUserFailure.unexpected(),
+                connection: () => const CreateUserFailure.connection(),
+                invalidToken: () => const CreateUserFailure.invalidToken(),
+                server: () => const CreateUserFailure.server(),
+                general: (message) => CreateUserFailure.general(message),
+              ),
+            ),
+            (_) => throw AssertionError(),
+          );
+        }
         _setProfileStatus(ProfileStatusType.NEEDS_VERIFICATION);
 
         return const Right(ProfileStatusType.NEEDS_VERIFICATION);
@@ -124,21 +139,41 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
 
         if (userResult.isLeft()) {
           return userResult.fold(
-              (failure) => Left(
-                    failure.when(
-                      unexpected: () => const LoginUserFailure.unexpected(),
-                      connection: () => const LoginUserFailure.connection(),
-                      invalidToken: () => const LoginUserFailure.invalidToken(),
-                      server: () => const LoginUserFailure.server(),
-                      general: (message) => LoginUserFailure.general(message),
-                    ),
-                  ),
-              (_) => throw AssertionError());
+            (failure) => Left(
+              failure.when(
+                unexpected: () => const LoginUserFailure.unexpected(),
+                connection: () => const LoginUserFailure.connection(),
+                invalidToken: () => const LoginUserFailure.invalidToken(),
+                server: () => const LoginUserFailure.server(),
+                general: (message) => LoginUserFailure.general(message),
+              ),
+            ),
+            (_) => throw AssertionError(),
+          );
         }
         final user = userResult.fold(
           (l) => throw AssertionError(),
           (user) => user,
         );
+
+        final tokenResult = await _userRepository.setDeviceToken();
+
+        Log.i(tokenResult.toString());
+
+        if (tokenResult.isLeft()) {
+          return tokenResult.fold(
+            (failure) => Left(
+              failure.when(
+                unexpected: () => const LoginUserFailure.unexpected(),
+                connection: () => const LoginUserFailure.connection(),
+                invalidToken: () => const LoginUserFailure.invalidToken(),
+                server: () => const LoginUserFailure.server(),
+                general: (message) => LoginUserFailure.general(message),
+              ),
+            ),
+            (_) => throw AssertionError(),
+          );
+        }
 
         if (user.state == UserVerificationState.UNVERIFIED) {
           _setProfileStatus(ProfileStatusType.NEEDS_VERIFICATION);

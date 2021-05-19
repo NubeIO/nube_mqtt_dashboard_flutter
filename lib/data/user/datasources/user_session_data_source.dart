@@ -20,4 +20,14 @@ class UserDataRepositoryImpl extends IUserDataSource {
         .then((response) => sessionMapper.toUser(response))
         .catchDioException();
   }
+
+  @override
+  Future<Unit> setDeviceToken(String token) {
+    return _apiRepository.userApi
+        .then(
+          (api) => api.setDeviceToken(SetDeviceTokenRequest(deviceId: token)),
+        )
+        .then((response) => unit)
+        .catchDioException();
+  }
 }
