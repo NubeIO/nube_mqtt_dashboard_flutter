@@ -20,6 +20,9 @@ class RegisterFormLastPage extends StatelessWidget {
         validation: PasswordValidation(
           mapper: (failure) => failure.when(
             tooShort: () => "Password must be atleast 8 charecters long.",
+            noDigit: () => "Password must have at least one digit (0-9).",
+            noUpperChar: () =>
+                "Password must have at least one uppercase (A-Z).",
             passwordMismatch: () => "Opps, seems the passwords don't match.",
           ),
         ),
@@ -36,6 +39,9 @@ class RegisterFormLastPage extends StatelessWidget {
         validation: PasswordValidation(
           mapper: (failure) => failure.when(
             tooShort: () => "Password must be atleast 8 charecters long.",
+            noDigit: () => "Password must have at least one digit (0-9).",
+            noUpperChar: () =>
+                "Password must have at least one uppercase (A-Z).",
             passwordMismatch: () => "Opps, seems the passwords don't match.",
           ),
           previousPassword: () => context.read<RegisterCubit>().state.password,
