@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -20,6 +23,9 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final BehaviorSubject<ProfileStatusType> _profileTypeStream =
       BehaviorSubject();
 
+  @nullable
+  Timer verificationTimer;
+
   ProwdlySessionRepositoryImpl(
     this._pinPreferenceManager,
     this._sessionPreferenceManager,
@@ -27,6 +33,13 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     this._userRepository,
   ) {
     _hasValidated = _pinPreferenceManager.isPinSet;
+    loginStatusStream.listen((event) {
+      if (event == ProfileStatusType.NEEDS_VERIFICATION) {
+        _onStartVerificationLooper();
+      } else {
+        _onStopVerificationLooper();
+      }
+    });
     _profileTypeStream.add(_sessionPreferenceManager.status);
   }
 
@@ -70,7 +83,34 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   @override
-  Stream<ProfileStatusType> get loginStatusStream => _profileTypeStream.stream;
+  Stream<ProfileStatusType> get loginStatusStream =>
+      _profileTypeStream.stream.distinct();
+
+  Future<void> _onStartVerificationLooper() async {
+    Log.i("Starting Verification Loop");
+    verificationTimer?.cancel();
+    verificationTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (value) async {
+        final userResult = await _userRepository.getUser();
+        if (userResult.isLeft()) return;
+        final user = userResult.fold(
+          (l) => throw AssertionError(),
+          (user) => user,
+        );
+        if (user.state == UserVerificationState.VERIFIED) {
+          _setProfileStatus(ProfileStatusType.PROFILE_EXISTS);
+        }
+      },
+    );
+  }
+
+  Future<void> _onStopVerificationLooper() async {
+    Log.i("Stopping Verification Loop");
+    if (verificationTimer?.isActive == true) {
+      verificationTimer?.cancel();
+    }
+  }
 
   @override
   Future<Either<CreateUserFailure, ProfileStatusType>> createUser(
