@@ -15,13 +15,11 @@ abstract class ISessionDataSource implements IDataSource {
     @required String email,
     @required String password,
     @required String username,
-    @required String deviceId,
   });
 
   Future<JwtModel> loginUser({
     @required String username,
     @required String password,
-    @required String deviceId,
   });
 
   Future<Unit> logout();

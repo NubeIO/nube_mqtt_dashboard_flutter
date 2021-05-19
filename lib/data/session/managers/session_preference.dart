@@ -9,14 +9,10 @@ class SessionPreferenceManager {
 
   SessionPreferenceManager(this._sharedPreferences);
 
-  String get idToken => _sharedPreferences.getString(_Model.idToken.key);
-  set idToken(String value) =>
-      _sharedPreferences.setString(_Model.idToken.key, value);
-
-  String get refreshToken =>
-      _sharedPreferences.getString(_Model.refreshToken.key);
-  set refreshToken(String value) =>
-      _sharedPreferences.setString(_Model.refreshToken.key, value);
+  String get accessToken =>
+      _sharedPreferences.getString(_Model.accessToken.key);
+  set accessToken(String value) =>
+      _sharedPreferences.setString(_Model.accessToken.key, value);
 
   ProfileStatusType get status =>
       _sharedPreferences.getString(_Model.status.key).toProfileStatus() ??
@@ -24,9 +20,9 @@ class SessionPreferenceManager {
   set status(ProfileStatusType value) =>
       _sharedPreferences.setString(_Model.status.key, value.name);
 
-  String get token => _sharedPreferences.getString(_Model.token.key);
-  set token(String value) =>
-      _sharedPreferences.setString(_Model.token.key, value);
+  String get tokenType => _sharedPreferences.getString(_Model.tokenType.key);
+  set tokenType(String value) =>
+      _sharedPreferences.setString(_Model.tokenType.key, value);
 
   void clearData() {
     _Model.values.forEach(_removeItem);
@@ -37,19 +33,21 @@ class SessionPreferenceManager {
   }
 }
 
-enum _Model { token, status, idToken, refreshToken }
+enum _Model {
+  accessToken,
+  status,
+  tokenType,
+}
 
 extension on _Model {
   String get key {
     switch (this) {
-      case _Model.token:
-        return "key:session:token";
+      case _Model.accessToken:
+        return "key:session:accessToken";
       case _Model.status:
         return "key:session:status";
-      case _Model.idToken:
-        return "key:session:id_token";
-      case _Model.refreshToken:
-        return "key:session:refresh_token";
+      case _Model.tokenType:
+        return "key:session:tokenType";
     }
     return "";
   }

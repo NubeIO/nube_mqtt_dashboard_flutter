@@ -23,7 +23,8 @@ abstract class ISessionRepository implements IRepository {
   Future<Either<ValidatePinFailure, Unit>> validatePin(String pin);
 
   Future<Either<CreateUserFailure, ProfileStatusType>> createUser(
-      CreateUserEntity entity);
+    CreateUserEntity entity,
+  );
 
   Future<Either<LoginUserFailure, ProfileStatusType>> loginUser(
     String username,
@@ -31,4 +32,6 @@ abstract class ISessionRepository implements IRepository {
   );
 
   Future<Either<LogoutFailure, Unit>> logout();
+
+  Future<String> get accessToken;
 }

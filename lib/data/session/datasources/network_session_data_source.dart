@@ -30,7 +30,6 @@ class SessionDataRepositoryImpl extends ISessionDataSource {
               email: email,
               password: password,
               username: username,
-              deviceId: deviceId,
             )))
         .then((response) => sessionMapper.toJwt(response))
         .catchDioException();
@@ -40,13 +39,11 @@ class SessionDataRepositoryImpl extends ISessionDataSource {
   Future<JwtModel> loginUser({
     String username,
     String password,
-    String deviceId,
   }) {
     return _apiRepository.sessionApi
         .then((api) => api.loginUser(LoginRequest(
               username: username,
               password: password,
-              deviceId: deviceId,
             )))
         .then((response) => sessionMapper.toJwt(response))
         .catchDioException();

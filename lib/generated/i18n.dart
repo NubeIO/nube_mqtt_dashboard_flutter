@@ -16,28 +16,35 @@ class I18n implements WidgetsLocalizations {
   static Locale _locale;
   static bool _shouldReload = false;
 
+  // ignore: avoid_setters_without_getters
   static set locale(Locale newLocale) {
     _shouldReload = true;
     I18n._locale = newLocale;
   }
 
-  static const GeneratedLocalizationsDelegate delegate = GeneratedLocalizationsDelegate();
+  static const GeneratedLocalizationsDelegate delegate =
+      GeneratedLocalizationsDelegate();
 
   /// function to be invoked when changing the language
   static LocaleChangeCallback onLocaleChanged;
 
   static I18n of(BuildContext context) =>
-    Localizations.of<I18n>(context, WidgetsLocalizations);
+      Localizations.of<I18n>(context, WidgetsLocalizations);
 
   @override
   TextDirection get textDirection => TextDirection.ltr;
 
   /// "Sorry, Something went wrong please try again later."
-  String get failureGeneric => "Sorry, Something went wrong please try again later.";
+  String get failureGeneric =>
+      "Sorry, Something went wrong please try again later.";
+
   /// "Sorry, Something went wrong with our servers, please try again later."
-  String get failureServer => "Sorry, Something went wrong with our servers, please try again later.";
+  String get failureServer =>
+      "Sorry, Something went wrong with our servers, please try again later.";
+
   /// "Something seems to be wrong with the connection. Please check your connection."
-  String get failureConnection => "Something seems to be wrong with the connection. Please check your connection.";
+  String get failureConnection =>
+      "Something seems to be wrong with the connection. Please check your connection.";
 }
 
 class _I18n_en_US extends I18n {
@@ -47,12 +54,11 @@ class _I18n_en_US extends I18n {
   TextDirection get textDirection => TextDirection.ltr;
 }
 
-class GeneratedLocalizationsDelegate extends LocalizationsDelegate<WidgetsLocalizations> {
+class GeneratedLocalizationsDelegate
+    extends LocalizationsDelegate<WidgetsLocalizations> {
   const GeneratedLocalizationsDelegate();
   List<Locale> get supportedLocales {
-    return const <Locale>[
-      Locale("en", "US")
-    ];
+    return const <Locale>[Locale("en", "US")];
   }
 
   LocaleResolutionCallback resolution({Locale fallback}) {
@@ -70,11 +76,11 @@ class GeneratedLocalizationsDelegate extends LocalizationsDelegate<WidgetsLocali
     I18n._locale ??= locale;
     I18n._shouldReload = false;
     final String lang = I18n._locale != null ? I18n._locale.toString() : "";
-    final String languageCode = I18n._locale != null ? I18n._locale.languageCode : "";
+    final String languageCode =
+        I18n._locale != null ? I18n._locale.languageCode : "";
     if ("en_US" == lang) {
       return SynchronousFuture<WidgetsLocalizations>(const _I18n_en_US());
-    }
-    else if ("en" == languageCode) {
+    } else if ("en" == languageCode) {
       return SynchronousFuture<WidgetsLocalizations>(const _I18n_en_US());
     }
 

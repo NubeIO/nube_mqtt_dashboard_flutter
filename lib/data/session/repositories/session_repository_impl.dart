@@ -5,6 +5,7 @@ import '../../../domain/core/future_failure_helper.dart';
 import '../../../domain/notifications/notification_repository_interface.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../domain/session/session_repository_interface.dart';
+import '../../../domain/user/user_repository_interface.dart';
 import '../managers/pin_preference.dart';
 import '../managers/session_preference.dart';
 
@@ -12,6 +13,7 @@ import '../managers/session_preference.dart';
 class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final PinPreferenceManager _pinPreferenceManager;
   final SessionPreferenceManager _sessionPreferenceManager;
+  final IUserRepository _userRepository;
   final INotificationRepository _notificationRepository;
   final ISessionDataSource _sessionDataSource;
   bool _hasValidated = false;
@@ -24,6 +26,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     this._sessionPreferenceManager,
     this._notificationRepository,
     this._sessionDataSource,
+    this._userRepository,
   ) {
     _hasValidated = _pinPreferenceManager.isPinSet;
     _profileTypeStream.add(_sessionPreferenceManager.status);
@@ -77,25 +80,14 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   ) async {
     return futureFailureHelper(
       request: () async {
-        final tokenId = await _notificationRepository.getToken();
-
-        if (tokenId.isLeft()) {
-          return const Left(CreateUserFailure.invalidToken());
-        }
-
-        final deviceId = tokenId.fold(
-          (_) => throw AssertionError(),
-          (deviceId) => deviceId,
-        );
-
         final jwtModel = await _sessionDataSource.createUser(
           firstName: entity.firstName,
           lastName: entity.lastName,
           email: entity.email,
           password: entity.password,
           username: entity.username,
-          deviceId: deviceId,
         );
+
         _storeSession(jwtModel);
 
         _setProfileStatus(ProfileStatusType.NEEDS_VERIFICATION);
@@ -122,27 +114,37 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   ) async {
     return futureFailureHelper(
       request: () async {
-        final tokenId = await _notificationRepository.getToken();
-
-        if (tokenId.isLeft()) {
-          return const Left(LoginUserFailure.invalidToken());
-        }
-
-        final deviceId = tokenId.fold(
-          (_) => throw AssertionError(),
-          (deviceId) => deviceId,
-        );
-
         final jwtModel = await _sessionDataSource.loginUser(
           username: username,
           password: password,
-          deviceId: deviceId,
         );
         _storeSession(jwtModel);
-        // Get Validation Status
 
-        _setProfileStatus(ProfileStatusType.NEEDS_VERIFICATION);
+        final userResult = await _userRepository.getUser();
 
+        if (userResult.isLeft()) {
+          return userResult.fold(
+              (failure) => Left(
+                    failure.when(
+                      unexpected: () => const LoginUserFailure.unexpected(),
+                      connection: () => const LoginUserFailure.connection(),
+                      invalidToken: () => const LoginUserFailure.invalidToken(),
+                      server: () => const LoginUserFailure.server(),
+                      general: (message) => LoginUserFailure.general(message),
+                    ),
+                  ),
+              (_) => throw AssertionError());
+        }
+        final user = userResult.fold(
+          (l) => throw AssertionError(),
+          (user) => user,
+        );
+
+        if (user.state == UserVerificationState.UNVERIFIED) {
+          _setProfileStatus(ProfileStatusType.NEEDS_VERIFICATION);
+        } else {
+          _setProfileStatus(ProfileStatusType.PROFILE_EXISTS);
+        }
         return Right(_sessionPreferenceManager.status);
       },
       failureMapper: (cases) => cases.maybeWhen(
@@ -164,9 +166,11 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     }
   }
 
+  @override
+  Future<String> get accessToken async => _sessionPreferenceManager.accessToken;
+
   void _storeSession(JwtModel jwt) {
-    _sessionPreferenceManager.refreshToken = jwt.refreshToken;
-    _sessionPreferenceManager.token = jwt.jwt;
-    _sessionPreferenceManager.idToken = jwt.idToken;
+    _sessionPreferenceManager.accessToken = jwt.accessToken;
+    _sessionPreferenceManager.tokenType = jwt.tokenType;
   }
 }

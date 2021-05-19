@@ -14,7 +14,7 @@ class UserMapper {
   }
 
   UserVerificationState toVerificationStatus(String state) {
-    if (state.toLowerCase() == "verified") {
+    if (state.toLowerCase() == "unverified") {
       return UserVerificationState.UNVERIFIED;
     }
     return UserVerificationState.VERIFIED;

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:nube_mqtt_dashboard/data/core/models/base_response.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../core/models/base_response.dart';
 import 'datasources/models/requests.dart';
 import 'datasources/models/responses.dart';
 
@@ -14,12 +14,12 @@ part 'session_api.g.dart';
 abstract class SessionApi {
   factory SessionApi(Dio dio, {String baseUrl}) = _SessionApi;
 
-  @POST("user")
+  @POST("um/api/users")
   Future<JWTResponse> registerUser(@Body() RegisterRequest request);
 
-  @POST("user")
+  @POST("um/api/user/login")
   Future<JWTResponse> loginUser(@Body() LoginRequest request);
 
-  @POST("user")
+  @POST("um/user")
   Future<BaseResponse> logout();
 }
