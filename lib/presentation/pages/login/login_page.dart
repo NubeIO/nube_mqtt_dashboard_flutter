@@ -46,7 +46,7 @@ class LoginPage extends StatelessWidget with MessageMixin, LoadingMixin {
       ExtendedNavigator.of(context).pushDashboardPage();
     } else if (profileStatusType == ProfileStatusType.NEEDS_VERIFICATION) {
       ExtendedNavigator.of(context).pushAndRemoveUntil(
-        Routes.alertsPage,
+        Routes.verificationPage,
         (route) => false,
       );
     }

@@ -10,13 +10,17 @@ class SplashPage extends StatelessWidget {
   const SplashPage({Key key}) : super(key: key);
 
   void _navigateToHomeScreen(BuildContext context) {
-    ExtendedNavigator.of(context)
-        .pushAndRemoveUntil(Routes.dashboardPage, (route) => false);
+    ExtendedNavigator.of(context).pushAndRemoveUntil(
+      Routes.dashboardPage,
+      (route) => false,
+    );
   }
 
   void _navigateToVerificatonScreen(BuildContext context) {
-    ExtendedNavigator.of(context)
-        .pushAndRemoveUntil(Routes.dashboardPage, (route) => false);
+    ExtendedNavigator.of(context).pushAndRemoveUntil(
+      Routes.verificationPage,
+      (route) => false,
+    );
   }
 
   void _navigateToOnboardingScreen(BuildContext context) {
