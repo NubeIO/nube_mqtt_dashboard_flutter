@@ -22,13 +22,13 @@ abstract class NetworkModule {
     HttpFormatter httpFormatter,
     ApiHeadersInterceptor apiHeaders,
   ) {
-    final dio = Dio()
-      ..interceptors.add(networkConnectionInterceptor)
-      ..interceptors.add(apiHeaders)
-      ..interceptors.add(errorInterceptor);
+    final dio = Dio();
     if (!kReleaseMode) {
       dio.interceptors.add(httpFormatter);
     }
-    return dio;
+    return dio
+      ..interceptors.add(networkConnectionInterceptor)
+      ..interceptors.add(apiHeaders)
+      ..interceptors.add(errorInterceptor);
   }
 }
