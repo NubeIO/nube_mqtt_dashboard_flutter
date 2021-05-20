@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nube_mqtt_dashboard/domain/forms/password_validation.dart';
 
 import '../../../application/register/register_cubit.dart';
+import '../../../domain/forms/password_validation.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
 import '../../widgets/responsive/padding.dart';
 
@@ -12,7 +12,6 @@ class RegisterFormLastPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final FocusScopeNode _node = FocusScopeNode();
 
     Widget _formPasswordInput(BuildContext context) {
@@ -79,23 +78,9 @@ class RegisterFormLastPage extends StatelessWidget {
                 size: PaddingSize.small,
               ),
             ),
-            FormPadding(
-              child: Text(
-                "Register",
-                style: textTheme.headline1,
-              ),
-            ),
-            FormPadding(
-              child: Text(
-                "Secure your account with a strong password.",
-                style: textTheme.bodyText1,
-              ),
-            ),
-            SizedBox(
-              height: ResponsiveSize.padding(
-                context,
-                size: PaddingSize.large,
-              ),
+            const FormInfoWidget(
+              title: "Register",
+              subtitle: "Secure your account with a strong password.",
             ),
             _buildMainInputs(context)
           ],

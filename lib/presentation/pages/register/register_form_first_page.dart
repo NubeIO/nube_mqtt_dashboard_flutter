@@ -4,14 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../application/register/register_cubit.dart';
 import '../../../domain/forms/non_empty_validation.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
-import '../../widgets/responsive/padding.dart';
 
 class RegisterFormFirstPage extends StatelessWidget {
   const RegisterFormFirstPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final FocusScopeNode _node = FocusScopeNode();
 
     Widget _formFirstNameInput(BuildContext context) {
@@ -63,29 +61,9 @@ class RegisterFormFirstPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: ResponsiveSize.padding(
-                context,
-                size: PaddingSize.small,
-              ),
-            ),
-            FormPadding(
-              child: Text(
-                "Register",
-                style: textTheme.headline1,
-              ),
-            ),
-            FormPadding(
-              child: Text(
-                "We'll need some basic info.",
-                style: textTheme.bodyText1,
-              ),
-            ),
-            SizedBox(
-              height: ResponsiveSize.padding(
-                context,
-                size: PaddingSize.large,
-              ),
+            const FormInfoWidget(
+              title: "Register",
+              subtitle: "We'll need some basic info.",
             ),
             _buildMainInputs(context)
           ],

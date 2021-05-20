@@ -244,3 +244,49 @@ class FormPadding extends StatelessWidget {
     );
   }
 }
+
+class FormInfoWidget extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const FormInfoWidget({
+    Key key,
+    @required this.title,
+    @required this.subtitle,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: ResponsiveSize.padding(
+            context,
+            size: PaddingSize.small,
+          ),
+        ),
+        FormPadding(
+          child: Text(
+            title,
+            style: textTheme.headline1,
+          ),
+        ),
+        FormPadding(
+          child: Text(
+            subtitle,
+            style: textTheme.bodyText1,
+          ),
+        ),
+        SizedBox(
+          height: ResponsiveSize.padding(
+            context,
+            size: PaddingSize.large,
+          ),
+        ),
+      ],
+    );
+  }
+}

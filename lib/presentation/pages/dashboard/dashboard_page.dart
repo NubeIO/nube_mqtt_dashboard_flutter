@@ -174,7 +174,7 @@ class _DashboardPageState extends State<DashboardPage>
           },
           builder: (context, state) {
             final rootList = state.layout.pages;
-            final isEmptyState = true;
+            final isEmptyState = state.layout.isEmptyState;
             final logo = state.layout.logo;
             final selectedPage = state.selectedPage;
             return DrawerDetailLayout(

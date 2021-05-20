@@ -12,7 +12,6 @@ import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
-import '../../widgets/responsive/padding.dart';
 
 class HostPage extends StatelessWidget with MessageMixin, LoadingMixin {
   final FocusScopeNode _node = FocusScopeNode();
@@ -134,29 +133,9 @@ class HostPage extends StatelessWidget with MessageMixin, LoadingMixin {
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: ResponsiveSize.padding(
-                      context,
-                      size: PaddingSize.small,
-                    ),
-                  ),
-                  FormPadding(
-                    child: Text(
-                      "Server Configuration",
-                      style: textTheme.headline1,
-                    ),
-                  ),
-                  FormPadding(
-                    child: Text(
-                      "Enter the server IP and Port Address",
-                      style: textTheme.bodyText1,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ResponsiveSize.padding(
-                      context,
-                      size: PaddingSize.large,
-                    ),
+                  const FormInfoWidget(
+                    title: "Server Configuration",
+                    subtitle: "Enter the server IP and Port Address",
                   ),
                   _buildMainInputs(context)
                 ],

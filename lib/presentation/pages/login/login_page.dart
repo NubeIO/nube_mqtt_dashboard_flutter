@@ -12,7 +12,6 @@ import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
-import '../../widgets/responsive/padding.dart';
 
 class LoginPage extends StatelessWidget with MessageMixin, LoadingMixin {
   final FocusScopeNode _node = FocusScopeNode();
@@ -147,29 +146,9 @@ class LoginPage extends StatelessWidget with MessageMixin, LoadingMixin {
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: ResponsiveSize.padding(
-                      context,
-                      size: PaddingSize.small,
-                    ),
-                  ),
-                  FormPadding(
-                    child: Text(
-                      "Welcome Back",
-                      style: textTheme.headline1,
-                    ),
-                  ),
-                  FormPadding(
-                    child: Text(
-                      "Sign in to continue.",
-                      style: textTheme.bodyText1,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ResponsiveSize.padding(
-                      context,
-                      size: PaddingSize.large,
-                    ),
+                  const FormInfoWidget(
+                    title: "Welcome Back",
+                    subtitle: "Sign in to continue.",
                   ),
                   _buildMainInputs(context)
                 ],

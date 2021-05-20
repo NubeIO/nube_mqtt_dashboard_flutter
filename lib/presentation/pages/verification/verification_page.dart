@@ -7,7 +7,7 @@ import '../../../domain/session/session_data_source_interface.dart';
 import '../../../injectable/injection.dart';
 import '../../routes/router.dart';
 import '../../widgets/animated/illustration_verification.dart';
-import '../../widgets/responsive/padding.dart';
+import '../../widgets/text/page_info_widget.dart';
 
 class VerificationPage extends StatelessWidget {
   const VerificationPage({Key key}) : super(key: key);
@@ -42,32 +42,10 @@ class VerificationPage extends StatelessWidget {
                   size: Size.infinite,
                 ),
               ),
-              SizedBox(
-                height: ResponsiveSize.padding(
-                  context,
-                  size: PaddingSize.medium,
-                ),
-              ),
-              Text(
-                "Almost Done",
-                style: textTheme.headline1,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: ResponsiveSize.padding(
-                    context,
-                    size: PaddingSize.large,
-                  ),
-                  vertical: ResponsiveSize.padding(
-                    context,
-                    size: PaddingSize.medium,
-                  ),
-                ),
-                child: Text(
-                  "In order to make sure nobody has unauthorized access to data, someone from the admin needs to validate your request.",
-                  style: textTheme.bodyText1,
-                  textAlign: TextAlign.center,
-                ),
+              const PageInfoText(
+                title: "Almost Done",
+                subtitle:
+                    "In order to make sure nobody has unauthorized access to data, someone from the admin needs to validate your request.",
               ),
             ],
           ),

@@ -131,36 +131,15 @@ class _ConnectPageState extends State<ConnectPage>
   }
 
   Widget _buildScaffold(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
       ),
       body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(
-          height: ResponsiveSize.padding(
-            context,
-            size: PaddingSize.small,
-          ),
-        ),
-        FormPadding(
-          child: Text(
-            widget.isInitalConfig ? "Configuration" : "Change Configuration",
-            style: textTheme.headline1,
-          ),
-        ),
-        FormPadding(
-          child: Text(
-            "Your personal theme and security settings.",
-            style: textTheme.bodyText1,
-          ),
-        ),
-        SizedBox(
-          height: ResponsiveSize.padding(
-            context,
-            size: PaddingSize.large,
-          ),
+        FormInfoWidget(
+          title:
+              widget.isInitalConfig ? "Configuration" : "Change Configuration",
+          subtitle: "Your personal theme and security settings.",
         ),
         _buildLayout(context)
       ]),

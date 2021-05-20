@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:nube_mqtt_dashboard/domain/forms/email_validation.dart';
-import 'package:nube_mqtt_dashboard/domain/forms/username_validation.dart';
-import 'package:nube_mqtt_dashboard/generated/i18n.dart';
 
 import '../../../application/register/register_cubit.dart';
+import '../../../domain/forms/email_validation.dart';
+import '../../../domain/forms/username_validation.dart';
+import '../../../generated/i18n.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
-import '../../widgets/responsive/padding.dart';
 
 class RegisterFormSecondPage extends StatelessWidget {
   const RegisterFormSecondPage({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final FocusScopeNode _node = FocusScopeNode();
 
     Widget _formUsernameInput(BuildContext context) {
@@ -74,29 +72,9 @@ class RegisterFormSecondPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: ResponsiveSize.padding(
-                context,
-                size: PaddingSize.small,
-              ),
-            ),
-            FormPadding(
-              child: Text(
-                "Register",
-                style: textTheme.headline1,
-              ),
-            ),
-            FormPadding(
-              child: Text(
-                "Some additional info to verify its you.",
-                style: textTheme.bodyText1,
-              ),
-            ),
-            SizedBox(
-              height: ResponsiveSize.padding(
-                context,
-                size: PaddingSize.large,
-              ),
+            const FormInfoWidget(
+              title: "Register",
+              subtitle: "Some additional info to verify its you.",
             ),
             _buildMainInputs(context)
           ],
