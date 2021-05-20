@@ -7,6 +7,7 @@ import '../../widgets/animated/illustration_alerts.dart';
 import '../../widgets/responsive/master_layout.dart';
 import '../../widgets/responsive/padding.dart';
 import '../../widgets/responsive/screen_type_layout.dart';
+import '../../widgets/text/page_info_widget.dart';
 
 class AlertsPage extends StatelessWidget {
   const AlertsPage({Key key}) : super(key: key);
@@ -51,8 +52,6 @@ class EmptyAlerts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -74,25 +73,9 @@ class EmptyAlerts extends StatelessWidget {
             size: PaddingSize.medium,
           ),
         ),
-        Text(
-          "No Alerts",
-          style: textTheme.headline1,
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: ResponsiveSize.padding(
-              context,
-              size: PaddingSize.large,
-            ),
-            vertical: ResponsiveSize.padding(
-              context,
-              size: PaddingSize.small,
-            ),
-          ),
-          child: Text(
-            "All your alerts appear here.",
-            style: textTheme.bodyText1,
-          ),
+        const PageInfoText(
+          title: "No Alerts",
+          subtitle: "All your alerts appear here.",
         ),
         SizedBox(
           height: ResponsiveSize.padding(

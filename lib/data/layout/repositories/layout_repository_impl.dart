@@ -39,7 +39,10 @@ class LayoutRepositoryImpl extends ILayoutRepository {
           (layout) => Right(layout),
         );
       }
+    } else {
+      yield Right(LayoutEntity.empty(isEmptyState: true));
     }
+
     yield* _configurationRepository.layoutTopicStream.flatMap((layout) async* {
       await _mqttRepository.connectionStream
           .firstWhere((element) => element == ServerConnectionState.CONNECTED);

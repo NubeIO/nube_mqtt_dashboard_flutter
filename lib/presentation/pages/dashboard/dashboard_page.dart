@@ -18,6 +18,7 @@ import '../../widgets/logo_widget.dart';
 import '../../widgets/responsive/drawer_detail_layout.dart';
 import '../../widgets/responsive/padding.dart';
 import '../../widgets/variable_menu_item.dart';
+import 'widgets/empty_layout.dart';
 import 'widgets/page_screen.dart';
 
 @FramyWidget(isPage: true)
@@ -140,6 +141,15 @@ class _DashboardPageState extends State<DashboardPage>
     );
   }
 
+  Widget _buildWidgetScreen(PageEntity selectedPage) {
+    return selectedPage != null
+        ? WidgetsScreen(
+            key: ValueKey(selectedPage.id),
+            page: selectedPage,
+          )
+        : Container();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,6 +174,7 @@ class _DashboardPageState extends State<DashboardPage>
           },
           builder: (context, state) {
             final rootList = state.layout.pages;
+            final isEmptyState = true;
             final logo = state.layout.logo;
             final selectedPage = state.selectedPage;
             return DrawerDetailLayout(
@@ -186,12 +197,9 @@ class _DashboardPageState extends State<DashboardPage>
                   size: Size.large,
                 ),
               ),
-              detailBuilder: selectedPage != null
-                  ? WidgetsScreen(
-                      key: ValueKey(selectedPage.id),
-                      page: selectedPage,
-                    )
-                  : Container(),
+              detailBuilder: isEmptyState
+                  ? const EmptyLayout()
+                  : _buildWidgetScreen(selectedPage),
               itemBuilder: (context, index) {
                 final currentItem = rootList[index];
                 return VariableMenuItem(

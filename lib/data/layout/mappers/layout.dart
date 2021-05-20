@@ -23,6 +23,7 @@ class LayoutMapper {
                   parentConfig: listOf(layout.widgetConfig),
                 ))
             .toImmutableList(),
+        isEmptyState: false,
       );
 
   Logo mapToLogo(LogoConfig logo) {
