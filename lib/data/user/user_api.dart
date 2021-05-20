@@ -21,4 +21,10 @@ abstract class UserApi {
   Future<DeviceTokenReponse> setDeviceToken(
     @Body() SetDeviceTokenRequest request,
   );
+
+  @POST("um/api/users/check/email")
+  Future<AvailableResponse> checkEmail(@Body() CheckEmailRequest request);
+
+  @POST("um/api/users/check/username")
+  Future<AvailableResponse> checkUsername(@Body() CheckUsernameRequest request);
 }

@@ -30,4 +30,24 @@ class UserDataRepositoryImpl extends IUserDataSource {
         .then((response) => unit)
         .catchDioException();
   }
+
+  @override
+  Future<bool> checkEmail(String email) {
+    return _apiRepository.userApi
+        .then(
+          (api) => api.checkEmail(CheckEmailRequest(email: email)),
+        )
+        .then((value) => value.exist)
+        .catchDioException();
+  }
+
+  @override
+  Future<bool> checkUsername(String username) {
+    return _apiRepository.userApi
+        .then(
+          (api) => api.checkUsername(CheckUsernameRequest(username: username)),
+        )
+        .then((value) => value.exist)
+        .catchDioException();
+  }
 }

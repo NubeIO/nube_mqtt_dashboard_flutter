@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nube_mqtt_dashboard/domain/forms/email_validation.dart';
 import 'package:nube_mqtt_dashboard/domain/forms/username_validation.dart';
+import 'package:nube_mqtt_dashboard/generated/i18n.dart';
 
 import '../../../application/register/register_cubit.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
@@ -23,6 +24,9 @@ class RegisterFormSecondPage extends StatelessWidget {
             usernameTaken: () => "Username you provided is already in use.",
             tooShort: () => "Username must be atleast 8 charecters long.",
             usernameInvalid: () => "Invalid username, try something else",
+            unexpected: () => I18n.of(context).failureGeneric,
+            connection: () => I18n.of(context).failureConnection,
+            server: () => I18n.of(context).failureServer,
           ),
         ),
         label: "Username",
@@ -38,6 +42,9 @@ class RegisterFormSecondPage extends StatelessWidget {
           mapper: (failure) => failure.when(
             invalidEmail: () => "Please provide a valid email.",
             emailTaken: () => "Email you provided is already in use.",
+            unexpected: () => I18n.of(context).failureGeneric,
+            connection: () => I18n.of(context).failureConnection,
+            server: () => I18n.of(context).failureServer,
           ),
         ),
         label: "Email",

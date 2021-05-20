@@ -50,4 +50,46 @@ class UserRepositoryImpl extends IUserRepository {
       ),
     );
   }
+
+  @override
+  Future<Either<UserExistFailure, Unit>> checkEmail(String email) {
+    return futureFailureHelper(
+      request: () async {
+        try {
+          final exists = await _userDataSource.checkEmail(email);
+          if (exists) {
+            return const Left(UserExistFailure.userExists());
+          } else {
+            return const Right(unit);
+          }
+        } catch (e) {
+          return const Left(UserExistFailure.unexpected());
+        }
+      },
+      failureMapper: (cases) => cases.maybeWhen(
+          connection: () => const UserExistFailure.connection(),
+          orElse: () => const UserExistFailure.server()),
+    );
+  }
+
+  @override
+  Future<Either<UserExistFailure, Unit>> checkUsername(String username) {
+    return futureFailureHelper(
+      request: () async {
+        try {
+          final exists = await _userDataSource.checkUsername(username);
+          if (exists) {
+            return const Left(UserExistFailure.userExists());
+          } else {
+            return const Right(unit);
+          }
+        } catch (e) {
+          return const Left(UserExistFailure.unexpected());
+        }
+      },
+      failureMapper: (cases) => cases.maybeWhen(
+          connection: () => const UserExistFailure.connection(),
+          orElse: () => const UserExistFailure.server()),
+    );
+  }
 }
