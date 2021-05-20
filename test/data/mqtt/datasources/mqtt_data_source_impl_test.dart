@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:nube_mqtt_dashboard/data/mqtt/datasources/mqtt_data_source_impl.dart';
+import 'package:nube_mqtt_dashboard/domain/configuration/entities.dart';
 import 'package:nube_mqtt_dashboard/domain/connection/connection_data_source_interface.dart';
 import 'package:nube_mqtt_dashboard/domain/mqtt/entities.dart';
 
@@ -11,7 +12,7 @@ class ConnectionDataSourceMock extends Mock implements IConnectionDataSource {}
 
 void main() {
   MqttDataSource _mqttDataSource;
-  ConnectionConfig _validConfig;
+  Configuration _validConfig;
   ConnectionDataSourceMock _connectionDataSourceMock;
   const topicName = "testtopic/ritesh";
 
@@ -21,12 +22,13 @@ void main() {
         .thenAnswer((_) => const Stream.empty());
 
     _mqttDataSource = MqttDataSource(_connectionDataSourceMock);
-    _validConfig = ConnectionConfig(
+    _validConfig = Configuration(
       host: "broker.mqttdashboard.com",
       port: 1883,
       clientId: Uuid().v1().toString(),
       username: "",
       password: "",
+      authentication: false,
     );
   });
 

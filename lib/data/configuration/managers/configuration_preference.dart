@@ -3,19 +3,14 @@ import 'dart:convert';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../domain/mqtt/mqtt_repository.dart';
+import 'models/config.dart';
+import 'models/topic_config.dart';
 
 @injectable
 class ConfigurationPreferenceManager {
   final SharedPreferences _sharedPreferences;
 
   ConfigurationPreferenceManager(this._sharedPreferences);
-
-  set validity(Validity value) =>
-      _sharedPreferences.setString(_Model.isValid.key, value.name);
-  Validity get validity =>
-      _sharedPreferences.getString(_Model.isValid.key).toValidity() ??
-      Validity.INVALID;
 
   ConnectionConfig get connectionConfig {
     try {
@@ -34,6 +29,23 @@ class ConfigurationPreferenceManager {
         ),
       );
 
+  TopicConfig get topicConfig {
+    try {
+      final config = _sharedPreferences.getString(_Model.topicConfig.key);
+      final map = jsonDecode(config) as Map<String, dynamic>;
+      return TopicConfig.fromJson(map);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  set topicConfig(TopicConfig value) => _sharedPreferences.setString(
+        _Model.topicConfig.key,
+        jsonEncode(
+          value.toJson(),
+        ),
+      );
+
   void clearData() {
     _Model.values.forEach(_removeItem);
   }
@@ -43,28 +55,16 @@ class ConfigurationPreferenceManager {
   }
 }
 
-enum _Model { isValid, connectionConfig }
-enum Validity { VALID, INVALID }
+enum _Model { connectionConfig, topicConfig }
 
 extension on _Model {
   String get key {
     switch (this) {
-      case _Model.isValid:
-        return "key:configuration:isValid";
-
       case _Model.connectionConfig:
         return "key:configuration:connectionConfig";
+      case _Model.topicConfig:
+        return "key:configuration:topicConfig";
     }
     return "";
   }
-}
-
-extension ValidityExtension on Validity {
-  String get name => toString();
-}
-
-extension on String {
-  Validity toValidity() =>
-      Validity.values.firstWhere((element) => element.name == this,
-          orElse: () => Validity.INVALID);
 }

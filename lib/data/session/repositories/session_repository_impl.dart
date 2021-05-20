@@ -4,7 +4,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../../domain/configuration/configuration_repository_interface.dart';
 import '../../../domain/core/future_failure_helper.dart';
+import '../../../domain/mqtt/mqtt_repository.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../domain/session/session_repository_interface.dart';
 import '../../../domain/user/user_repository_interface.dart';
@@ -16,8 +18,11 @@ import '../managers/session_preference.dart';
 class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final PinPreferenceManager _pinPreferenceManager;
   final SessionPreferenceManager _sessionPreferenceManager;
+  final IConfigurationRepository _configurationRepository;
   final IUserRepository _userRepository;
   final ISessionDataSource _sessionDataSource;
+  final IMqttRepository _mqttRepository;
+
   bool _hasValidated = false;
 
   final BehaviorSubject<ProfileStatusType> _profileTypeStream =
@@ -31,13 +36,18 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     this._sessionPreferenceManager,
     this._sessionDataSource,
     this._userRepository,
+    this._configurationRepository,
+    this._mqttRepository,
   ) {
     _hasValidated = _pinPreferenceManager.isPinSet;
-    loginStatusStream.listen((event) {
+    loginStatusStream.listen((event) async {
       if (event == ProfileStatusType.NEEDS_VERIFICATION) {
         _onStartVerificationLooper();
       } else {
         _onStopVerificationLooper();
+      }
+      if (event == ProfileStatusType.PROFILE_EXISTS) {
+        await _fetchRequiredData();
       }
     });
     _profileTypeStream.add(_sessionPreferenceManager.status);
@@ -111,6 +121,15 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
         }
       },
     );
+  }
+
+  Future<void> _fetchRequiredData() async {
+    final configResult = await _configurationRepository.fetchConnectionConfig();
+    if (configResult.isRight()) {
+      final config = configResult.fold((l) => throw AssertionError(), id);
+      await _mqttRepository.login(config);
+    }
+    await _configurationRepository.fetchTopicConfig();
   }
 
   Future<void> _onStopVerificationLooper() async {

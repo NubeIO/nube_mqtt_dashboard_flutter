@@ -14,6 +14,7 @@ class NetworkDataSourceImpl extends IApiDataSource {
 
   final Map<String, SessionApi> sessionApiInstances = {};
   final Map<String, UserApi> userApiInstances = {};
+  final Map<String, ConfigurationApi> configurationApiInstances = {};
 
   @override
   Future<SessionApi> get sessionApi => _hostRepository.serverUrl.then((value) {
@@ -29,6 +30,16 @@ class NetworkDataSourceImpl extends IApiDataSource {
           userApiInstances[value] = UserApi(_dio, baseUrl: value);
         }
         return userApiInstances[value];
+      });
+
+  @override
+  Future<ConfigurationApi> get configurationApi =>
+      _hostRepository.serverUrl.then((value) {
+        if (configurationApiInstances[value] == null) {
+          configurationApiInstances[value] =
+              ConfigurationApi(_dio, baseUrl: value);
+        }
+        return configurationApiInstances[value];
       });
 
   @override

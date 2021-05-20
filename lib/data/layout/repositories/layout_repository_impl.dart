@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../../domain/configuration/configuration_repository_interface.dart';
-import '../../../domain/core/extensions/option_ext.dart';
 import '../../../domain/layout/layout_repository_interface.dart';
 import '../../../domain/mqtt/mqtt_repository.dart';
 import '../../../utils/logger/log.dart';
@@ -29,75 +29,31 @@ class LayoutRepositoryImpl extends ILayoutRepository {
   final layoutMapper = LayoutMapper();
 
   @override
-  Future<Either<LayoutFailure, LayoutEntity>> getPersistantLayout() async {
-    final result = await _configurationRepository.getConfiguration();
-    if (result.isSome()) {
-      final config = result.getOrCrash();
-      if (config.layoutTopic.isEmpty) {
-        return const Left(LayoutFailure.noLayoutConfig());
-      } else {
-        final message = _layoutPreferenceManager.message;
-        if (message == null || message.topic != config.layoutTopic) {
-          return Right(LayoutEntity.empty());
-        } else {
-          final result = await _mapToLayoutBuilder(message);
-          Log.d("Restoring layout $result", tag: _TAG);
-          return result.fold(
-            (l) => Right(LayoutEntity.empty()),
-            (layout) => Right(layout),
-          );
-        }
-      }
-    } else {
-      return const Left(LayoutFailure.noLayoutConfig());
-    }
-  }
-
-  @override
-  Future<Either<LayoutSubscribeFailure, Unit>> subscribe() async {
-    try {
-      final result = await _configurationRepository.getConfiguration();
-      if (result.isSome()) {
-        final config = result.getOrCrash();
-        if (config.layoutTopic.isEmpty) {
-          return const Left(LayoutSubscribeFailure.noLayoutConfig());
-        }
-        await _mqttRepository.login(ConnectionConfig(
-          host: config.host,
-          port: config.port,
-          clientId: config.clientId,
-          username: config.username,
-          password: config.password,
-          layoutTopic: config.layoutTopic,
-        ));
-        await _mqttRepository.subscribe(config.layoutTopic);
-        return const Right(unit);
-      } else {
-        return const Left(LayoutSubscribeFailure.noLayoutConfig());
-      }
-    } catch (e) {
-      return const Left(LayoutSubscribeFailure.unexpected());
-    }
-  }
-
-  @override
   Stream<Either<LayoutFailure, LayoutEntity>> get layoutStream async* {
-    final result = await _configurationRepository.getConfiguration();
-    if (result.isSome()) {
-      final config = result.getOrCrash();
-      if (config.layoutTopic.isEmpty) {
-        yield const Left(LayoutFailure.noLayoutConfig());
-      } else {
-        yield* _mqttRepository
-            .getTopicMessage(config.layoutTopic)
-            .asyncMap((message) => _mapToLayoutBuilder(message).then((value) {
-                  _layoutPreferenceManager.message = message;
-                  return value;
-                }).catchError(_onErrorCatch));
+    final message = _layoutPreferenceManager.message;
+    if (message != null) {
+      final result = await _mapToLayoutBuilder(message);
+      if (result.isRight()) {
+        yield result.fold(
+          (l) => throw AssertionError(),
+          (layout) => Right(layout),
+        );
       }
-    } else {
-      yield const Left(LayoutFailure.noLayoutConfig());
     }
+    yield* _configurationRepository.layoutTopicStream.flatMap((layout) async* {
+      await _mqttRepository.connectionStream
+          .firstWhere((element) => element == ServerConnectionState.CONNECTED);
+      await _mqttRepository.subscribe(layout);
+
+      yield* _mqttRepository.getTopicMessage(layout).asyncMap(
+            (message) => _mapToLayoutBuilder(message).then(
+              (value) {
+                _layoutPreferenceManager.message = message;
+                return value;
+              },
+            ).catchError(_onErrorCatch),
+          );
+    });
   }
 
   Future<Either<LayoutFailure, LayoutEntity>> _onErrorCatch(

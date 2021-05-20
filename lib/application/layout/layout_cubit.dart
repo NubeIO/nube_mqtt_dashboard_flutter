@@ -27,59 +27,10 @@ class LayoutCubit extends Cubit<LayoutState> {
   StreamSubscription<Either<LayoutFailure, LayoutEntity>> subscription;
 
   LayoutCubit(this._layoutRepository) : super(LayoutState.initial()) {
-    _initializePersistant();
-  }
-
-  Future<void> _initializePersistant() async {
-    final event = await _layoutRepository.getPersistantLayout();
-    // Only Restore if persistent config isn't disabled
-    if (event.fold((l) => true, (layout) => layout.config.persistData)) {
-      _onLayoutChange(event);
-    }
-    init(
-      showLoading: event.fold(
-        (l) => true,
-        (layout) => layout.config.showLoading,
-      ),
-      shouldReconnect: true,
-    );
-  }
-
-  Future<void> init({
-    bool showLoading = true,
-    bool shouldReconnect = false,
-  }) async {
-    if (showLoading) {
-      emit(state.copyWith(layoutConnection: const InternalState.loading()));
-    } else {
-      emit(state.copyWith(layoutConnection: const InternalState.success()));
-    }
-
-    final result = await _layoutRepository.subscribe();
-
-    result.fold(
-      (failure) => emit(
-        state.copyWith(
-          layoutConnection: InternalState.failure(failure),
-        ),
-      ),
-      (r) {
-        if (shouldReconnect) {
-          _listen();
-        } else {
-          emit(
-            state.copyWith(layoutConnection: const InternalState.success()),
-          );
-        }
-      },
-    );
+    _listen();
   }
 
   void _listen() {
-    if (subscription != null) {
-      subscription.cancel();
-      subscription = null;
-    }
     subscription = _layoutRepository.layoutStream.listen((event) {
       _onLayoutChange(event);
     });
@@ -88,7 +39,10 @@ class LayoutCubit extends Cubit<LayoutState> {
   void _onLayoutChange(Either<LayoutFailure, LayoutEntity> event) {
     event.fold(
       (failure) => emit(
-        state.copyWith(layoutState: InternalState.failure(failure)),
+        state.copyWith(
+          layoutState: InternalState.failure(failure),
+          layoutConnection: const InternalState.success(),
+        ),
       ),
       (layout) {
         final currentPage = _getPageFromId(

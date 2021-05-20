@@ -29,29 +29,9 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage>
-    with WidgetsBindingObserver, MessageMixin, LoadingMixin {
+    with MessageMixin, LoadingMixin {
   final cubit = getIt<LayoutCubit>();
   final configurationCubit = getIt<ConfigurationCubit>();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    cubit.close();
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      cubit.init();
-    }
-  }
 
   Future<void> _navigateToVerifyAdminPin(BuildContext context) async {
     final isPinProtected = await configurationCubit.isPinProtected();

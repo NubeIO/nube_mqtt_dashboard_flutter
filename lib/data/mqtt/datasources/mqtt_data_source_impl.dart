@@ -12,19 +12,21 @@ import '../../../domain/connection/connection_data_source_interface.dart';
 import '../../../domain/connection/connection_repository_interface.dart';
 import '../../../domain/mqtt/exceptions/mqtt.dart';
 import '../../../domain/mqtt/mqtt_data_source.dart';
+import '../../../domain/session/session_data_source_interface.dart';
 import '../../../utils/logger/log.dart';
+import '../../session/managers/session_preference.dart';
 import '../models/connection_status_dto.dart';
 
 const _TAG = "MQTTDataSource";
 
 @LazySingleton(as: IMqttDataSource)
 class MqttDataSource extends IMqttDataSource {
-  ConnectionConfig _mqttConfig;
-  MqttServerClient _client;
-
   String get _connectionTopic => "${_mqttConfig?.clientId}/connection";
 
-  MqttDataSource(IConnectionDataSource connectionRepository) {
+  MqttDataSource(
+    IConnectionDataSource connectionRepository,
+    SessionPreferenceManager sessionPreferenceManager,
+  ) {
     connectionRepository.layoutStream.listen((event) async {
       Log.d("Connection status changed $event", tag: _TAG);
       if (_client != null && event.isConnected) {
@@ -37,6 +39,12 @@ class MqttDataSource extends IMqttDataSource {
     Timer.periodic(const Duration(seconds: 30), (timer) async {
       Log.d("Periodic block started", tag: _TAG);
       final event = await connectionRepository.layoutStream.first;
+
+      if (sessionPreferenceManager.status != ProfileStatusType.PROFILE_EXISTS) {
+        // Return as we don't need to reconnect if the user isn't
+        // verified and logged in
+        return;
+      }
       if (event.isConnected) {
         final message = jsonEncode(
             ConnectionStatusDto.simple(lastMessage.keys.toList()).toJson());
@@ -63,6 +71,9 @@ class MqttDataSource extends IMqttDataSource {
     });
   }
 
+  Configuration _mqttConfig;
+  MqttServerClient _client;
+
   final BehaviorSubject<ServerConnectionState> _connectionState =
       BehaviorSubject.seeded(ServerConnectionState.IDLE)
         ..listen((event) {
@@ -83,7 +94,7 @@ class MqttDataSource extends IMqttDataSource {
   final Map<String, TopicMessage> lastMessage = {};
 
   @override
-  Future<Unit> login(ConnectionConfig mqttConfig) async {
+  Future<Unit> login(Configuration mqttConfig) async {
     if (mqttConfig == _mqttConfig &&
         _connectionState.value != ServerConnectionState.DISCONNECTED) {
       return unit;
@@ -177,7 +188,7 @@ Loggin in with:
         .keepAliveFor(60)
         .withWillQos(MqttQos.atMostOnce);
 
-    if (_mqttConfig.username.isNotEmpty && _mqttConfig.password.isNotEmpty) {
+    if (_mqttConfig.authentication) {
       connMess.authenticateAs(_mqttConfig.username, _mqttConfig.password);
     }
 

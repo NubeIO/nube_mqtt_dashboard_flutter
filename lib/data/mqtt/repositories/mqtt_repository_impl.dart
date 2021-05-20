@@ -11,7 +11,8 @@ class MqttRepositoryImpl extends IMqttRepository {
 
   @override
   Future<Either<ConnectFailure, Unit>> login(
-      ConnectionConfig mqttConfig) async {
+    Configuration mqttConfig,
+  ) async {
     try {
       await _mqttDataSource.login(mqttConfig);
       return const Right(unit);

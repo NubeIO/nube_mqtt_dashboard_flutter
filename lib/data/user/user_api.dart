@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
-import '../core/models/base_response.dart';
 import 'datasources/models/requests.dart';
 import 'datasources/models/responses.dart';
 
