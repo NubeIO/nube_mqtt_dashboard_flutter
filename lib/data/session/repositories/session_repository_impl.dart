@@ -86,6 +86,14 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   Stream<ProfileStatusType> get loginStatusStream =>
       _profileTypeStream.stream.distinct();
 
+  @override
+  Future<Option<String>> getPinConfiguration() async {
+    if (_pinPreferenceManager.isPinSet) {
+      return Some(_pinPreferenceManager.pin);
+    }
+    return const None();
+  }
+
   Future<void> _onStartVerificationLooper() async {
     Log.i("Starting Verification Loop");
     verificationTimer?.cancel();

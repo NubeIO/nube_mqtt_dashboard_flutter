@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:framy_annotation/framy_annotation.dart';
 
+import '../../../application/configuration/configuration_cubit.dart';
 import '../../../application/layout/layout_cubit.dart';
 import '../../../domain/layout/entities.dart';
 import '../../../domain/layout/failures.dart';
@@ -30,6 +31,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage>
     with WidgetsBindingObserver, MessageMixin, LoadingMixin {
   final cubit = getIt<LayoutCubit>();
+  final configurationCubit = getIt<ConfigurationCubit>();
 
   @override
   void initState() {
@@ -52,17 +54,19 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   Future<void> _navigateToVerifyAdminPin(BuildContext context) async {
-    final result = await ExtendedNavigator.of(context).pushValidatePinPage();
-    if (result != null) {
+    final isPinProtected = await configurationCubit.isPinProtected();
+    if (isPinProtected) {
+      final result = await ExtendedNavigator.of(context).pushValidatePinPage();
+      if (result != null) {
+        _navigateToSettings(context);
+      }
+    } else {
       _navigateToSettings(context);
     }
   }
 
   Future<void> _navigateToSettings(BuildContext context) async {
-    final result = await ExtendedNavigator.of(context).pushConnectPage();
-    if (result == null) return;
-
-    cubit.init(shouldReconnect: result);
+    await ExtendedNavigator.of(context).pushConnectPage();
   }
 
   void _onNavigateToAlerts(BuildContext context) {
@@ -70,9 +74,15 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   Future<void> _navigateToLogs(BuildContext context) async {
-    final result = await ExtendedNavigator.of(context).pushValidatePinPage();
-    if (result != null) {
-      await ExtendedNavigator.of(context).pushLogsPage();
+    final isPinProtected = await configurationCubit.isPinProtected();
+
+    if (isPinProtected) {
+      final result = await ExtendedNavigator.of(context).pushValidatePinPage();
+      if (result != null) {
+        ExtendedNavigator.of(context).pushLogsPage();
+      }
+    } else {
+      ExtendedNavigator.of(context).pushLogsPage();
     }
   }
 

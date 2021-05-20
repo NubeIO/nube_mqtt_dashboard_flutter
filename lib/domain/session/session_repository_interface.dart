@@ -14,6 +14,8 @@ abstract class ISessionRepository implements IRepository {
 
   Future<bool> isPinProtected();
 
+  Future<Option<String>> getPinConfiguration();
+
   Future<ProfileStatusType> getLoginStatus();
 
   Stream<ProfileStatusType> get loginStatusStream;

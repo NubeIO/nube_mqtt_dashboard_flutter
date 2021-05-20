@@ -4,11 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/configuration/configuration_cubit.dart';
-import '../../../domain/forms/layout_topic_validation.dart';
-import '../../../domain/forms/non_empty_validation.dart';
-import '../../../domain/forms/port_validation.dart';
-import '../../../domain/forms/url_validation.dart';
-import '../../../domain/mqtt/mqtt_repository.dart';
+import '../../../domain/session/failures.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
 import '../../mixins/loading_mixin.dart';
@@ -45,9 +41,9 @@ class _ConnectPageState extends State<ConnectPage>
     cubit = getIt<ConfigurationCubit>();
   }
 
-  void _onConnectionFailure(
+  void _onSaveFailure(
     BuildContext context,
-    ConnectFailure failure,
+    CreatePinFailure failure,
   ) {
     onFailureMessage(
       context,
@@ -57,7 +53,7 @@ class _ConnectPageState extends State<ConnectPage>
     );
   }
 
-  void _onConnectionSuccess(BuildContext context, bool shouldReconnect) {
+  void _onSaveSuccess(BuildContext context, bool shouldReconnect) {
     if (widget.isInitalConfig) {
       _navigateToDashboardScreen(context);
     } else {
@@ -70,23 +66,17 @@ class _ConnectPageState extends State<ConnectPage>
   }
 
   void _navigateToDashboardScreen(BuildContext context) {
-    ExtendedNavigator.of(context)
-        .pushAndRemoveUntil(Routes.dashboardPage, (route) => false);
+    ExtendedNavigator.of(context).pushAndRemoveUntil(
+      Routes.dashboardPage,
+      (route) => false,
+    );
   }
 
   void _onNavigateChangeTheme(BuildContext context) {
     ExtendedNavigator.of(context).pushPreviewPage();
   }
 
-  Future<String> _onGetAdminPin(BuildContext context) async {
-    final result = await ExtendedNavigator.of(context).pushCreatePinPage(
-      subtitle:
-          "Please enter a admin pin which will be used to lock down the settings",
-    );
-    return result;
-  }
-
-  Future<String> _onGetUserPin(BuildContext context) async {
+  Future<String> _onGetPin(BuildContext context) async {
     final result = await ExtendedNavigator.of(context).pushCreatePinPage(
       subtitle:
           "Please enter a user pin which will be used to lock down the application for users.",
@@ -94,83 +84,18 @@ class _ConnectPageState extends State<ConnectPage>
     return result;
   }
 
-  Widget _buildMobile(BuildContext context) {
-    return SingleChildScrollView(
-      child: BuildForm(
-          child: FocusScope(
-        node: _node,
-        child: Column(
-          children: [
-            _buildMainInputs(context),
-            const SizedBox(height: 16),
-            _buildApplicationInputs(context),
-            const SizedBox(height: 16),
-            _buildCredentialInputs(context),
-            const SizedBox(height: 72),
-          ],
-        ),
-      )),
-    );
-  }
-
-  Widget _buildTablet(BuildContext context) {
-    return Form(
-      child: BuildForm(
+  Widget _buildLayout(BuildContext context) {
+    return BuildForm(
         child: FocusScope(
-          node: _node,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _buildMainInputs(context),
-              ),
-              SizedBox(
-                width: ResponsiveSize.padding(
-                  context,
-                  size: PaddingSize.medium,
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  children: [
-                    _buildCredentialInputs(context),
-                    SizedBox(
-                      height: ResponsiveSize.padding(
-                        context,
-                        size: PaddingSize.large,
-                      ),
-                    ),
-                    _buildApplicationInputs(context)
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
+      node: _node,
+      child: Column(
+        children: [
+          _themeInput(context),
+          const SizedBox(height: 16),
+          _buildPin(context),
+        ],
       ),
-    );
-  }
-
-  Widget _buildCredentialInputs(BuildContext context) {
-    return FormExpansionTile(
-      label: "Credentials",
-      children: [
-        _formUsernameInput(context),
-        _formPasswordInput(context),
-      ],
-    );
-  }
-
-  Widget _buildApplicationInputs(BuildContext context) {
-    return FormExpansionTile(
-      label: "Application",
-      children: [
-        _themeInput(context),
-        _buildAdminPin(context),
-        const SizedBox(height: 16),
-        _buildUserPin(context),
-      ],
-    );
+    ));
   }
 
   Widget _themeInput(BuildContext context) {
@@ -189,159 +114,56 @@ class _ConnectPageState extends State<ConnectPage>
     );
   }
 
-  Widget _buildMainInputs(BuildContext context) {
-    return FormExpansionTile(
-      label: "MQTT Broker",
-      children: [
-        _formHostInput(context),
-        _formPortInput(context),
-        _formClientIdInput(context),
-        _formLayoutTopicInput(context),
-      ],
-    );
-  }
-
-  Widget _formHostInput(BuildContext context) {
-    return FormStringInput(
-      validation: UrlValidation(
-        mapper: (failure) => failure.when(
-          invalidUrl: () => "Please provide a valid url.",
-          unexpected: () => I18n.of(context).failureGeneric,
-        ),
-      ),
-      label: "Host",
-      keyboardType: TextInputType.url,
-      initialValue: cubit.state.host,
-      onChanged: cubit.setHost,
-      onEditingComplete: _node.nextFocus,
-    );
-  }
-
-  Widget _formPortInput(BuildContext context) {
-    return FormIntInput(
-      validation: PortValidation(
-        mapper: (failure) => failure.when(
-          invalidPort: () => "Please provide a valid port number",
-          noNumber: () => "Port number can only be numbers",
-          unexpected: () => I18n.of(context).failureGeneric,
-        ),
-      ),
-      label: "Port",
-      initialValue: cubit.state.port,
-      fallbackValue: 1883,
-      onChanged: cubit.setPort,
-      onEditingComplete: _node.nextFocus,
-    );
-  }
-
-  Widget _formClientIdInput(BuildContext context) {
-    return FormStringInput(
-      validation: NonEmptyValidation(
-        mapper: (failure) => failure.when(
-          empty: () => "Client id is required and can't be empty",
-        ),
-      ),
-      label: "Client Id",
-      initialValue: cubit.state.clientId,
-      onChanged: cubit.setClientId,
-      onEditingComplete: _node.nextFocus,
-    );
-  }
-
-  Widget _formLayoutTopicInput(BuildContext context) {
-    return FormStringInput(
-      validation: LayoutTopicValidation(
-        mapper: (failure) => failure.when(
-          empty: () => "Client id is required and can't be empty",
-        ),
-      ),
-      label: "Layout Topic",
-      initialValue: cubit.state.layoutTopic,
-      onChanged: cubit.setLayoutTopic,
-      onEditingComplete: _node.nextFocus,
-    );
-  }
-
-  Widget _formUsernameInput(BuildContext context) {
-    return FormStringInput(
-      validation: NonEmptyValidation(
-        mapper: (failure) => failure.when(
-          empty: () => "Username is required and can't be empty",
-        ),
-      ),
-      label: "Username",
-      initialValue: cubit.state.username,
-      onChanged: cubit.setUsername,
-      onEditingComplete: _node.nextFocus,
-      isRequired: false,
-    );
-  }
-
-  Widget _formPasswordInput(BuildContext context) {
-    return FormStringInput(
-      validation: NonEmptyValidation(
-        mapper: (failure) => failure.when(
-          empty: () => "Password is required and can't be empty",
-        ),
-      ),
-      label: "Password",
-      initialValue: cubit.state.password,
-      onChanged: cubit.setPassword,
-      onEditingComplete: _node.nextFocus,
-      textInputAction: TextInputAction.done,
-      isRequired: false,
-    );
-  }
-
-  Widget _buildAdminPin(BuildContext context) {
+  Widget _buildPin(BuildContext context) {
     return FormPinInput(
-      label: "Admin Pin",
-      getPin: () => _onGetAdminPin(context),
-      initialValue: cubit.state.adminPin,
-      onChanged: cubit.setAdminPin,
-      isRequired: true,
+      label: "Access Pin",
+      getPin: () => _onGetPin(context),
+      initialValue: cubit.state.accessPin,
+      onChanged: cubit.setPin,
     );
-  }
-
-  Widget _buildUserPin(BuildContext context) {
-    return FormPinInput(
-        label: "User Pin",
-        getPin: () => _onGetUserPin(context),
-        initialValue: cubit.state.userPin,
-        onChanged: cubit.setUserPin);
   }
 
   Widget _buildFab(BuildContext context) {
-    final fab = FloatingActionButton.extended(
-      onPressed: cubit.connect,
-      label: const Text("Connect"),
+    return FloatingActionButton.extended(
+      onPressed: cubit.save,
+      label: const Text("Save"),
     );
-
-    return BlocBuilder<ConfigurationCubit, ConfigurationState>(
-        cubit: cubit,
-        builder: (context, state) {
-          if (cubit.isValid) {
-            return state.connectState.maybeWhen(
-              initial: () => fab,
-              success: () => fab,
-              orElse: () => Container(),
-            );
-          }
-          return Container();
-        });
   }
 
-  Widget _buildScaffold(BuildContext context, bool isMobile) {
+  Widget _buildScaffold(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
-          widget.isInitalConfig ? "Configuration" : "Change Configuration",
-        ),
       ),
-      body: isMobile
-          ? _buildMobile(context)
-          : SingleChildScrollView(child: _buildTablet(context)),
+      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SizedBox(
+          height: ResponsiveSize.padding(
+            context,
+            size: PaddingSize.small,
+          ),
+        ),
+        FormPadding(
+          child: Text(
+            widget.isInitalConfig ? "Configuration" : "Change Configuration",
+            style: textTheme.headline1,
+          ),
+        ),
+        FormPadding(
+          child: Text(
+            "Your personal theme and security settings.",
+            style: textTheme.bodyText1,
+          ),
+        ),
+        SizedBox(
+          height: ResponsiveSize.padding(
+            context,
+            size: PaddingSize.large,
+          ),
+        ),
+        _buildLayout(context)
+      ]),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: _buildFab(context),
     );
@@ -355,15 +177,15 @@ class _ConnectPageState extends State<ConnectPage>
         child: BlocConsumer<ConfigurationCubit, ConfigurationState>(
           cubit: cubit,
           listener: (context, state) {
-            state.connectState.maybeWhen(
-              loading: () => showLoading(context, message: "Connecting..."),
+            state.saveState.maybeWhen(
+              loading: () => showLoading(context, message: "Saving..."),
               failure: (failure) {
                 hideLoading(context);
-                _onConnectionFailure(context, failure);
+                _onSaveFailure(context, failure);
               },
               success: () {
                 hideLoading(context);
-                _onConnectionSuccess(context, state.shouldReconnect);
+                _onSaveSuccess(context, state.shouldReconnect);
               },
               orElse: () => hideLoading(context),
             );
@@ -373,10 +195,9 @@ class _ConnectPageState extends State<ConnectPage>
               return Container();
             }
             return ScreenTypeLayout(
-              mobile: _buildScaffold(context, true),
+              mobile: _buildScaffold(context),
               tablet: MasterLayout(
-                width: ResponsiveSize.twoWidth(context),
-                master: _buildScaffold(context, false),
+                master: _buildScaffold(context),
               ),
             );
           },

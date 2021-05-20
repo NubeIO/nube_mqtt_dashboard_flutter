@@ -8,7 +8,6 @@ import '../../../domain/session/failures.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
-import '../../../utils/logger/log.dart';
 import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
@@ -41,9 +40,12 @@ class LoginPage extends StatelessWidget with MessageMixin, LoadingMixin {
     BuildContext context,
     ProfileStatusType profileStatusType,
   ) {
-    Log.i("$profileStatusType");
     if (profileStatusType == ProfileStatusType.PROFILE_EXISTS) {
-      ExtendedNavigator.of(context).pushDashboardPage();
+      ExtendedNavigator.of(context).pushAndRemoveUntil(
+        Routes.connectPage,
+        (route) => false,
+        arguments: ConnectPageArguments(isInitalConfig: true),
+      );
     } else if (profileStatusType == ProfileStatusType.NEEDS_VERIFICATION) {
       ExtendedNavigator.of(context).pushAndRemoveUntil(
         Routes.verificationPage,
