@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:nube_mqtt_dashboard/data/mqtt/datasources/mqtt_data_source_impl.dart';
+import 'package:nube_mqtt_dashboard/data/session/managers/session_preference.dart';
 import 'package:nube_mqtt_dashboard/domain/configuration/entities.dart';
 import 'package:nube_mqtt_dashboard/domain/connection/connection_data_source_interface.dart';
 import 'package:nube_mqtt_dashboard/domain/mqtt/entities.dart';
@@ -10,18 +11,26 @@ import 'package:uuid/uuid.dart';
 
 class ConnectionDataSourceMock extends Mock implements IConnectionDataSource {}
 
+class MockSessionPreferenceManager extends Mock
+    implements SessionPreferenceManager {}
+
 void main() {
   MqttDataSource _mqttDataSource;
   Configuration _validConfig;
   ConnectionDataSourceMock _connectionDataSourceMock;
+  SessionPreferenceManager _sessionPreferenceManager;
   const topicName = "testtopic/ritesh";
 
   setUp(() {
     _connectionDataSourceMock = ConnectionDataSourceMock();
+    _sessionPreferenceManager = MockSessionPreferenceManager();
     when(_connectionDataSourceMock.layoutStream)
         .thenAnswer((_) => const Stream.empty());
 
-    _mqttDataSource = MqttDataSource(_connectionDataSourceMock);
+    _mqttDataSource = MqttDataSource(
+      _connectionDataSourceMock,
+      _sessionPreferenceManager,
+    );
     _validConfig = Configuration(
       host: "broker.mqttdashboard.com",
       port: 1883,
