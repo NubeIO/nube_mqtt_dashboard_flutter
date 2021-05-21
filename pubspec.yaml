@@ -24,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   auto_route: ^0.6.9
+  badges: ^1.2.0
   cached_network_image: ^2.5.0
   connectivity: ^2.0.2
   cupertino_icons: ^1.0.0

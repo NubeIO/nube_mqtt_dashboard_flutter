@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:framy_annotation/framy_annotation.dart';
 
+import '../../../application/alerts/alerts_cubit.dart';
 import '../../../application/configuration/configuration_cubit.dart';
 import '../../../application/layout/layout_cubit.dart';
 import '../../../domain/layout/entities.dart';
@@ -14,6 +15,7 @@ import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../themes/nube_theme.dart';
+import '../../widgets/icons/alert_badge.dart';
 import '../../widgets/logo_widget.dart';
 import '../../widgets/responsive/drawer_detail_layout.dart';
 import '../../widgets/responsive/padding.dart';
@@ -290,9 +292,21 @@ List<Widget> appbarActions({
   @required void Function() onNotificationPressed,
 }) {
   return [
-    IconButton(
-      icon: const Icon(Icons.notifications_outlined),
-      onPressed: () => onNotificationPressed(),
-    )
+    BlocProvider<AlertsCubit>(
+      create: (context) => getIt<AlertsCubit>(),
+      child: BlocBuilder<AlertsCubit, AlertsState>(
+        builder: (context, state) {
+          return state.alertState.maybeWhen(
+            success: () => AlertBadgeIcon(
+              onNotificationPressed: onNotificationPressed,
+              count: state.alert.alerts.size,
+            ),
+            orElse: () => AlertBadgeIcon(
+              onNotificationPressed: onNotificationPressed,
+            ),
+          );
+        },
+      ),
+    ),
   ];
 }

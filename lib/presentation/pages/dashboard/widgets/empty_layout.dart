@@ -28,8 +28,6 @@ class _EmptyLayoutState extends State<EmptyLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
