@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart';
 import '../../../domain/configuration/configuration_repository_interface.dart';
 import '../../../domain/core/future_failure_helper.dart';
 import '../../../domain/mqtt/mqtt_repository.dart';
+import '../../../domain/notifications/notification_repository_interface.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../domain/session/session_repository_interface.dart';
 import '../../../domain/user/user_repository_interface.dart';
@@ -22,6 +23,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final IUserRepository _userRepository;
   final ISessionDataSource _sessionDataSource;
   final IMqttRepository _mqttRepository;
+  final INotificationRepository _notificationRepository;
 
   bool _hasValidated = false;
 
@@ -29,7 +31,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
       BehaviorSubject();
 
   @nullable
-  Timer verificationTimer;
+  StreamSubscription _subscription;
 
   ProwdlySessionRepositoryImpl(
     this._pinPreferenceManager,
@@ -38,6 +40,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     this._userRepository,
     this._configurationRepository,
     this._mqttRepository,
+    this._notificationRepository,
   ) {
     _hasValidated = _pinPreferenceManager.isPinSet;
     loginStatusStream.listen((event) async {
@@ -105,22 +108,35 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   Future<void> _onStartVerificationLooper() async {
-    Log.i("Starting Verification Loop");
-    verificationTimer?.cancel();
-    verificationTimer = Timer.periodic(
-      const Duration(seconds: 5),
-      (value) async {
-        final userResult = await _userRepository.getUser();
-        if (userResult.isLeft()) return;
-        final user = userResult.fold(
-          (l) => throw AssertionError(),
-          (user) => user,
-        );
-        if (user.state == UserVerificationState.VERIFIED) {
-          _setProfileStatus(ProfileStatusType.PROFILE_EXISTS);
+    final isValidated = await validateUserProfile();
+    if (!isValidated) {
+      _notificationRepository.notificaitonStream.listen((event) async {
+        if (event.isRight()) {
+          final notificationData = event.getOrElse(
+            () => throw AssertionError(),
+          );
+
+          notificationData.maybeWhen(
+            verification: () async => validateUserProfile(),
+            orElse: () {},
+          );
         }
-      },
+      });
+    }
+  }
+
+  Future<bool> validateUserProfile() async {
+    final userResult = await _userRepository.getUser();
+    if (userResult.isLeft()) return false;
+    final user = userResult.fold(
+      (l) => throw AssertionError(),
+      (user) => user,
     );
+    if (user.state == UserVerificationState.VERIFIED) {
+      _setProfileStatus(ProfileStatusType.PROFILE_EXISTS);
+      return true;
+    }
+    return false;
   }
 
   Future<void> _fetchRequiredData() async {
@@ -133,10 +149,8 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   Future<void> _onStopVerificationLooper() async {
-    Log.i("Stopping Verification Loop");
-    if (verificationTimer?.isActive == true) {
-      verificationTimer?.cancel();
-    }
+    Log.i("Stopping Verification Listener");
+    _subscription?.cancel();
   }
 
   @override
@@ -156,7 +170,6 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
         _storeSession(jwtModel);
 
         final tokenResult = await _userRepository.setDeviceToken();
-        Log.i(tokenResult.toString());
 
         if (tokenResult.isLeft()) {
           return tokenResult.fold(
@@ -224,8 +237,6 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
         );
 
         final tokenResult = await _userRepository.setDeviceToken();
-
-        Log.i(tokenResult.toString());
 
         if (tokenResult.isLeft()) {
           return tokenResult.fold(
