@@ -13,4 +13,6 @@ abstract class INotificationRepository implements IRepository {
   Stream<Either<TokenStreamFailure, String>> get tokenStream;
 
   Stream<Either<AlertFailure, AlertEntity>> get alertStream;
+
+  Stream<Either<NotificationFailure, NotificationData>> get notificaitonStream;
 }

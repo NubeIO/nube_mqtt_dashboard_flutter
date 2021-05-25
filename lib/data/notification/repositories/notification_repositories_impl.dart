@@ -84,6 +84,13 @@ class NotificationRepositoryImpl extends INotificationRepository {
     });
   }
 
+  @override
+  Stream<Either<NotificationFailure, NotificationData>> get notificaitonStream {
+    return _notificationDataSource.notificationStream
+        .handleError((error) => const Left(NotificationFailure.unexpected()))
+        .map((event) => Right(event));
+  }
+
   Future<Either<AlertFailure, AlertEntity>> _onErrorCatch(
     Object error,
   ) async {
