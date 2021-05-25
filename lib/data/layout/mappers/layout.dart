@@ -111,6 +111,7 @@ class LayoutMapper {
             globalConfig: mapToGlobalConfig(
               widget.config,
               parentConfig: config,
+              mapper: (config) => config?.gaugeConfig,
             ),
           );
         },
@@ -124,6 +125,7 @@ class LayoutMapper {
           globalConfig: mapToGlobalConfig(
             widget.config,
             parentConfig: config,
+            mapper: (config) => config?.switchConfig,
           ),
         ),
         SLIDER: (widget) => WidgetEntity.sliderWidget(
@@ -136,6 +138,7 @@ class LayoutMapper {
           globalConfig: mapToGlobalConfig(
             widget.config,
             parentConfig: config,
+            mapper: (config) => config?.sliderConfig,
           ),
         ),
         VALUE: (widget) => WidgetEntity.valueWidget(
@@ -148,6 +151,7 @@ class LayoutMapper {
           globalConfig: mapToGlobalConfig(
             widget.config,
             parentConfig: config,
+            mapper: (config) => config?.valueConfig,
           ),
         ),
         SWITCH_GROUP: (widget) {
@@ -161,6 +165,7 @@ class LayoutMapper {
             globalConfig: mapToGlobalConfig(
               widget.config,
               parentConfig: config,
+              mapper: (config) => config?.switchGroupConfig,
             ),
           );
         },
@@ -175,6 +180,7 @@ class LayoutMapper {
             globalConfig: mapToGlobalConfig(
               widget.config,
               parentConfig: config,
+              mapper: (config) => config?.mapConfig,
             ),
           );
         },
@@ -186,6 +192,7 @@ class LayoutMapper {
           globalConfig: mapToGlobalConfig(
             const WidgetConfigDto.emptyConfig(),
             parentConfig: config,
+            mapper: (config) => null,
           ),
         ),
         unknownWidget: (value) => WidgetEntity.failure(
@@ -196,6 +203,7 @@ class LayoutMapper {
           globalConfig: mapToGlobalConfig(
             const WidgetConfigDto.emptyConfig(),
             parentConfig: config,
+            mapper: (config) => null,
           ),
         ),
       );
@@ -210,17 +218,25 @@ class LayoutMapper {
   GlobalConfig mapToGlobalConfig(
     WidgetConfigDto config, {
     @required KtList<GlobalWidgetConfigDto> parentConfig,
+    @required WidgetConfigDto Function(GlobalWidgetTypeConfigDto config) mapper,
   }) {
     return GlobalConfig(
-      background: mapToBackground(parentConfig
-          .mapNotNull((it) => it?.background)
-          .plusElement(config?.background)),
-      title: mapToTitle(parentConfig
-          .mapNotNull((it) => it?.title)
-          .plusElement(config?.title)),
-      initial: mapToInitial(parentConfig
-          .mapNotNull((it) => it?.initial)
-          .plusElement(config?.initial)),
+      background: mapToBackground(parentConfig.mapNotNull((it) {
+        final WidgetConfigDto configDto = mapper(it?.widget);
+        return it?.background ?? configDto?.background;
+      }).plusElement(config?.background)),
+      title: mapToTitle(parentConfig.mapNotNull((it) {
+        final WidgetConfigDto configDto = mapper(it?.widget);
+        return it?.title ?? configDto?.title;
+      }).plusElement(config?.title)),
+      initial: mapToInitial(parentConfig.mapNotNull((it) {
+        final WidgetConfigDto configDto = mapper(it?.widget);
+        return it?.initial ?? configDto?.initial;
+      }).plusElement(config?.initial)),
+      gridSize: mapToGridSize(parentConfig.mapNotNull((it) {
+        final WidgetConfigDto configDto = mapper(it?.widget);
+        return it?.grid ?? configDto?.grid;
+      }).plusElement(config?.grid)),
     );
   }
 
@@ -239,6 +255,19 @@ class LayoutMapper {
     return BackgroundConfig(
       color: hexColor != null ? HexColor.parseColor(hexColor) : null,
       colors: mapToColorsKeys(config.mapAndNonNull((it) => it.colors) ?? {}),
+    );
+  }
+
+  GridSize mapToGridSize(
+    KtList<GridSizeDto> config,
+  ) {
+    final gridSize = config.lastOrNull((it) => it != null);
+
+    if (gridSize == null) return null;
+    if (gridSize.rowSpan == null || gridSize.columnSpan == null) return null;
+    return GridSize(
+      rowSpan: gridSize.rowSpan,
+      columnSpan: gridSize.columnSpan,
     );
   }
 

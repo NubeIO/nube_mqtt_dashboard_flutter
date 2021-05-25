@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:nube_mqtt_dashboard/utils/logger/log.dart';
 
 import '../../../../application/layout/pages/pages_cubit.dart';
 import '../../../../domain/layout/entities.dart';
@@ -42,20 +43,43 @@ class WidgetsScreen extends StatelessWidget {
       itemCount: page.widgets.size,
       staggeredTileBuilder: (index) {
         final widget = page.widgets[index];
+        final rowSpan = widget.globalConfig.gridSize?.rowSpan;
+        final columnSpan = widget.globalConfig.gridSize?.columnSpan;
+        Log.i("Widget ${widget.name} $rowSpan x $columnSpan");
         return widget.map(
-          gaugeWidget: (_) =>
-              StaggeredTile.count(widthCount * 2, heightCalc * 2),
+          gaugeWidget: (_) => StaggeredTile.count(
+            widthCount * (rowSpan ?? 2),
+            heightCalc * (columnSpan ?? 2),
+          ),
           sliderWidget: (_) {
-            return StaggeredTile.count(widthCount * 2, heightCalc);
+            return StaggeredTile.count(
+              widthCount * (rowSpan ?? 2),
+              heightCalc * (columnSpan ?? 1),
+            );
           },
-          switchWidget: (_) => StaggeredTile.count(widthCount, heightCalc),
-          valueWidget: (_) => StaggeredTile.count(widthCount, heightCalc),
+          switchWidget: (_) => StaggeredTile.count(
+            widthCount * (rowSpan ?? 1),
+            heightCalc * (columnSpan ?? 1),
+          ),
+          valueWidget: (_) => StaggeredTile.count(
+            widthCount * (rowSpan ?? 1),
+            heightCalc * (columnSpan ?? 1),
+          ),
           switchGroupWidget: (widget) {
             final cellSpan = widget.config.items.size > 1 ? 2 : 1;
-            return StaggeredTile.count(widthCount * cellSpan, heightCalc);
+            return StaggeredTile.count(
+              widthCount * (rowSpan ?? cellSpan),
+              heightCalc * (columnSpan ?? 1),
+            );
           },
-          mapWidget: (_) => StaggeredTile.count(widthCount, heightCalc),
-          failure: (_) => StaggeredTile.count(widthCount, heightCalc),
+          mapWidget: (_) => StaggeredTile.count(
+            widthCount * (rowSpan ?? 1),
+            heightCalc * (columnSpan ?? 1),
+          ),
+          failure: (_) => StaggeredTile.count(
+            widthCount * (rowSpan ?? 1),
+            heightCalc * (columnSpan ?? 1),
+          ),
         );
       },
     );

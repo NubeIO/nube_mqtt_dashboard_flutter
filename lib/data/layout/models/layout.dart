@@ -149,6 +149,7 @@ abstract class GlobalWidgetConfigDto with _$GlobalWidgetConfigDto {
     BackgroundConfigDto background,
     TitleConfigDto title,
     GlobalWidgetTypeConfigDto widget,
+    GridSizeDto grid,
     double initial,
   }) = _GlobalWidgetConfigDto;
 
@@ -333,6 +334,7 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
+    GridSizeDto grid,
   }) = GaugeConfigDto;
 
   const factory WidgetConfigDto.sliderConfig({
@@ -343,6 +345,7 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
+    GridSizeDto grid,
   }) = SliderConfigDto;
 
   const factory WidgetConfigDto.switchConfig({
@@ -350,6 +353,7 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
+    GridSizeDto grid,
   }) = SwitchConfigDto;
 
   const factory WidgetConfigDto.valueConfig({
@@ -359,6 +363,7 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     @JsonKey(unknownEnumValue: AlignmentType.LEFT) AlignmentType align,
     BackgroundConfigDto background,
     TitleConfigDto title,
+    GridSizeDto grid,
   }) = ValueConfigDto;
 
   const factory WidgetConfigDto.switchGroupConfig({
@@ -367,6 +372,7 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
+    GridSizeDto grid,
   }) = SwitchGroupConfigDto;
 
   const factory WidgetConfigDto.mapConfig({
@@ -377,16 +383,29 @@ abstract class WidgetConfigDto with _$WidgetConfigDto {
     double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
+    GridSizeDto grid,
   }) = MapConfigDto;
 
   const factory WidgetConfigDto.emptyConfig({
     double initial,
     BackgroundConfigDto background,
     TitleConfigDto title,
+    GridSizeDto grid,
   }) = EmptyConfigDto;
 
   factory WidgetConfigDto.fromJson(Map<String, dynamic> json) =>
       _$WidgetConfigDtoFromJson(json);
+}
+
+@freezed
+abstract class GridSizeDto with _$GridSizeDto {
+  const factory GridSizeDto({
+    @JsonKey(name: 'row_span') int rowSpan,
+    @JsonKey(name: 'column_span') int columnSpan,
+  }) = _GridSizeDto;
+
+  factory GridSizeDto.fromJson(Map<String, dynamic> json) =>
+      _$GridSizeDtoFromJson(json);
 }
 
 @freezed

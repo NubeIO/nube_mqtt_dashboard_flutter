@@ -67,6 +67,7 @@ abstract class GlobalConfig with _$GlobalConfig {
   const factory GlobalConfig({
     @required BackgroundConfig background,
     @required TitleConfig title,
+    GridSize gridSize,
     double initial,
   }) = _GlobalConfig;
 
@@ -117,6 +118,14 @@ abstract class TitleConfig with _$TitleConfig {
         align: const Alignment.left(),
         colors: emptyMap(),
       );
+}
+
+@freezed
+abstract class GridSize with _$GridSize {
+  const factory GridSize({
+    @required int rowSpan,
+    @required int columnSpan,
+  }) = _GridSize;
 }
 
 @freezed
