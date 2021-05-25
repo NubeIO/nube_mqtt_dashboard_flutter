@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../widgets/animated/illustration_empty_layout.dart';
@@ -15,15 +17,24 @@ class EmptyLayout extends StatefulWidget {
 
 class _EmptyLayoutState extends State<EmptyLayout> {
   bool isLoading = true;
+  StreamSubscription _subscription;
 
   @override
   void initState() {
-    Future.delayed(const Duration(seconds: 5)).then((value) {
+    _subscription = Future.delayed(
+      const Duration(seconds: 5),
+    ).asStream().listen((value) {
       setState(() {
         isLoading = false;
       });
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   @override

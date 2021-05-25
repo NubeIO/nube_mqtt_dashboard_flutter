@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'closable_tree.dart';
@@ -90,7 +91,9 @@ class Log {
         tag: tag,
         ex: ex,
         stacktrace: stacktrace ??
-            (level == const LogLevel.e() ? StackTrace.current : null),
+            (level == const LogLevel.e() || !kReleaseMode
+                ? StackTrace.current
+                : null),
       );
     }
   }
