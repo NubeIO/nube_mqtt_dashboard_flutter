@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:injectable/injectable.dart';
@@ -31,6 +33,13 @@ class NotificationDataSource extends INotificationDataSource {
       onLaunch: _onLaunch,
       onResume: _onResume,
     );
+
+    FirebaseMessaging().requestNotificationPermissions();
+    FirebaseMessaging()
+        .onIosSettingsRegistered
+        .listen((IosNotificationSettings settings) {
+      Log.i("Settings registered: $settings");
+    });
   }
 
   Future _onResume(Map<String, dynamic> message) async {
@@ -43,9 +52,13 @@ class NotificationDataSource extends INotificationDataSource {
 
   Future _onMessage(Map<String, dynamic> message) async {
     Log.d("OnMessage $message", tag: _TAG);
-    final data = message["data"];
-    if (data != null) {
-      _notificationPublisher.add(notificationMapper.mapToNotification(data));
+    if (Platform.isAndroid) {
+      final data = message["data"];
+      if (data != null) {
+        _notificationPublisher.add(notificationMapper.mapToNotification(data));
+      }
+    } else if (Platform.isIOS) {
+      _notificationPublisher.add(notificationMapper.mapToNotification(message));
     }
   }
 

@@ -45,7 +45,6 @@ class WidgetsScreen extends StatelessWidget {
         final widget = page.widgets[index];
         final rowSpan = widget.globalConfig.gridSize?.rowSpan;
         final columnSpan = widget.globalConfig.gridSize?.columnSpan;
-        Log.i("Widget ${widget.name} $rowSpan x $columnSpan");
         return widget.map(
           gaugeWidget: (_) => StaggeredTile.count(
             widthCount * (rowSpan ?? 2),

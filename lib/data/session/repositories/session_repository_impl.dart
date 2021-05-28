@@ -15,6 +15,8 @@ import '../../../utils/logger/log.dart';
 import '../managers/pin_preference.dart';
 import '../managers/session_preference.dart';
 
+const _TAG = "SessionRepository";
+
 @LazySingleton(as: ISessionRepository)
 class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final PinPreferenceManager _pinPreferenceManager;
@@ -237,7 +239,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
         );
 
         final tokenResult = await _userRepository.setDeviceToken();
-
+        Log.e(tokenResult.toString(), tag: _TAG);
         if (tokenResult.isLeft()) {
           return tokenResult.fold(
             (failure) => Left(

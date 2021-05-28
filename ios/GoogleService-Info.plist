@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>250681901394-ln3c4d9pifrccl4v9gj3taecjunl5o1p.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.250681901394-ln3c4d9pifrccl4v9gj3taecjunl5o1p</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>250681901394-mp83jdil9eeem7qppneek1p6cqonq9hj.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAhU0zeGQPi2NPfN7gUv3EAcZx27njvj48</string>
+	<key>GCM_SENDER_ID</key>
+	<string>250681901394</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.nubeio.nubeMqttDashboard</string>
+	<key>PROJECT_ID</key>
+	<string>nube-io-mqtt</string>
+	<key>STORAGE_BUCKET</key>
+	<string>nube-io-mqtt.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:250681901394:ios:3849336530075bc9f8ba8b</string>
+</dict>
+</plist>
