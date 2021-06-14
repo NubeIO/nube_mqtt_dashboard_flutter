@@ -10,7 +10,7 @@ abstract class HostState with _$HostState {
 
   factory HostState.initial() => HostState(
         host: ValueObject.none(),
-        port: const ValueObject(Some(1616)),
+        port: const ValueObject(Some(1617)),
         saveConfigState: const InternalState.initial(),
       );
 }

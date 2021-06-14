@@ -12,9 +12,9 @@ part 'configuration_api.g.dart';
 abstract class ConfigurationApi {
   factory ConfigurationApi(Dio dio, {String baseUrl}) = _ConfigurationApi;
 
-  @GET("api/mrb_listener")
+  @GET("c/mqtt")
   Future<ConnectionConfigResponse> getConnectionConfig();
 
-  @GET("um/api/mqtt/topics")
+  @GET("c/mqtt/topics")
   Future<TopicConfigResponse> getTopicConfig();
 }

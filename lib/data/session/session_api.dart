@@ -14,10 +14,10 @@ part 'session_api.g.dart';
 abstract class SessionApi {
   factory SessionApi(Dio dio, {String baseUrl}) = _SessionApi;
 
-  @POST("um/api/users")
+  @POST("users")
   Future<JWTResponse> registerUser(@Body() RegisterRequest request);
 
-  @POST("um/api/users/login")
+  @POST("users/login")
   Future<JWTResponse> loginUser(@Body() LoginRequest request);
 
   @POST("um/user")

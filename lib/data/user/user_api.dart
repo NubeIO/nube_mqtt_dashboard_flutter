@@ -13,17 +13,17 @@ part 'user_api.g.dart';
 abstract class UserApi {
   factory UserApi(Dio dio, {String baseUrl}) = _UserApi;
 
-  @GET("um/api/user")
+  @GET("o/users")
   Future<UserResponse> getUser();
 
-  @POST("um/api/user/devices")
+  @POST("o/users/devices")
   Future<DeviceTokenReponse> setDeviceToken(
     @Body() SetDeviceTokenRequest request,
   );
 
-  @POST("um/api/users/check/email")
+  @POST("users/check/email")
   Future<AvailableResponse> checkEmail(@Body() CheckEmailRequest request);
 
-  @POST("um/api/users/check/username")
+  @POST("users/check/username")
   Future<AvailableResponse> checkUsername(@Body() CheckUsernameRequest request);
 }

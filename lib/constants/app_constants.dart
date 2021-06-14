@@ -4,4 +4,5 @@ class AppConstants {
   static const String APP_NAME = "Nube Mqtt";
   static const int PIN_LENGTH = 4;
   static const String LAYOUT_TOPIC = "UUID/update";
+  static const String COMMON_API_URL = "api/apps/";
 }
