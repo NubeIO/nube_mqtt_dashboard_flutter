@@ -32,6 +32,16 @@ class UserDataRepositoryImpl extends IUserDataSource {
   }
 
   @override
+  Future<Unit> removeDeviceToken(String token) {
+    return _apiRepository.userApi
+        .then(
+          (api) => api.removeDeviceToken(token),
+        )
+        .then((response) => unit)
+        .catchDioException();
+  }
+
+  @override
   Future<bool> checkEmail(String email) {
     return _apiRepository.userApi
         .then(

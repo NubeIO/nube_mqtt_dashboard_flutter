@@ -21,9 +21,9 @@ const _TAG = "SessionRepository";
 class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final PinPreferenceManager _pinPreferenceManager;
   final SessionPreferenceManager _sessionPreferenceManager;
+  final ISessionDataSource _sessionDataSource;
   final IConfigurationRepository _configurationRepository;
   final IUserRepository _userRepository;
-  final ISessionDataSource _sessionDataSource;
   final IMqttRepository _mqttRepository;
   final INotificationRepository _notificationRepository;
 
@@ -275,6 +275,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     try {
       _pinPreferenceManager.clearData();
       _sessionPreferenceManager.clearData();
+      _userRepository.removeDeviceToken();
       return const Right(unit);
     } catch (e) {
       return const Left(LogoutFailure.unexpected());

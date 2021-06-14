@@ -92,4 +92,27 @@ class UserRepositoryImpl extends IUserRepository {
           orElse: () => const UserExistFailure.server()),
     );
   }
+
+  @override
+  Future<Either<RemoveTokenFailure, String>> removeDeviceToken() {
+    return futureFailureHelper(
+      request: () async {
+        final tokenResult = await _notificationRepository.getToken();
+        if (tokenResult.isLeft()) {
+          return const Left(RemoveTokenFailure.unexpected());
+        }
+        final token = tokenResult.fold(
+          (l) => throw AssertionError(),
+          (token) => token,
+        );
+        await _userDataSource.removeDeviceToken(token);
+        return Right(token);
+      },
+      failureMapper: (cases) => cases.maybeWhen(
+        connection: () => const RemoveTokenFailure.connection(),
+        general: (message) => RemoveTokenFailure.general(message),
+        orElse: () => const RemoveTokenFailure.server(),
+      ),
+    );
+  }
 }

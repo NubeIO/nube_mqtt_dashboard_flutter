@@ -48,12 +48,4 @@ class SessionDataRepositoryImpl extends ISessionDataSource {
         .then((response) => sessionMapper.toJwt(response))
         .catchDioException();
   }
-
-  @override
-  Future<Unit> logout() {
-    return _apiRepository.sessionApi
-        .then((api) => api.logout())
-        .then((value) => unit)
-        .catchDioException();
-  }
 }

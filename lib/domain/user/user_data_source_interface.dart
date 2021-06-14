@@ -15,4 +15,6 @@ abstract class IUserDataSource implements IDataSource {
   Future<bool> checkEmail(String email);
 
   Future<bool> checkUsername(String username);
+
+  Future<Unit> removeDeviceToken(String token);
 }

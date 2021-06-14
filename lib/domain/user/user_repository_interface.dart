@@ -13,4 +13,6 @@ abstract class IUserRepository {
   Future<Either<UserExistFailure, Unit>> checkEmail(String email);
 
   Future<Either<UserExistFailure, Unit>> checkUsername(String username);
+
+  Future<Either<RemoveTokenFailure, String>> removeDeviceToken();
 }
