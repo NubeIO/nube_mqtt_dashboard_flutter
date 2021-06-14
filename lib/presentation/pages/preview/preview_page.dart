@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/preview/preview_cubit.dart';
 import '../../../application/validation/value_object.dart';
@@ -19,7 +18,6 @@ import 'models/theme_option.dart';
 import 'widgets/demo_layout.dart';
 import 'widgets/theme_selection.dart';
 
-@FramyWidget(isPage: true)
 class PreviewPage extends StatefulWidget {
   const PreviewPage({Key key}) : super(key: key);
 

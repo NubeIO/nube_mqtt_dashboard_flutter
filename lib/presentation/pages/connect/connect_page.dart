@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/configuration/configuration_cubit.dart';
 import '../../../domain/session/failures.dart';
@@ -18,7 +17,6 @@ import '../../widgets/responsive/master_layout.dart';
 import '../../widgets/responsive/padding.dart';
 import '../../widgets/responsive/screen_type_layout.dart';
 
-@FramyWidget(isPage: true)
 class ConnectPage extends StatefulWidget {
   final bool isInitalConfig;
   const ConnectPage({

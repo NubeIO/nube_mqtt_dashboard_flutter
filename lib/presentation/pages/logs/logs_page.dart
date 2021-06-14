@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:kt_dart/collection.dart';
 
@@ -14,7 +13,6 @@ import '../../widgets/expandable_text.dart';
 import '../../widgets/responsive/master_layout.dart';
 import '../../widgets/responsive/screen_type_layout.dart';
 
-@FramyWidget(isPage: true)
 class LogsPage extends StatelessWidget with MessageMixin {
   const LogsPage({Key key}) : super(key: key);
 

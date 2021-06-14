@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../constants/app_constants.dart';
-import '../../../constants/framy_constants.dart';
 import '../../themes/nube_theme.dart';
 
-@FramyWidget(groupName: FramyConstants.FORM_INPUTS)
 class PinInput extends StatelessWidget {
   final ValueChanged<String> _onValueChanged;
   final VoidCallback _onEditingComplete;

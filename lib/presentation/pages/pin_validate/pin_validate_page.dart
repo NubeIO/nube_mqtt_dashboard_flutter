@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/session/validate_pin/validate_pin_cubit.dart';
 import '../../../domain/core/internal_state.dart';
@@ -12,7 +11,6 @@ import '../../../injectable/injection.dart';
 import '../../mixins/message_mixin.dart';
 import '../../widgets/screens/pin_screen.dart';
 
-@FramyWidget(isPage: true)
 class ValidatePinPage extends StatelessWidget with MessageMixin {
   final cubit = getIt<ValidatePinCubit>();
   final String title;

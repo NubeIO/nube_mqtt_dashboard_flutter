@@ -1,10 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../widgets/screens/pin_screen.dart';
 
-@FramyWidget(isPage: true)
 class CreatePinPage extends StatelessWidget {
   final String title;
   final String subtitle;

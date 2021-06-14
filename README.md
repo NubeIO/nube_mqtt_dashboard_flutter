@@ -157,7 +157,6 @@ Some useful snippets
 
 The project includes a bunch of useful snippets which can be found in the `dart.code-snippets` under `.vscode`
 
-1. Framy Model Class - `framym` - Creates a Framy Model Class
 1. Part Statement - `pts` - Creates a filled-in part statement
 1.  Part 'Freezed' statement - `ptf` - Creates a filled-in freezed part statement
 1. Freezed Data Class - `fdataclass` - Create a Freezed Data Class

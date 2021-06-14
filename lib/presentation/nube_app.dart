@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 
 import '../constants/app_constants.dart';
 import 'rotue_guards/auth_route_guard.dart';
@@ -12,7 +11,6 @@ import 'themes/nube_theme.dart';
 import 'themes/theme_builder.dart';
 import 'widgets/locale/locale_builder.dart';
 
-@FramyApp(useDevicePreview: true)
 class NubeApp extends StatelessWidget {
   const NubeApp({Key key}) : super(key: key);
 

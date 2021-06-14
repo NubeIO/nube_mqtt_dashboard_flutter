@@ -11,6 +11,5 @@ analyzer:
     avoid_print: error
   exclude:
     - "**/*.g.dart"
-    - "**/*.framy.dart"
     - "**/*.freezed.dart"
     - "**/*.config.dart"

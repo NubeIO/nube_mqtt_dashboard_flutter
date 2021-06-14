@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/validation/value_validation_state.dart';
-import '../../../constants/framy_constants.dart';
 import 'input_statue.dart';
 import 'styles/input_types.dart';
 
-@FramyWidget(groupName: FramyConstants.FORM_INPUTS)
 class TextInput extends StatelessWidget {
   final ValueValidationState _validationState;
   final ValueChanged<String> _onValueChanged;

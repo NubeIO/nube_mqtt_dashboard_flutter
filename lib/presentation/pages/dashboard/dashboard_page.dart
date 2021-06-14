@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../../application/alerts/alerts_cubit.dart';
 import '../../../application/configuration/configuration_cubit.dart';
@@ -23,7 +22,6 @@ import '../../widgets/variable_menu_item.dart';
 import 'widgets/empty_layout.dart';
 import 'widgets/page_screen.dart';
 
-@FramyWidget(isPage: true)
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key key}) : super(key: key);
 

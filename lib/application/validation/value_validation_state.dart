@@ -1,9 +1,7 @@
-import 'package:framy_annotation/framy_annotation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'value_validation_state.freezed.dart';
 
-@framyModel
 @freezed
 abstract class ValueValidationState with _$ValueValidationState {
   const factory ValueValidationState.initial() = Initial;

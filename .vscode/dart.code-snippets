@@ -35,17 +35,6 @@
 		],
 		"description": "Freezed Data Class"
 	},
-	"Framy Model Class": {
-		"prefix": "framym",
-		"body": [
-			"@FramyModel()",
-			"@immutable",
-			"class ${1:ModelClass}{",
-			"  const ${1:ModelClass}({${2}});",
-			"}"
-		],
-		"description": "Framy Model Class"
-	},
 	"Freezed Union": {
 		"prefix": "funion",
 		"body": [

@@ -105,8 +105,6 @@ class HostPage extends StatelessWidget with MessageMixin, LoadingMixin {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
       body: BlocProvider(
         create: (context) => getIt<HostCubit>(),

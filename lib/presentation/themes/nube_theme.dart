@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:framy_annotation/framy_annotation.dart';
 
 import '../../domain/theme/entities.dart';
 import 'supported_theme/custom_theme.dart';
@@ -8,7 +7,6 @@ import 'supported_theme/default_theme.dart';
 import 'theme_interface.dart';
 
 // ignore: avoid_classes_with_only_static_members
-@FramyTheme()
 class NubeTheme {
   final ITheme theme;
 

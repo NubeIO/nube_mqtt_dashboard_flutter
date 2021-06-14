@@ -47,5 +47,4 @@ app.*.map.json
 **/*.freezed.dart
 **/*.g.dart
 **/*.gr.dart
-lib/presentation/*.app.framy.dart
 .fvm/flutter_sdk

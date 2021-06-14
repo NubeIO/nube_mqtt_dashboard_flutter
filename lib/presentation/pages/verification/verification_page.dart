@@ -24,8 +24,6 @@ class VerificationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
       body: BlocProvider(
         create: (context) => getIt<VerificationCubit>(),
@@ -35,14 +33,14 @@ class VerificationPage extends StatelessWidget {
           },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const AspectRatio(
+            children: const [
+              AspectRatio(
                 aspectRatio: 1,
                 child: VerificationIllustration(
                   size: Size.infinite,
                 ),
               ),
-              const PageInfoText(
+              PageInfoText(
                 title: "Almost Done",
                 subtitle:
                     "In order to make sure nobody has unauthorized access to data, someone from the admin needs to validate your request.",
