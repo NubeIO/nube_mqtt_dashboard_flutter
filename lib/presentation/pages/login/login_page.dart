@@ -93,9 +93,8 @@ class LoginPage extends StatelessWidget with MessageMixin, LoadingMixin {
     return BlocBuilder<LoginCubit, LoginState>(builder: (context, state) {
       if (cubit.isValid) {
         return state.loginState.maybeWhen(
-          initial: () => fab,
-          success: (_) => fab,
-          orElse: () => Container(),
+          loading: () => const SizedBox(),
+          orElse: () => fab,
         );
       }
       return Container();

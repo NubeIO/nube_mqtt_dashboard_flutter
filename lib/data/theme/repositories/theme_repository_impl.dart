@@ -53,4 +53,11 @@ class ThemeRepositoryImpl extends IThemeRepository {
   ) async {
     return left(const GetThemeFailure.unexpected());
   }
+
+  @override
+  Future<Unit> clearData() async {
+    themeStream.add(const SupportedTheme.defaultTheme());
+    await _themePreferenceManager.clearData();
+    return unit;
+  }
 }

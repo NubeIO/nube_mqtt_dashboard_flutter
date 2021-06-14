@@ -2,9 +2,10 @@ import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../constants/app_constants.dart';
+import '../../../domain/core/interfaces/managers.dart';
 
 @injectable
-class PinPreferenceManager {
+class PinPreferenceManager extends IManager {
   final SharedPreferences _sharedPreferences;
 
   PinPreferenceManager(this._sharedPreferences) {
@@ -17,8 +18,10 @@ class PinPreferenceManager {
   bool get isPinSet =>
       _sharedPreferences.getString(_Model.pin.key)?.isNotEmpty ?? false;
 
-  void clearData() {
+  @override
+  Future<Unit> clearData() async {
     _Model.values.forEach(_removeItem);
+    return unit;
   }
 
   void _removeItem(_Model model) {

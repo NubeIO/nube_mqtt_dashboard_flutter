@@ -32,8 +32,8 @@ class HostDataSourceImpl extends IHostDataSource {
   }
 
   @override
-  Future<Unit> logout() {
-    _hostPreferenceManager.clearData();
+  Future<Unit> clearData() async {
+    await _hostPreferenceManager.clearData();
     return Future.value(unit);
   }
 }

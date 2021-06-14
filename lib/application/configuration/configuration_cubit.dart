@@ -7,10 +7,13 @@ import 'package:injectable/injectable.dart';
 import '../../domain/core/internal_state.dart';
 import '../../domain/session/session_repository_interface.dart';
 import '../../domain/theme/theme_repository_interface.dart';
+import '../../utils/logger/log.dart';
 import '../validation/value_object.dart';
 
 part 'configuration_cubit.freezed.dart';
 part 'configuration_state.dart';
+
+const String _TAG = "ConfigurationCubit";
 
 @injectable
 class ConfigurationCubit extends Cubit<ConfigurationState> {
@@ -26,13 +29,12 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
     _prefillData();
   }
 
-  void setPin(ValueObject<String> value) => emit(
-        state.copyWith(
-          accessPin: value,
-        ),
-      );
+  Future<void> setPin(ValueObject<String> value) async {
+    emit(state.copyWith(accessPin: value));
+    await next();
+  }
 
-  Future<void> save() async {
+  Future<void> next() async {
     emit(state.copyWith(saveState: const InternalState.loading()));
 
     final accessPin = state.accessPin.getOrElse("");
@@ -71,6 +73,22 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
     subscription = _themeRepository.getThemeStream().listen((event) {
       event.fold((_) {}, (theme) => emit(state.copyWith(currentTheme: theme)));
     });
+  }
+
+  Future<void> logout() async {
+    Log.d("Logging out user", tag: _TAG);
+    emit(state.copyWith(logoutState: const InternalState.loading()));
+
+    final result = await _sessionRepository.logout();
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(logoutState: InternalState.failure(failure)),
+      ),
+      (_) => emit(
+        state.copyWith(logoutState: const InternalState.success()),
+      ),
+    );
   }
 
   @override

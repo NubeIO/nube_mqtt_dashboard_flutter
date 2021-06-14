@@ -22,7 +22,7 @@ class MqttRepositoryImpl extends IMqttRepository {
   }
 
   @override
-  Future<Unit> clear() {
+  Future<Unit> clearData() {
     return _mqttDataSource.clear();
   }
 

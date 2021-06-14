@@ -17,5 +17,5 @@ abstract class IApiDataSource implements IDataSource {
 
   Future<ConfigurationApi> get configurationApi;
 
-  Future<Unit> logout();
+  Future<Unit> clearData();
 }

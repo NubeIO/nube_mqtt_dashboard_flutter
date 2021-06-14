@@ -1,8 +1,10 @@
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../domain/core/interfaces/managers.dart';
+
 @injectable
-class HostPreferenceManager {
+class HostPreferenceManager extends IManager {
   final SharedPreferences _sharedPreferences;
 
   HostPreferenceManager(this._sharedPreferences);
@@ -10,8 +12,10 @@ class HostPreferenceManager {
   String get url => _sharedPreferences.getString(_Model.url.key) ?? "";
   set url(String value) => _sharedPreferences.setString(_Model.url.key, value);
 
-  void clearData() {
+  @override
+  Future<Unit> clearData() async {
     _Model.values.forEach(_removeItem);
+    return unit;
   }
 
   void _removeItem(_Model model) {

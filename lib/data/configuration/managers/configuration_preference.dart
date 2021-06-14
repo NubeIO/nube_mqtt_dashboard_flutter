@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../domain/core/interfaces/managers.dart';
 import 'models/config.dart';
 import 'models/topic_config.dart';
 
 @injectable
-class ConfigurationPreferenceManager {
+class ConfigurationPreferenceManager extends IManager {
   final SharedPreferences _sharedPreferences;
 
   ConfigurationPreferenceManager(this._sharedPreferences);
@@ -46,8 +47,10 @@ class ConfigurationPreferenceManager {
         ),
       );
 
-  void clearData() {
+  @override
+  Future<Unit> clearData() async {
     _Model.values.forEach(_removeItem);
+    return unit;
   }
 
   void _removeItem(_Model model) {

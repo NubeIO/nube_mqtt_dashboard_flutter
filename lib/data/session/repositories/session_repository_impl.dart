@@ -6,26 +6,33 @@ import 'package:rxdart/rxdart.dart';
 
 import '../../../domain/configuration/configuration_repository_interface.dart';
 import '../../../domain/core/future_failure_helper.dart';
+import '../../../domain/layout/layout_repository_interface.dart';
+import '../../../domain/log/log_repository_interface.dart';
 import '../../../domain/mqtt/mqtt_repository.dart';
+import '../../../domain/network/api_data_source_interface.dart';
 import '../../../domain/notifications/notification_repository_interface.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../domain/session/session_repository_interface.dart';
+import '../../../domain/theme/theme_repository_interface.dart';
 import '../../../domain/user/user_repository_interface.dart';
 import '../../../utils/logger/log.dart';
 import '../managers/pin_preference.dart';
 import '../managers/session_preference.dart';
-
-const _TAG = "SessionRepository";
 
 @LazySingleton(as: ISessionRepository)
 class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final PinPreferenceManager _pinPreferenceManager;
   final SessionPreferenceManager _sessionPreferenceManager;
   final ISessionDataSource _sessionDataSource;
+
   final IConfigurationRepository _configurationRepository;
-  final IUserRepository _userRepository;
+  final ILayoutRepository _layoutRepository;
+  final ILogRepository _logRepository;
   final IMqttRepository _mqttRepository;
+  final IApiDataSource _networkRepository;
   final INotificationRepository _notificationRepository;
+  final IThemeRepository _themeRepository;
+  final IUserRepository _userRepository;
 
   bool _hasValidated = false;
 
@@ -39,10 +46,14 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     this._pinPreferenceManager,
     this._sessionPreferenceManager,
     this._sessionDataSource,
-    this._userRepository,
     this._configurationRepository,
+    this._layoutRepository,
+    this._logRepository,
     this._mqttRepository,
+    this._networkRepository,
     this._notificationRepository,
+    this._themeRepository,
+    this._userRepository,
   ) {
     _hasValidated = _pinPreferenceManager.isPinSet;
     loginStatusStream.listen((event) async {
@@ -239,7 +250,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
         );
 
         final tokenResult = await _userRepository.setDeviceToken();
-        Log.e(tokenResult.toString(), tag: _TAG);
+
         if (tokenResult.isLeft()) {
           return tokenResult.fold(
             (failure) => Left(
@@ -273,9 +284,40 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   @override
   Future<Either<LogoutFailure, Unit>> logout() async {
     try {
-      _pinPreferenceManager.clearData();
-      _sessionPreferenceManager.clearData();
-      _userRepository.removeDeviceToken();
+      final result = await _userRepository.removeDeviceToken();
+      if (result.isLeft()) {
+        final isValidError = result.fold(
+          (failure) => failure.maybeWhen(
+            invalidToken: () => false,
+            orElse: () => true,
+          ),
+          (r) => true,
+        );
+        if (isValidError) {
+          return result.fold(
+            (failure) => Left(
+              failure.when(
+                unexpected: () => const LogoutFailure.unexpected(),
+                connection: () => const LogoutFailure.connection(),
+                invalidToken: () => throw AssertionError(),
+                server: () => const LogoutFailure.server(),
+                general: (message) => LogoutFailure.general(message),
+              ),
+            ),
+            (_) => throw AssertionError(),
+          );
+        }
+      }
+      await _configurationRepository.clearData();
+      await _layoutRepository.clearData();
+      await _logRepository.clearData();
+      await _mqttRepository.clearData();
+      await _networkRepository.clearData();
+      await _notificationRepository.clearData();
+      await _themeRepository.clearData();
+
+      await _pinPreferenceManager.clearData();
+      await _sessionPreferenceManager.clearData();
       return const Right(unit);
     } catch (e) {
       return const Left(LogoutFailure.unexpected());

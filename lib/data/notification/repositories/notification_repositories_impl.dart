@@ -108,4 +108,10 @@ class NotificationRepositoryImpl extends INotificationRepository {
     final layout = jsonDecode(message.message) as Map<String, dynamic>;
     return Right(alertMapper.mapToAlerts(Alerts.fromJson(layout)));
   }
+
+  @override
+  Future<Unit> clearData() async {
+    await _preferenceManager.clearData();
+    return unit;
+  }
 }

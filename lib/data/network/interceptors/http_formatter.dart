@@ -96,6 +96,11 @@ class HttpFormatter extends Interceptor {
 
   /// Whether to pretty print a JSON or return as regular String
   String _getBody(dynamic data, String contentType) {
+    if (data is Map<String, dynamic> && data.isEmpty) {
+      return "";
+    } else if (data is String && data.isEmpty) {
+      return "";
+    }
     if (contentType != null &&
         contentType.toLowerCase().contains('application/json')) {
       const encoder = JsonEncoder.withIndent('  ');

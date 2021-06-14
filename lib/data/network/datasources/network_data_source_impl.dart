@@ -46,7 +46,7 @@ class NetworkDataSourceImpl extends IApiDataSource {
       });
 
   @override
-  Future<Unit> logout() {
+  Future<Unit> clearData() {
     sessionApiInstances.clear();
     userApiInstances.clear();
     return Future.value(unit);

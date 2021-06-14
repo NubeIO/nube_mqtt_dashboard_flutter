@@ -161,4 +161,10 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
       return const Left(SaveFailure.unexpected());
     }
   }
+
+  @override
+  Future<Unit> clearData() async {
+    await _preferenceManager.clearData();
+    return unit;
+  }
 }

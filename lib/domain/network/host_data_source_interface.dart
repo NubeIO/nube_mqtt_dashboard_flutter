@@ -7,5 +7,5 @@ abstract class IHostDataSource implements IDataSource {
 
   Future<String> get serverUrl;
 
-  Future<Unit> logout();
+  Future<Unit> clearData();
 }

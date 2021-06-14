@@ -1,14 +1,14 @@
 import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../core/interfaces/repository.dart';
+import '../core/interfaces/data_repository.dart';
 import 'entities.dart';
 import 'failures.dart';
 
 export 'entities.dart';
 export 'failures.dart';
 
-abstract class IConfigurationRepository implements IRepository {
+abstract class IConfigurationRepository implements IDataRepository {
   Stream<Configuration> get configurationStream;
 
   Stream<String> get layoutTopicStream;

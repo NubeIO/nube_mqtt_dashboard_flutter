@@ -23,4 +23,9 @@ class LogDataSource extends ILogDataSource {
 
   @override
   Stream<List<LogItem>> get logStream => _logStream.stream;
+
+  @override
+  Future<void> clearData() async {
+    _logStream.add([]);
+  }
 }

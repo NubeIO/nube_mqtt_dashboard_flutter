@@ -26,4 +26,10 @@ class LogRepositoryImpl extends ILogRepository {
         .handleError(() => const Left(LogStreamFailure.unknown()))
         .map((event) => Right(event.toImmutableList()));
   }
+
+  @override
+  Future<Unit> clearData() async {
+    await _logDataSource.clearData();
+    return unit;
+  }
 }

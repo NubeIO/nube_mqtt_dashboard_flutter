@@ -1,10 +1,11 @@
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../domain/core/interfaces/managers.dart';
 import '../../../domain/session/entities.dart';
 
 @injectable
-class SessionPreferenceManager {
+class SessionPreferenceManager extends IManager {
   final SharedPreferences _sharedPreferences;
 
   SessionPreferenceManager(this._sharedPreferences);
@@ -24,8 +25,10 @@ class SessionPreferenceManager {
   set tokenType(String value) =>
       _sharedPreferences.setString(_Model.tokenType.key, value);
 
-  void clearData() {
+  @override
+  Future<Unit> clearData() async {
     _Model.values.forEach(_removeItem);
+    return unit;
   }
 
   void _removeItem(_Model model) {

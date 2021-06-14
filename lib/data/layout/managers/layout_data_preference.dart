@@ -3,12 +3,13 @@ import 'dart:convert';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../domain/core/interfaces/managers.dart';
 import '../../../domain/mqtt/entities.dart';
 import '../../mqtt/mappers/topic_message.dart';
 import '../../mqtt/models/topic_message_dto.dart';
 
 @injectable
-class LayoutPreferenceManager {
+class LayoutPreferenceManager extends IManager {
   final SharedPreferences _sharedPreferences;
   final _topicMessageMapper = TopicMessageMapper();
 
@@ -26,6 +27,16 @@ class LayoutPreferenceManager {
       _Model.layout.key,
       jsonEncode(_topicMessageMapper.mapFromTopicMessage(message).toJson()),
     );
+  }
+
+  @override
+  Future<Unit> clearData() async {
+    _Model.values.forEach(_removeItem);
+    return unit;
+  }
+
+  void _removeItem(_Model model) {
+    _sharedPreferences.remove(model.key);
   }
 }
 

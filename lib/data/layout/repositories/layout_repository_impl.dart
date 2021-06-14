@@ -76,4 +76,10 @@ class LayoutRepositoryImpl extends ILayoutRepository {
     final layout = jsonDecode(message.message) as Map<String, dynamic>;
     return Right(layoutMapper.mapToBuilder(Layout.fromJson(layout)));
   }
+
+  @override
+  Future<Unit> clearData() async {
+    await _layoutPreferenceManager.clearData();
+    return unit;
+  }
 }

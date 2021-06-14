@@ -6,12 +6,14 @@ import '../../../application/configuration/configuration_cubit.dart';
 import '../../../domain/session/failures.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
+import '../../mixins/alert_mixin.dart';
 import '../../mixins/loading_mixin.dart';
 import '../../mixins/message_mixin.dart';
 import '../../routes/router.dart';
 import '../../themes/nube_theme.dart';
 import '../../themes/theme_interface.dart';
 import '../../widgets/form_elements/customized/customized_inputs.dart';
+import '../../widgets/form_elements/styles/input_types.dart';
 import '../../widgets/form_elements/theme_input.dart';
 import '../../widgets/responsive/master_layout.dart';
 import '../../widgets/responsive/padding.dart';
@@ -29,7 +31,7 @@ class ConnectPage extends StatefulWidget {
 }
 
 class _ConnectPageState extends State<ConnectPage>
-    with MessageMixin, LoadingMixin {
+    with MessageMixin, LoadingMixin, AlertMixin {
   ConfigurationCubit cubit;
   final FocusScopeNode _node = FocusScopeNode();
 
@@ -51,21 +53,35 @@ class _ConnectPageState extends State<ConnectPage>
     );
   }
 
-  void _onSaveSuccess(BuildContext context, bool shouldReconnect) {
-    if (widget.isInitalConfig) {
-      _navigateToDashboardScreen(context);
-    } else {
-      _navigationPop(context, shouldReconnect);
-    }
+  void _onLogoutFailure(
+    BuildContext context,
+    LogoutFailure failure,
+  ) {
+    onFailureMessage(
+      context,
+      failure.when(
+        unexpected: () => I18n.of(context).failureGeneric,
+        connection: () => I18n.of(context).failureConnection,
+        server: () => I18n.of(context).failureServer,
+        general: (message) => message,
+      ),
+    );
   }
 
-  void _navigationPop(BuildContext context, bool shouldReconnect) {
-    ExtendedNavigator.of(context).pop(shouldReconnect);
+  void _onLogoutSuccess(BuildContext context) {
+    _navigateToSplashScreen(context);
   }
 
   void _navigateToDashboardScreen(BuildContext context) {
     ExtendedNavigator.of(context).pushAndRemoveUntil(
       Routes.dashboardPage,
+      (route) => false,
+    );
+  }
+
+  void _navigateToSplashScreen(BuildContext context) {
+    ExtendedNavigator.of(context).pushAndRemoveUntil(
+      Routes.splashPage,
       (route) => false,
     );
   }
@@ -80,6 +96,18 @@ class _ConnectPageState extends State<ConnectPage>
           "Please enter a user pin which will be used to lock down the application for users.",
     );
     return result;
+  }
+
+  void _showLogoutPrompt(BuildContext context) {
+    final color = Theme.of(context).colorScheme.error;
+    showPromptAlert(
+      context,
+      title: "Logout",
+      subtitle: "Are you sure you want to log out?",
+      actionText: "Logout",
+      color: color,
+      onAction: cubit.logout,
+    );
   }
 
   Widget _buildLayout(BuildContext context) {
@@ -123,26 +151,61 @@ class _ConnectPageState extends State<ConnectPage>
 
   Widget _buildFab(BuildContext context) {
     return FloatingActionButton.extended(
-      onPressed: cubit.save,
-      label: const Text("Save"),
+      onPressed: () => _navigateToDashboardScreen(context),
+      label: const Text("Next"),
     );
   }
 
   Widget _buildScaffold(BuildContext context) {
+    final isInitalConfig = widget.isInitalConfig;
+    final errorColor = Theme.of(context).errorColor;
+    final minWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
       ),
-      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        FormInfoWidget(
-          title:
-              widget.isInitalConfig ? "Configuration" : "Change Configuration",
-          subtitle: "Your personal theme and security settings.",
-        ),
-        _buildLayout(context)
-      ]),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FormInfoWidget(
+                  title:
+                      isInitalConfig ? "Configuration" : "Change Configuration",
+                  subtitle: "Your personal theme and security settings.",
+                ),
+                _buildLayout(context)
+              ],
+            ),
+          ),
+          if (!isInitalConfig)
+            FlatButton(
+              minWidth: minWidth,
+              height: 48,
+              onPressed: () => _showLogoutPrompt(context),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Logout",
+                  textAlign: TextAlign.left,
+                  style: InputStyles.textStyle(context)
+                      .copyWith(color: errorColor),
+                ),
+              ),
+            )
+          else
+            const SizedBox(),
+          SizedBox(
+            height: ResponsiveSize.padding(context),
+          )
+        ],
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: _buildFab(context),
+      floatingActionButton:
+          isInitalConfig ? _buildFab(context) : const SizedBox(),
     );
   }
 
@@ -162,7 +225,19 @@ class _ConnectPageState extends State<ConnectPage>
               },
               success: () {
                 hideLoading(context);
-                _onSaveSuccess(context, state.shouldReconnect);
+              },
+              orElse: () => hideLoading(context),
+            );
+
+            state.logoutState.maybeWhen(
+              loading: () => showLoading(context, message: "Logging Out..."),
+              failure: (failure) {
+                hideLoading(context);
+                _onLogoutFailure(context, failure);
+              },
+              success: () {
+                hideLoading(context);
+                _onLogoutSuccess(context);
               },
               orElse: () => hideLoading(context),
             );

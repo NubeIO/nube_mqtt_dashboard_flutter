@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
-import '../core/models/base_response.dart';
 import 'datasources/models/requests.dart';
 import 'datasources/models/responses.dart';
 
@@ -28,6 +27,6 @@ abstract class UserApi {
   @POST("users/check/username")
   Future<AvailableResponse> checkUsername(@Body() CheckUsernameRequest request);
 
-  @POST("o/users/devices/uuid/{device_uuid}")
-  Future<BaseResponse> removeDeviceToken(@Part() String deviceId);
+  @DELETE("o/users/devices/device_id/{deviceId}")
+  Future<HttpResponse<void>> removeDeviceToken(@Path() String deviceId);
 }
