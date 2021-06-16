@@ -46,8 +46,9 @@ class MqttDataSource extends IMqttDataSource {
         return;
       }
       if (event.isConnected) {
-        final message = jsonEncode(
-            ConnectionStatusDto.simple(lastMessage.keys.toList()).toJson());
+        final topics = _topicSubscriptionStream.value.keys.iter;
+        final message =
+            jsonEncode(ConnectionStatusDto.simple(topics.toList()).toJson());
         writeVerified(_connectionTopic, message)
             .then((value) {
               Log.d("Periodic connection check valid", tag: _TAG);
@@ -244,7 +245,7 @@ Loggin in with:
 
   Future<void> _subscribeToPrevious() async {
     Log.d("Subscribing to ${lastMessage.keys}", tag: _TAG);
-    for (final topicId in lastMessage.keys) {
+    for (final topicId in _topicSubscriptionStream.value.keys.iter) {
       await subscribe(topicId);
     }
     await subscribe(_connectionTopic);
@@ -292,16 +293,21 @@ Loggin in with:
 
   @override
   Future<Unit> subscribe(String topicName) async {
-    if (_client.getSubscriptionsStatus(topicName) ==
+    if (_client?.getSubscriptionsStatus(topicName) ==
         MqttSubscriptionStatus.active) {
       Log.i("Subscription to $topicName exists", tag: _TAG);
       return unit;
     }
     Log.i("Subscribing to $topicName", tag: _TAG);
+
+    final topics = _topicSubscriptionStream.value;
+    topics[topicName] = MqttSubscriptionState.PENDING;
+    _topicSubscriptionStream.add(topics);
+
     await _connectionState
         .firstWhere((element) => element == ServerConnectionState.CONNECTED);
     try {
-      _client.subscribe(topicName, MqttQos.atMostOnce);
+      _client?.subscribe(topicName, MqttQos.atMostOnce);
     } catch (e, stack) {
       Log.e("Failed to subscribte to $topicName",
           tag: _TAG, stacktrace: stack, ex: e);
@@ -317,7 +323,7 @@ Loggin in with:
 
   @override
   Future<Unit> unsubscribe(String topicName) async {
-    if (_client.getSubscriptionsStatus(topicName) !=
+    if (_client?.getSubscriptionsStatus(topicName) !=
         MqttSubscriptionStatus.active) {
       Log.i("Subscription to $topicName doesn't exists. Can't unsubscribe",
           tag: _TAG);
@@ -337,7 +343,7 @@ Loggin in with:
     builder.addString(message);
     try {
       Log.i('Publishing message $message to topic $topicName', tag: _TAG);
-      _client.publishMessage(
+      _client?.publishMessage(
         topicName,
         MqttQos.exactlyOnce,
         builder.payload,
@@ -366,7 +372,7 @@ Loggin in with:
         }
       });
       Log.i('Publishing message $message to topic $topicName', tag: _TAG);
-      _client.publishMessage(
+      _client?.publishMessage(
         topicName,
         MqttQos.exactlyOnce,
         builder.payload,
