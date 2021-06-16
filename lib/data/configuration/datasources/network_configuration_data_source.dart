@@ -30,7 +30,9 @@ class NetworkConfigurationDataSource extends IConfigurationDataSource {
   Future<TopicConfiguration> fetchTopicConfig() {
     return _apiRepository.configurationApi
         .then((api) => api.getTopicConfig())
-        .then((response) => configurationMapper.toTopicConfig(response))
-        .catchDioException();
+        .then((map) {
+      final topic = map.entries.first.value;
+      return configurationMapper.toTopicConfig(topic);
+    }).catchDioException();
   }
 }

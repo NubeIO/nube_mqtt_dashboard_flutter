@@ -15,6 +15,6 @@ abstract class ConfigurationApi {
   @GET("c/mqtt")
   Future<ConnectionConfigResponse> getConnectionConfig();
 
-  @GET("c/mqtt/topics")
-  Future<TopicConfigResponse> getTopicConfig();
+  @GET("o/users/mqtt")
+  Future<Map<String, TopicConfigResponse>> getTopicConfig();
 }
