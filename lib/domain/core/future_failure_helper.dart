@@ -14,6 +14,9 @@ Future<Either<F, Response>> futureFailureHelper<F extends Failure, Response>({
   } on NetworkException catch (e) {
     return Left(failureMapper(e.asFailure));
   } catch (e) {
+    if (e is RefreshException) {
+      return Left(failureMapper(const NetworkFailureCase.refresh()));
+    }
     return Left(failureMapper(const NetworkFailureCase.unexpected()));
   }
 }

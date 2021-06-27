@@ -8,5 +8,6 @@ part 'failures/create_pin.dart';
 part 'failures/create_user.dart';
 part 'failures/login_user.dart';
 part 'failures/logout.dart';
+part 'failures/refresh_token.dart';
 part 'failures/validate_pin.dart';
 part 'failures.freezed.dart';

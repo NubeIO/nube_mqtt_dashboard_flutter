@@ -18,4 +18,7 @@ abstract class SessionApi {
 
   @POST("users/login")
   Future<JWTResponse> loginUser(@Body() LoginRequest request);
+
+  @GET("o/users/refresh_token")
+  Future<JWTResponse> refreshToken();
 }

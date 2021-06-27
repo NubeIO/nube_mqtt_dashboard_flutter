@@ -33,7 +33,9 @@ abstract class ISessionRepository implements IRepository {
     String password,
   );
 
-  Future<Either<LogoutFailure, Unit>> logout();
+  Future<Either<LogoutFailure, Unit>> logout({bool clearApi = true});
 
   Future<String> get accessToken;
+
+  Future<Either<RefreshTokenFailure, Unit>> refreshToken();
 }

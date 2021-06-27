@@ -1,8 +1,12 @@
 import 'package:dio/dio.dart';
 
+import '../../../domain/events/events_repository_interface.dart';
+import '../../../injectable/injection.dart';
 import '../exceptions.dart';
 
 class ErrorInterceptor extends Interceptor {
+  final IEventsRepository _eventsRepository = getIt<IEventsRepository>();
+
   @override
   Future onError(DioError err) async {
     if (err.response != null) {
@@ -18,6 +22,7 @@ class ErrorInterceptor extends Interceptor {
             error: AuthException(),
             response: err.response);
       } else if (errorCode == 401) {
+        await _eventsRepository.logout();
         return DioError(
             request: err.request,
             error: RefreshException(),

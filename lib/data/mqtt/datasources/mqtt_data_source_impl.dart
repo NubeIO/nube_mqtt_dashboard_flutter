@@ -23,9 +23,12 @@ const _TAG = "MQTTDataSource";
 class MqttDataSource extends IMqttDataSource {
   String get _connectionTopic => "${_mqttConfig?.clientId}/connection";
 
+  final IConnectionDataSource connectionRepository;
+  final SessionPreferenceManager sessionPreferenceManager;
+
   MqttDataSource(
-    IConnectionDataSource connectionRepository,
-    SessionPreferenceManager sessionPreferenceManager,
+    this.connectionRepository,
+    this.sessionPreferenceManager,
   ) {
     connectionRepository.layoutStream.listen((event) async {
       Log.d("Connection status changed $event", tag: _TAG);
@@ -33,41 +36,6 @@ class MqttDataSource extends IMqttDataSource {
         Log.d("Connection resumed trying to resume MQTT", tag: _TAG);
         await Future.delayed(const Duration(seconds: 5));
         _client.doAutoReconnect(force: true);
-      }
-    });
-
-    Timer.periodic(const Duration(seconds: 30), (timer) async {
-      Log.d("Periodic block started", tag: _TAG);
-      final event = await connectionRepository.layoutStream.first;
-
-      if (sessionPreferenceManager.status != ProfileStatusType.PROFILE_EXISTS) {
-        // Return as we don't need to reconnect if the user isn't
-        // verified and logged in
-        return;
-      }
-      if (event.isConnected) {
-        final topics = _topicSubscriptionStream.value.keys.iter;
-        final message =
-            jsonEncode(ConnectionStatusDto.simple(topics.toList()).toJson());
-        writeVerified(_connectionTopic, message)
-            .then((value) {
-              Log.d("Periodic connection check valid", tag: _TAG);
-            })
-            .timeout(const Duration(seconds: 5))
-            .catchError((e) async {
-              Log.e("Periodic connection check invalid", tag: _TAG, ex: e);
-              if (_client == null) {
-                _client =
-                    await clear().then((value) => _login()).catchError((error) {
-                  Log.e("Periodic connection _login invalid",
-                      tag: _TAG, ex: error);
-                });
-              } else {
-                _client.doAutoReconnect(force: true);
-              }
-            });
-      } else {
-        Log.d("Active connection not detected on periodic check", tag: _TAG);
       }
     });
   }
@@ -137,6 +105,8 @@ class MqttDataSource extends IMqttDataSource {
         subscribe(topicName);
       });
 
+  Timer timer;
+
   Future<Unit> _connectToClient() async {
     if (_client != null && _client.state == MqttConnectionState.connected) {
       _connectionState.add(ServerConnectionState.CONNECTED);
@@ -147,6 +117,51 @@ class MqttDataSource extends IMqttDataSource {
       if (_client == null) {
         Log.i("Login couldn't proceed", tag: _TAG);
         throw MqttConnectionException();
+      } else {
+        if (timer != null && timer.isActive) {
+          timer.cancel();
+        }
+        timer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+          Log.d("Periodic block started", tag: _TAG);
+          final event = await connectionRepository.layoutStream.first;
+
+          if (sessionPreferenceManager.status !=
+              ProfileStatusType.PROFILE_EXISTS) {
+            // Return as we don't need to reconnect if the user isn't
+            // verified and logged in
+            return;
+          }
+          if (event.isConnected) {
+            final topics = _topicSubscriptionStream.value.keys
+                .filter((key) =>
+                    _client?.getSubscriptionsStatus(key) ==
+                    MqttSubscriptionStatus.active)
+                .iter;
+            final message = jsonEncode(
+                ConnectionStatusDto.simple(topics.toList()).toJson());
+            writeVerified(_connectionTopic, message)
+                .then((value) {
+                  Log.d("Periodic connection check valid", tag: _TAG);
+                })
+                .timeout(const Duration(seconds: 5))
+                .catchError((e) async {
+                  Log.e("Periodic connection check invalid", tag: _TAG, ex: e);
+                  if (_client == null) {
+                    _client = await clear()
+                        .then((value) => _login())
+                        .catchError((error) {
+                      Log.e("Periodic connection _login invalid",
+                          tag: _TAG, ex: error);
+                    });
+                  } else {
+                    _client.doAutoReconnect(force: true);
+                  }
+                });
+          } else {
+            Log.d("Active connection not detected on periodic check",
+                tag: _TAG);
+          }
+        });
       }
     }
     return connectionStream
@@ -323,7 +338,7 @@ Loggin in with:
 
   @override
   Future<Unit> unsubscribe(String topicName) async {
-    if (_client?.getSubscriptionsStatus(topicName) !=
+    if (_client.getSubscriptionsStatus(topicName) !=
         MqttSubscriptionStatus.active) {
       Log.i("Subscription to $topicName doesn't exists. Can't unsubscribe",
           tag: _TAG);
@@ -343,7 +358,7 @@ Loggin in with:
     builder.addString(message);
     try {
       Log.i('Publishing message $message to topic $topicName', tag: _TAG);
-      _client?.publishMessage(
+      _client.publishMessage(
         topicName,
         MqttQos.exactlyOnce,
         builder.payload,
@@ -372,7 +387,7 @@ Loggin in with:
         }
       });
       Log.i('Publishing message $message to topic $topicName', tag: _TAG);
-      _client?.publishMessage(
+      _client.publishMessage(
         topicName,
         MqttQos.exactlyOnce,
         builder.payload,

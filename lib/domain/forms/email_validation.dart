@@ -15,7 +15,7 @@ class EmailValidation extends IValidation<EmailFailure, String> {
     @required ValidationMapper<EmailFailure> mapper,
   }) : super(mapper);
   final regex = RegExp(
-      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9-]+\.[a-zA-Z]+");
   @override
   Future<Either<EmailFailure, String>> validate(String input) async {
     final validEmail = regex.hasMatch(input);

@@ -20,4 +20,6 @@ abstract class ISessionDataSource implements IDataSource {
     @required String username,
     @required String password,
   });
+
+  Future<JwtModel> refreshToken();
 }

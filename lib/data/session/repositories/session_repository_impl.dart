@@ -282,30 +282,50 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   @override
-  Future<Either<LogoutFailure, Unit>> logout() async {
+  Future<Either<RefreshTokenFailure, Unit>> refreshToken() {
+    return futureFailureHelper(
+      request: () async {
+        final jwtModel = await _sessionDataSource.refreshToken();
+        _storeSession(jwtModel);
+
+        return const Right(unit);
+      },
+      failureMapper: (cases) => cases.maybeWhen(
+        refresh: () => const RefreshTokenFailure.refresh(),
+        orElse: () => const RefreshTokenFailure.unexpected(),
+      ),
+    );
+  }
+
+  @override
+  Future<Either<LogoutFailure, Unit>> logout({
+    bool clearApi = true,
+  }) async {
     try {
-      final result = await _userRepository.removeDeviceToken();
-      if (result.isLeft()) {
-        final isValidError = result.fold(
-          (failure) => failure.maybeWhen(
-            invalidToken: () => false,
-            orElse: () => true,
-          ),
-          (r) => true,
-        );
-        if (isValidError) {
-          return result.fold(
-            (failure) => Left(
-              failure.when(
-                unexpected: () => const LogoutFailure.unexpected(),
-                connection: () => const LogoutFailure.connection(),
-                invalidToken: () => throw AssertionError(),
-                server: () => const LogoutFailure.server(),
-                general: (message) => LogoutFailure.general(message),
-              ),
+      if (clearApi) {
+        final result = await _userRepository.removeDeviceToken();
+        if (result.isLeft()) {
+          final isValidError = result.fold(
+            (failure) => failure.maybeWhen(
+              invalidToken: () => false,
+              orElse: () => true,
             ),
-            (_) => throw AssertionError(),
+            (r) => true,
           );
+          if (isValidError) {
+            return result.fold(
+              (failure) => Left(
+                failure.when(
+                  unexpected: () => const LogoutFailure.unexpected(),
+                  connection: () => const LogoutFailure.connection(),
+                  invalidToken: () => throw AssertionError(),
+                  server: () => const LogoutFailure.server(),
+                  general: (message) => LogoutFailure.general(message),
+                ),
+              ),
+              (_) => throw AssertionError(),
+            );
+          }
         }
       }
       await _configurationRepository.clearData();

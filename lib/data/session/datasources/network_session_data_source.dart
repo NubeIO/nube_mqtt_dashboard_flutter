@@ -48,4 +48,12 @@ class SessionDataRepositoryImpl extends ISessionDataSource {
         .then((response) => sessionMapper.toJwt(response))
         .catchDioException();
   }
+
+  @override
+  Future<JwtModel> refreshToken() {
+    return _apiRepository.sessionApi
+        .then((api) => api.refreshToken())
+        .then((response) => sessionMapper.toJwt(response))
+        .catchDioException();
+  }
 }

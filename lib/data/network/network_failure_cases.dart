@@ -9,5 +9,6 @@ abstract class NetworkFailureCase with _$NetworkFailureCase {
   const factory NetworkFailureCase.connection() = _ConnectionException;
   const factory NetworkFailureCase.server() = _ServerException;
   const factory NetworkFailureCase.unexpected() = _UnexpectedException;
+  const factory NetworkFailureCase.refresh() = _RefreshException;
   const factory NetworkFailureCase.general(String message) = _GeneralException;
 }

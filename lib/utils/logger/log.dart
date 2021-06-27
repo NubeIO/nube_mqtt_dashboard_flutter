@@ -91,9 +91,7 @@ class Log {
         tag: tag,
         ex: ex,
         stacktrace: stacktrace ??
-            (level == const LogLevel.e() || !kReleaseMode
-                ? StackTrace.current
-                : null),
+            (level == const LogLevel.e() ? StackTrace.current : null),
       );
     }
   }
