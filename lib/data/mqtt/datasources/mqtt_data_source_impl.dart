@@ -101,8 +101,11 @@ class MqttDataSource extends IMqttDataSource {
       _topicSubscriptionStream.stream
           .map((event) => event[topicName] ?? MqttSubscriptionState.IDLE)
           .doOnEach((message) {
-        Log.i("Subscription Status for $topicName ${message.value}", tag: _TAG);
-        subscribe(topicName);
+        if (message.value != MqttSubscriptionState.PENDING) {
+          Log.i("Subscription Status for $topicName ${message.value}",
+              tag: _TAG);
+          subscribe(topicName);
+        }
       });
 
   Timer timer;
