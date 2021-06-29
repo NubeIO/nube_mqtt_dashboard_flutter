@@ -25,7 +25,12 @@ class HostPage extends StatelessWidget with MessageMixin, LoadingMixin {
   void _onConnectionFailure(BuildContext context, SetHostFailure failure) {
     onFailureMessage(
       context,
-      failure.when(unexpected: () => I18n.of(context).failureGeneric),
+      failure.when(
+        unexpected: () => I18n.of(context).failureGeneric,
+        connection: () => I18n.of(context).failureConnection,
+        server: () => I18n.of(context).failureServer,
+        general: (message) => message,
+      ),
     );
   }
 

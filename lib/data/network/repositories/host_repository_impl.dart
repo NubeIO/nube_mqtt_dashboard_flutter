@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../domain/core/future_failure_helper.dart';
 import '../../../domain/network/api_data_source_interface.dart';
 import '../../../domain/network/host_data_source_interface.dart';
 import '../../../domain/network/host_repository_interface.dart';
@@ -13,9 +14,18 @@ class HostRepositoryImpl extends IHostRepository {
 
   @override
   Future<Either<SetHostFailure, Unit>> setServerDetail(String host, int port) {
-    return _hostDataSource
-        .setServerDetail(host, port)
-        .then((value) => const Right(unit));
+    return futureFailureHelper(
+      request: () async {
+        await _hostDataSource.setServerDetail(host, port);
+
+        return const Right(unit);
+      },
+      failureMapper: (cases) => cases.maybeWhen(
+        connection: () => const SetHostFailure.connection(),
+        general: (message) => SetHostFailure.general(message),
+        orElse: () => const SetHostFailure.server(),
+      ),
+    );
   }
 
   @override

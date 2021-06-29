@@ -1,14 +1,23 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../constants/app_constants.dart';
+import '../../../data/network/dio_error_extension.dart';
 import '../../../domain/network/host_data_source_interface.dart';
 import '../exceptions.dart';
 import '../managers/host_preference.dart';
+import '../network_api.dart';
 
 @LazySingleton(as: IHostDataSource)
 class HostDataSourceImpl extends IHostDataSource {
   final HostPreferenceManager _hostPreferenceManager;
-  HostDataSourceImpl(this._hostPreferenceManager);
+  final Dio _dio;
+
+  HostDataSourceImpl(
+    this._hostPreferenceManager,
+    this._dio,
+  );
 
   @override
   Future<Unit> setServerDetail(
@@ -20,8 +29,18 @@ class HostDataSourceImpl extends IHostDataSource {
     if (!host.startsWith(RegExp(r"http?:"))) {
       _host = "http://$host";
     }
-    _hostPreferenceManager.url = "$_host:$port/";
-    return Future.value(unit);
+    return Future.value("$_host:$port/").then(
+      (value) {
+        return NetworkApi(_dio, baseUrl: "$value${AppConstants.COMMON_API_URL}")
+            .ping()
+            .then((_) => value);
+      },
+    ).then(
+      (value) {
+        _hostPreferenceManager.url = value;
+        return unit;
+      },
+    ).catchDioException();
   }
 
   @override
