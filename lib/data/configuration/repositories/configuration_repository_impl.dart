@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -8,6 +10,8 @@ import '../../../domain/configuration/configuration_repository_interface.dart';
 import '../../../domain/configuration/entities.dart';
 import '../../../domain/core/future_failure_helper.dart';
 import '../../../domain/mqtt/mqtt_repository.dart';
+import '../../../domain/site/site_data_source_interface.dart';
+import '../../../domain/site/site_repository_interface.dart';
 import '../../../utils/logger/log.dart';
 import '../managers/configuration_preference.dart';
 import '../managers/models/config.dart';
@@ -19,10 +23,14 @@ const _TAG = "ConfigurationRepository";
 class ConfigurationRepositoryImpl extends IConfigurationRepository {
   final ConfigurationPreferenceManager _preferenceManager;
   final IConfigurationDataSource _configurationDataSource;
+  final ISiteRepository _siteRepository;
+
+  StreamSubscription<Either<SiteFailure, Site>> activeSubscription;
 
   ConfigurationRepositoryImpl(
     this._preferenceManager,
     this._configurationDataSource,
+    this._siteRepository,
   ) {
     _updateConfiguration();
     _updateTopics();
@@ -38,7 +46,7 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
       Log.i("Layout $event", tag: _TAG);
     });
 
-  final BehaviorSubject<String> _alertState = BehaviorSubject()
+  final BehaviorSubject<KtList<String>> _alertState = BehaviorSubject()
     ..listen((event) {
       Log.i("Alert $event", tag: _TAG);
     });
@@ -58,15 +66,22 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
   }
 
   Future<void> _updateTopics() async {
-    if (_preferenceManager.topicConfig != null) {
-      final config = _preferenceManager.topicConfig;
-      _layoutState.add(config.layoutTopic);
-      _alertState.add(config.alertTopic);
-    }
+    activeSubscription?.cancel();
+    activeSubscription = _siteRepository.activeSiteStream.listen((event) async {
+      final topicConfig = _preferenceManager.topicConfig;
+
+      if (topicConfig != null) {
+        final currentConfig = await _getCurrentConfig(event);
+
+        _layoutState.add(currentConfig.layoutTopic);
+        _alertState
+            .add(topicConfig.values.map((e) => e.alertTopic).toImmutableList());
+      }
+    });
   }
 
   @override
-  Stream<String> get alertTopicStream => _alertState.stream.distinct();
+  Stream<KtList<String>> get alertTopicStream => _alertState.stream.distinct();
 
   @override
   Stream<Configuration> get configurationStream =>
@@ -102,11 +117,18 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
     return futureFailureHelper(
       request: () async {
         final result = await _configurationDataSource.fetchTopicConfig();
-        await saveTopics(
-          alertTopic: result.alertTopic,
-          layoutTopic: result.layoutTopic,
+
+        await _saveTopics(result);
+
+        final activeSite = await _siteRepository.activeSiteStream.first;
+
+        final currentConfig = await _getCurrentConfig(activeSite);
+        return Right(
+          TopicConfiguration(
+            layoutTopic: currentConfig.layoutTopic,
+            alertTopic: currentConfig.alertTopic,
+          ),
         );
-        return Right(result);
       },
       failureMapper: (cases) => cases.maybeWhen(
         connection: () => const GetTopicFailure.connection(),
@@ -143,18 +165,18 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
     }
   }
 
-  @override
-  Future<Either<SaveFailure, Unit>> saveTopics({
-    @required String layoutTopic,
-    @required String alertTopic,
-  }) async {
+  Future<Either<SaveFailure, Unit>> _saveTopics(
+    Map<String, TopicConfiguration> config,
+  ) async {
     try {
-      final topicConfig = TopicConfig(
-        layoutTopic: layoutTopic,
-        alertTopic: alertTopic,
+      _preferenceManager.topicConfig = config.map(
+        (key, value) => MapEntry(
+            key,
+            TopicConfig(
+              alertTopic: value.alertTopic,
+              layoutTopic: value.layoutTopic,
+            )),
       );
-
-      _preferenceManager.topicConfig = topicConfig;
       await _updateTopics();
       return const Right(unit);
     } catch (e) {
@@ -166,5 +188,21 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
   Future<Unit> clearData() async {
     await _preferenceManager.clearData();
     return unit;
+  }
+
+  Future<TopicConfig> _getCurrentConfig(Either<SiteFailure, Site> event) async {
+    final configs = _preferenceManager.topicConfig;
+    if (event.isLeft()) {
+      return configs.entries.first.value;
+    }
+    final activeSite = event.fold((l) => throw AssertionError(), id);
+
+    final config = configs.entries
+        .firstWhere(
+          (element) => element.key == activeSite.uuid,
+          orElse: () => configs.entries.first,
+        )
+        .value;
+    return config;
   }
 }

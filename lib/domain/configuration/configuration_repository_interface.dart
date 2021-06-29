@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:kt_dart/collection.dart';
 
 import '../core/interfaces/data_repository.dart';
 import 'entities.dart';
@@ -13,7 +14,7 @@ abstract class IConfigurationRepository implements IDataRepository {
 
   Stream<String> get layoutTopicStream;
 
-  Stream<String> get alertTopicStream;
+  Stream<KtList<String>> get alertTopicStream;
 
   Future<Either<GetConnectionFailure, Configuration>> fetchConnectionConfig();
 
@@ -25,10 +26,5 @@ abstract class IConfigurationRepository implements IDataRepository {
     @required String clientId,
     @required String username,
     @required String password,
-  });
-
-  Future<Either<SaveFailure, Unit>> saveTopics({
-    @required String layoutTopic,
-    @required String alertTopic,
   });
 }

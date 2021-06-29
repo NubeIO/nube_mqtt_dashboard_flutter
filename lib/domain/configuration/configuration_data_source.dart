@@ -6,5 +6,5 @@ export 'entities.dart';
 abstract class IConfigurationDataSource extends IDataSource {
   Future<Configuration> fetchConnectionConfig();
 
-  Future<TopicConfiguration> fetchTopicConfig();
+  Future<Map<String, TopicConfiguration>> fetchTopicConfig();
 }

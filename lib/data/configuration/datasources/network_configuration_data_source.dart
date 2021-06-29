@@ -27,12 +27,15 @@ class NetworkConfigurationDataSource extends IConfigurationDataSource {
   }
 
   @override
-  Future<TopicConfiguration> fetchTopicConfig() {
+  Future<Map<String, TopicConfiguration>> fetchTopicConfig() {
     return _apiRepository.configurationApi
         .then((api) => api.getTopicConfig())
-        .then((map) {
-      final topic = map.entries.first.value;
-      return configurationMapper.toTopicConfig(topic);
-    }).catchDioException();
+        .then((map) => map.map(
+              (id, config) => MapEntry(
+                id,
+                configurationMapper.toTopicConfig(config),
+              ),
+            ))
+        .catchDioException();
   }
 }

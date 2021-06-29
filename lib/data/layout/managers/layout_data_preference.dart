@@ -25,7 +25,10 @@ class LayoutPreferenceManager extends IManager {
   set message(TopicMessage message) {
     _sharedPreferences.setString(
       _Model.layout.key,
-      jsonEncode(_topicMessageMapper.mapFromTopicMessage(message).toJson()),
+      message == null
+          ? null
+          : jsonEncode(
+              _topicMessageMapper.mapFromTopicMessage(message).toJson()),
     );
   }
 

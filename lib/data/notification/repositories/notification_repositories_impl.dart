@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:kt_dart/kt.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../domain/configuration/configuration_repository_interface.dart';
@@ -21,13 +22,13 @@ class NotificationRepositoryImpl extends INotificationRepository {
   final INotificationDataSource _notificationDataSource;
   final IMqttRepository _mqttRepository;
   final IConfigurationRepository _configurationRepository;
-  final AlertsPreferenceManager _preferenceManager;
+  final AlertsPreferenceManager _alertsPreferenceManager;
 
   NotificationRepositoryImpl(
     this._notificationDataSource,
     this._mqttRepository,
     this._configurationRepository,
-    this._preferenceManager,
+    this._alertsPreferenceManager,
   );
 
   final alertMapper = AlertMapper();
@@ -54,13 +55,13 @@ class NotificationRepositoryImpl extends INotificationRepository {
 
   @override
   Stream<Either<AlertFailure, AlertEntity>> get alertStream async* {
-    final message = _preferenceManager.message;
+    final message = _alertsPreferenceManager.message;
     if (message != null) {
       final result = await _mapToAlertBuilder(message);
       if (result.isRight()) {
         yield result.fold(
           (l) => throw AssertionError(),
-          (layout) => Right(layout),
+          (alerts) => Right(alerts),
         );
       }
     } else {
@@ -68,19 +69,40 @@ class NotificationRepositoryImpl extends INotificationRepository {
     }
 
     yield* _configurationRepository.alertTopicStream
-        .flatMap((alertTopic) async* {
+        .flatMap((alertTopics) async* {
       await _mqttRepository.connectionStream
           .firstWhere((element) => element == ServerConnectionState.CONNECTED);
-      await _mqttRepository.subscribe(alertTopic);
 
-      yield* _mqttRepository.getTopicMessage(alertTopic).asyncMap(
-            (message) => _mapToAlertBuilder(message).then(
-              (value) {
-                _preferenceManager.message = message;
-                return value;
-              },
-            ).catchError(_onErrorCatch),
-          );
+      final List<Stream<Either<AlertFailure, AlertEntity>>> streams = [];
+
+      for (final alertTopic in alertTopics.iter) {
+        await _mqttRepository.subscribe(alertTopic);
+        final stream = _mqttRepository.getTopicMessage(alertTopic).asyncMap(
+              (message) =>
+                  _mapToAlertBuilder(message).catchError(_onErrorCatch),
+            );
+        streams.add(stream);
+      }
+
+      yield* Rx.combineLatest<Either<AlertFailure, AlertEntity>,
+          Either<AlertFailure, AlertEntity>>(
+        streams,
+        (values) {
+          if (values.every((element) => element.isLeft())) {
+            return const Left(AlertFailure.invalidAlert());
+          }
+          final KtList<Alert> alerts = values
+              .map((e) => e.fold(
+                    (l) => const KtList<Alert>.empty(),
+                    (entry) => entry.alerts,
+                  ))
+              .reduce(
+                (KtList<Alert> value, KtList<Alert> element) =>
+                    element.toMutableList()..addAll(value),
+              );
+          return Right(AlertEntity(alerts: alerts));
+        },
+      );
     });
   }
 
@@ -111,7 +133,7 @@ class NotificationRepositoryImpl extends INotificationRepository {
 
   @override
   Future<Unit> clearData() async {
-    await _preferenceManager.clearData();
+    await _alertsPreferenceManager.clearData();
     return unit;
   }
 }

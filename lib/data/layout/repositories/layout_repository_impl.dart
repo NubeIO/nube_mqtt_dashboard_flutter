@@ -42,15 +42,30 @@ class LayoutRepositoryImpl extends ILayoutRepository {
     } else {
       yield Right(LayoutEntity.empty(isEmptyState: true));
     }
-
+    bool isInitial = true;
+    String currentLayout;
     yield* _configurationRepository.layoutTopicStream.flatMap((layout) async* {
+      Log.d("New Layout Topic $layout", tag: _TAG);
+      currentLayout = layout;
       await _mqttRepository.connectionStream
           .firstWhere((element) => element == ServerConnectionState.CONNECTED);
+      if (!isInitial) {
+        _layoutPreferenceManager.message = null;
+        yield Right(LayoutEntity.empty(isEmptyState: true));
+      }
+      Log.d("Subscribing Layout Topic $layout", tag: _TAG);
+
       await _mqttRepository.subscribe(layout);
 
-      yield* _mqttRepository.getTopicMessage(layout).asyncMap(
+      final mqttRepository = _mqttRepository;
+      yield* mqttRepository
+          .getTopicMessage(layout)
+          .where((event) => event.topic == currentLayout)
+          .asyncMap(
             (message) => _mapToLayoutBuilder(message).then(
               (value) {
+                isInitial = false;
+                Log.d("New Layout for $currentLayout $value", tag: _TAG);
                 _layoutPreferenceManager.message = message;
                 return value;
               },

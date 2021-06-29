@@ -30,20 +30,23 @@ class ConfigurationPreferenceManager extends IManager {
         ),
       );
 
-  TopicConfig get topicConfig {
+  Map<String, TopicConfig> get topicConfig {
     try {
       final config = _sharedPreferences.getString(_Model.topicConfig.key);
       final map = jsonDecode(config) as Map<String, dynamic>;
-      return TopicConfig.fromJson(map);
+      return map.map(
+        (k, v) => MapEntry(k, TopicConfig.fromJson(v as Map<String, dynamic>)),
+      );
     } catch (e) {
       return null;
     }
   }
 
-  set topicConfig(TopicConfig value) => _sharedPreferences.setString(
+  set topicConfig(Map<String, TopicConfig> value) =>
+      _sharedPreferences.setString(
         _Model.topicConfig.key,
         jsonEncode(
-          value.toJson(),
+          value,
         ),
       );
 
