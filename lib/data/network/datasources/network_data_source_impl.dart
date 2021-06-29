@@ -16,6 +16,7 @@ class NetworkDataSourceImpl extends IApiDataSource {
   final Map<String, SessionApi> sessionApiInstances = {};
   final Map<String, UserApi> userApiInstances = {};
   final Map<String, ConfigurationApi> configurationApiInstances = {};
+  final Map<String, SiteApi> siteApiInstances = {};
 
   Future<String> get _serverUrl => _hostRepository.serverUrl
       .then((value) => "$value${AppConstants.COMMON_API_URL}");
@@ -43,6 +44,14 @@ class NetworkDataSourceImpl extends IApiDataSource {
               ConfigurationApi(_dio, baseUrl: value);
         }
         return configurationApiInstances[value];
+      });
+
+  @override
+  Future<SiteApi> get siteApi => _serverUrl.then((value) {
+        if (siteApiInstances[value] == null) {
+          siteApiInstances[value] = SiteApi(_dio, baseUrl: value);
+        }
+        return siteApiInstances[value];
       });
 
   @override

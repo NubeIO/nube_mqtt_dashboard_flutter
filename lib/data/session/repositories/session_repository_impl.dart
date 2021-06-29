@@ -13,6 +13,7 @@ import '../../../domain/network/api_data_source_interface.dart';
 import '../../../domain/notifications/notification_repository_interface.dart';
 import '../../../domain/session/session_data_source_interface.dart';
 import '../../../domain/session/session_repository_interface.dart';
+import '../../../domain/site/site_repository_interface.dart';
 import '../../../domain/theme/theme_repository_interface.dart';
 import '../../../domain/user/user_repository_interface.dart';
 import '../../../utils/logger/log.dart';
@@ -31,6 +32,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final IMqttRepository _mqttRepository;
   final IApiDataSource _networkRepository;
   final INotificationRepository _notificationRepository;
+  final ISiteRepository _siteRepository;
   final IThemeRepository _themeRepository;
   final IUserRepository _userRepository;
 
@@ -52,6 +54,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
     this._mqttRepository,
     this._networkRepository,
     this._notificationRepository,
+    this._siteRepository,
     this._themeRepository,
     this._userRepository,
   ) {
@@ -153,6 +156,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   Future<void> _fetchRequiredData() async {
+    await _siteRepository.fetchSites();
     final configResult = await _configurationRepository.fetchConnectionConfig();
     if (configResult.isRight()) {
       final config = configResult.fold((l) => throw AssertionError(), id);
@@ -334,6 +338,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
       await _mqttRepository.clearData();
       await _networkRepository.clearData();
       await _notificationRepository.clearData();
+      await _siteRepository.clearData();
       await _themeRepository.clearData();
 
       await _pinPreferenceManager.clearData();
