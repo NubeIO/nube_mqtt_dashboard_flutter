@@ -8,6 +8,7 @@ typedef IndexedWidgetBuilder = Widget Function(BuildContext context, int index);
 class DrawerDetailLayout extends StatefulWidget {
   final Widget _header;
   final Widget _footer;
+  final Widget _switch;
   final Widget _builder;
   final int itemCount;
   final IndexedWidgetBuilder _itemBuilder;
@@ -19,6 +20,7 @@ class DrawerDetailLayout extends StatefulWidget {
     Key key,
     Widget header,
     Widget footer,
+    Widget dropdown,
     @required Widget detailBuilder,
     @required this.itemCount,
     @required IndexedWidgetBuilder itemBuilder,
@@ -30,6 +32,7 @@ class DrawerDetailLayout extends StatefulWidget {
         assert(itemBuilder != null),
         _header = header,
         _footer = footer,
+        _switch = dropdown,
         _builder = detailBuilder,
         _itemBuilder = itemBuilder,
         _appBarBuilder = appBarBuilder,
@@ -60,24 +63,39 @@ class _DrawerDetailLayoutState extends State<DrawerDetailLayout> {
       child: Column(
         children: [
           DrawerHeader(
-              child: widget._header ??
-                  Center(
-                      child: Text(
+            child: widget._header ??
+                Center(
+                  child: Text(
                     'Nubeio',
                     style: theme.textTheme.headline1,
-                  ))),
-          if (widget.itemCount > 0)
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.itemCount,
-                itemBuilder: (context, position) {
-                  return widget._itemBuilder(context, position);
-                },
+                  ),
+                ),
+          ),
+          if (widget._switch != null)
+            Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: Divider.createBorderSide(context),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: widget._switch,
               ),
             )
           else
-            Expanded(child: Container()),
-          widget._footer ?? Container(),
+            const SizedBox(),
+          Expanded(
+            child: widget.itemCount > 0
+                ? ListView.builder(
+                    itemCount: widget.itemCount,
+                    itemBuilder: (context, position) {
+                      return widget._itemBuilder(context, position);
+                    },
+                  )
+                : const SizedBox(),
+          ),
+          widget._footer ?? const SizedBox(),
           SizedBox(
             height: bottomPadding,
           ),

@@ -21,6 +21,7 @@ import '../../widgets/responsive/padding.dart';
 import '../../widgets/variable_menu_item.dart';
 import 'widgets/empty_layout.dart';
 import 'widgets/page_screen.dart';
+import 'widgets/site_dropdown.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key key}) : super(key: key);
@@ -197,6 +198,7 @@ class _DashboardPageState extends State<DashboardPage>
                   size: Size.large,
                 ),
               ),
+              dropdown: const SiteDropDown(),
               detailBuilder: isEmptyState
                   ? const EmptyLayout()
                   : _buildWidgetScreen(selectedPage),
