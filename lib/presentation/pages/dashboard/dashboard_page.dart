@@ -115,7 +115,9 @@ class _DashboardPageState extends State<DashboardPage>
       cubit.startTimeout(page.config);
     }
 
-    if (page.config.protected) {
+    final isPinProtected = await configurationCubit.isPinProtected();
+
+    if (page.config.protected && isPinProtected) {
       final result = await ExtendedNavigator.of(context).pushValidatePinPage();
       if (result != null) {
         navigate();
