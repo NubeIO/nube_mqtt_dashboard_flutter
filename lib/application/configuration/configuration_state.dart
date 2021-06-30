@@ -7,7 +7,9 @@ abstract class ConfigurationState with _$ConfigurationState {
     @required bool shouldReconnect,
     @required SupportedTheme currentTheme,
     @required ValueObject<String> accessPin,
-    @required InternalState<CreatePinFailure> saveState,
+    @required ValueObject<bool> kioskMode,
+    @required InternalState<CreatePinFailure> savePinState,
+    @required InternalState<SetKioskFailure> saveModeState,
     @required InternalState<LogoutFailure> logoutState,
   }) = _Initial;
 
@@ -16,7 +18,9 @@ abstract class ConfigurationState with _$ConfigurationState {
         shouldReconnect: false,
         currentTheme: const SupportedTheme.defaultTheme(),
         accessPin: ValueObject.none(),
-        saveState: const InternalState.initial(),
+        kioskMode: ValueObject.none(),
+        savePinState: const InternalState.initial(),
+        saveModeState: const InternalState.initial(),
         logoutState: const InternalState.initial(),
       );
 }

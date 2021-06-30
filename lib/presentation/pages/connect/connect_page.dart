@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../application/configuration/configuration_cubit.dart';
+import '../../../application/validation/value_object.dart';
 import '../../../domain/session/failures.dart';
 import '../../../generated/i18n.dart';
 import '../../../injectable/injection.dart';
@@ -41,9 +42,21 @@ class _ConnectPageState extends State<ConnectPage>
     cubit = getIt<ConfigurationCubit>();
   }
 
-  void _onSaveFailure(
+  void _onSavePinFailure(
     BuildContext context,
     CreatePinFailure failure,
+  ) {
+    onFailureMessage(
+      context,
+      failure.when(
+        unexpected: () => I18n.of(context).failureGeneric,
+      ),
+    );
+  }
+
+  void _onSaveModeFailure(
+    BuildContext context,
+    SetKioskFailure failure,
   ) {
     onFailureMessage(
       context,
@@ -118,6 +131,8 @@ class _ConnectPageState extends State<ConnectPage>
         children: [
           _themeInput(context),
           const SizedBox(height: 16),
+          _buildKiosk(context),
+          const SizedBox(height: 16),
           _buildPin(context),
         ],
       ),
@@ -140,12 +155,38 @@ class _ConnectPageState extends State<ConnectPage>
     );
   }
 
+  Widget _buildKiosk(BuildContext context) {
+    return FormSwitchInput(
+      label: "Kiosk Mode",
+      initialValue: cubit.state.kioskMode,
+      onChanged: (value) async {
+        if (value.isValid) {
+          final isKiosk = value.getOrCrash();
+          final pinCode = cubit.state.accessPin.value.getOrElse(() => "");
+          if (isKiosk && pinCode.isEmpty) {
+            final pin = await _onGetPin(context);
+            cubit.setPin(ValueObject.emptyString(pin));
+          }
+        }
+        cubit.setKioskMode(value);
+      },
+    );
+  }
+
   Widget _buildPin(BuildContext context) {
-    return FormPinInput(
-      label: "Access Pin",
-      getPin: () => _onGetPin(context),
-      initialValue: cubit.state.accessPin,
-      onChanged: cubit.setPin,
+    return BlocBuilder<ConfigurationCubit, ConfigurationState>(
+      builder: (context, state) {
+        final isKiosk = state.kioskMode.getOrElse(false);
+        if (isKiosk) {
+          return const SizedBox();
+        }
+        return FormPinInput(
+          label: "Access Pin",
+          getPin: () => _onGetPin(context),
+          initialValue: cubit.state.accessPin,
+          onChanged: cubit.setPin,
+        );
+      },
     );
   }
 
@@ -217,11 +258,22 @@ class _ConnectPageState extends State<ConnectPage>
         child: BlocConsumer<ConfigurationCubit, ConfigurationState>(
           cubit: cubit,
           listener: (context, state) {
-            state.saveState.maybeWhen(
+            state.savePinState.maybeWhen(
               loading: () => showLoading(context, message: "Saving..."),
               failure: (failure) {
                 hideLoading(context);
-                _onSaveFailure(context, failure);
+                _onSavePinFailure(context, failure);
+              },
+              success: () {
+                hideLoading(context);
+              },
+              orElse: () => hideLoading(context),
+            );
+            state.saveModeState.maybeWhen(
+              loading: () => showLoading(context, message: "Saving..."),
+              failure: (failure) {
+                hideLoading(context);
+                _onSaveModeFailure(context, failure);
               },
               success: () {
                 hideLoading(context);

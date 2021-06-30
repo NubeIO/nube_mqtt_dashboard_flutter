@@ -83,12 +83,29 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   @override
+  Future<bool> isKioskMode() async {
+    return _pinPreferenceManager.isKioskMode;
+  }
+
+  @override
   Future<Either<CreatePinFailure, Unit>> createPin(String pin) async {
     try {
       _pinPreferenceManager.pin = pin;
       return const Right(unit);
     } catch (e) {
       return const Left(CreatePinFailure.unexpected());
+    }
+  }
+
+  @override
+  Future<Either<SetKioskFailure, Unit>> setKioskMode({
+    bool isKioskMode = false,
+  }) async {
+    try {
+      _pinPreferenceManager.isKioskMode = isKioskMode;
+      return const Right(unit);
+    } catch (e) {
+      return const Left(SetKioskFailure.unexpected());
     }
   }
 

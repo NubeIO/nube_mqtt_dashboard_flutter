@@ -14,6 +14,8 @@ abstract class ISessionRepository implements IRepository {
 
   Future<bool> isPinProtected();
 
+  Future<bool> isKioskMode();
+
   Future<Option<String>> getPinConfiguration();
 
   Future<ProfileStatusType> getLoginStatus();
@@ -21,6 +23,10 @@ abstract class ISessionRepository implements IRepository {
   Stream<ProfileStatusType> get loginStatusStream;
 
   Future<Either<CreatePinFailure, Unit>> createPin(String pin);
+
+  Future<Either<SetKioskFailure, Unit>> setKioskMode({
+    bool isKioskMode = false,
+  });
 
   Future<Either<ValidatePinFailure, Unit>> validatePin(String pin);
 

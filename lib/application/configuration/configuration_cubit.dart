@@ -31,11 +31,35 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
 
   Future<void> setPin(ValueObject<String> value) async {
     emit(state.copyWith(accessPin: value));
-    await next();
+    await _savePin();
   }
 
-  Future<void> next() async {
-    emit(state.copyWith(saveState: const InternalState.loading()));
+  Future<void> setKioskMode(ValueObject<bool> value) async {
+    emit(state.copyWith(kioskMode: value));
+    await _saveKioskMode();
+  }
+
+  Future<void> _saveKioskMode() async {
+    emit(state.copyWith(saveModeState: const InternalState.loading()));
+
+    final isKioskMode = state.kioskMode.getOrElse(false);
+
+    final result = await _sessionRepository.setKioskMode(
+      isKioskMode: isKioskMode,
+    );
+
+    result.fold(
+      (failure) => emit(
+        state.copyWith(saveModeState: InternalState.failure(failure)),
+      ),
+      (_) => emit(
+        state.copyWith(saveModeState: const InternalState.success()),
+      ),
+    );
+  }
+
+  Future<void> _savePin() async {
+    emit(state.copyWith(savePinState: const InternalState.loading()));
 
     final accessPin = state.accessPin.getOrElse("");
 
@@ -43,10 +67,10 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
 
     result.fold(
       (failure) => emit(
-        state.copyWith(saveState: InternalState.failure(failure)),
+        state.copyWith(savePinState: InternalState.failure(failure)),
       ),
       (_) => emit(
-        state.copyWith(saveState: const InternalState.success()),
+        state.copyWith(savePinState: const InternalState.success()),
       ),
     );
   }
@@ -55,18 +79,25 @@ class ConfigurationCubit extends Cubit<ConfigurationState> {
 
   Future<void> _prefillData() async {
     final resultPins = await _sessionRepository.getPinConfiguration();
+    final isKioskMode = await _sessionRepository.isKioskMode();
+
+    Log.d("isKioskMode $isKioskMode", tag: _TAG);
 
     if (resultPins.isSome()) {
-      final pins = resultPins.fold(() => throw Error(), id);
+      final pins = resultPins.fold(() => throw AssertionError(), id);
       emit(
         state.copyWith(
           dataReady: true,
           accessPin: ValueObject(some(pins)),
+          kioskMode: ValueObject(some(isKioskMode)),
         ),
       );
     } else {
       emit(
-        state.copyWith(dataReady: true),
+        state.copyWith(
+          dataReady: true,
+          kioskMode: ValueObject(some(isKioskMode)),
+        ),
       );
     }
 

@@ -34,8 +34,6 @@ class SiteCubit extends Cubit<SiteState> {
         final siteResult = values.first as Either<SiteFailure, KtList<Site>>;
         final activeSiteResult = values.last as Either<SiteFailure, Site>;
 
-        Log.e("result $activeSiteResult$siteResult ", tag: _TAG);
-
         KtList<SimpleSite> sites;
         if (siteResult.isLeft() && activeSiteResult.isLeft()) {
           return const Left(SiteFailure.unexpected());
@@ -52,8 +50,6 @@ class SiteCubit extends Cubit<SiteState> {
               (index, site) => fromSite(site, isSelected: index == 0),
             ),
             (active) {
-              Log.e("active $active", tag: _TAG);
-              Log.e("siteList $siteList", tag: _TAG);
               return siteList.map(
                 (site) => fromSite(site, isSelected: site.uuid == active.uuid),
               );

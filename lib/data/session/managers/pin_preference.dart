@@ -15,6 +15,10 @@ class PinPreferenceManager extends IManager {
   String get pin => _sharedPreferences.getString(_Model.pin.key) ?? "";
   set pin(String value) => _sharedPreferences.setString(_Model.pin.key, value);
 
+  bool get isKioskMode => _sharedPreferences.getBool(_Model.kiosk.key) ?? false;
+  set isKioskMode(bool value) =>
+      _sharedPreferences.setBool(_Model.kiosk.key, value);
+
   bool get isPinSet =>
       _sharedPreferences.getString(_Model.pin.key)?.isNotEmpty ?? false;
 
@@ -29,13 +33,15 @@ class PinPreferenceManager extends IManager {
   }
 }
 
-enum _Model { pin }
+enum _Model { pin, kiosk }
 
 extension on _Model {
   String get key {
     switch (this) {
       case _Model.pin:
         return "key:session:pin";
+      case _Model.kiosk:
+        return "key:session:kiosk";
     }
     return "";
   }

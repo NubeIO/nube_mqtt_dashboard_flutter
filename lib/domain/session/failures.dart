@@ -5,6 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import '../core/failure.dart';
 
 part 'failures/create_pin.dart';
+part 'failures/set_kiosk.dart';
 part 'failures/create_user.dart';
 part 'failures/login_user.dart';
 part 'failures/logout.dart';
