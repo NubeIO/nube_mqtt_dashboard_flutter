@@ -22,6 +22,8 @@ abstract class ISessionRepository implements IRepository {
 
   Stream<ProfileStatusType> get loginStatusStream;
 
+  Stream<bool> get kioskModeStream;
+
   Future<Either<CreatePinFailure, Unit>> createPin(String pin);
 
   Future<Either<SetKioskFailure, Unit>> setKioskMode({

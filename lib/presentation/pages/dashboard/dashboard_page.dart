@@ -298,6 +298,7 @@ List<Widget> appbarActions({
       create: (context) => getIt<AlertsCubit>(),
       child: BlocBuilder<AlertsCubit, AlertsState>(
         builder: (context, state) {
+          if (state.alertsEnabled) return const SizedBox();
           return state.alertState.maybeWhen(
             success: () => AlertBadgeIcon(
               onNotificationPressed: onNotificationPressed,

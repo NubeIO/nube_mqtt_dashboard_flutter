@@ -41,6 +41,8 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   final BehaviorSubject<ProfileStatusType> _profileTypeStream =
       BehaviorSubject();
 
+  final BehaviorSubject<bool> _kioskModeStream = BehaviorSubject();
+
   @nullable
   StreamSubscription _subscription;
 
@@ -70,6 +72,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
       }
     });
     _profileTypeStream.add(_sessionPreferenceManager.status);
+    _kioskModeStream.add(_pinPreferenceManager.isKioskMode);
   }
 
   @override
@@ -103,6 +106,7 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }) async {
     try {
       _pinPreferenceManager.isKioskMode = isKioskMode;
+      _kioskModeStream.add(isKioskMode);
       return const Right(unit);
     } catch (e) {
       return const Left(SetKioskFailure.unexpected());
@@ -131,6 +135,9 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   @override
   Stream<ProfileStatusType> get loginStatusStream =>
       _profileTypeStream.stream.distinct();
+
+  @override
+  Stream<bool> get kioskModeStream => _kioskModeStream.stream.distinct();
 
   @override
   Future<Option<String>> getPinConfiguration() async {
