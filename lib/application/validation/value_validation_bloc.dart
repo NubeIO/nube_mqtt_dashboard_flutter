@@ -18,7 +18,7 @@ class ValueValidationBloc<T>
 
   ValueValidationBloc(
     IValidation<dynamic, T> validation, {
-    ValueObject<String> initial,
+    ValueObject<T> initial,
   })  : _validation = validation,
         super(const ValueValidationState.initial()) {
     if (initial.isValid) {
@@ -65,7 +65,7 @@ class ValueValidationBloc<T>
     yield const ValueValidationState.loading();
 
     yield* event.when(validate: (value) async* {
-      final result = await _validation.validate(value);
+      final result = await _validation.validate(value as T);
       yield result.fold(
         (error) =>
             ValueValidationState.error(failure: _validation.mapFailure(error)),

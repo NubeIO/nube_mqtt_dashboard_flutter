@@ -12,7 +12,7 @@ abstract class IValidation<T extends Failure, O> {
 
   IValidation(this.mapper);
 
-  Future<Either<Failure, O>> validate(String input);
+  Future<Either<Failure, O>> validate(O input);
 
   @nonVirtual
   String mapFailure(dynamic error) {

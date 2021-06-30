@@ -7,7 +7,7 @@ import '../../../../application/validation/value_validation_state.dart';
 import '../../../../constants/app_constants.dart';
 import '../../../../domain/core/validation_interface.dart';
 import '../../../../domain/forms/length_validation.dart';
-import '../../../../utils/logger/log.dart';
+import '../../../../domain/forms/switch_validation.dart';
 import '../../responsive/padding.dart';
 import '../builder/form_text_builder.dart';
 import '../checkbox_input.dart';
@@ -116,12 +116,62 @@ class FormStringInput extends StatelessWidget {
   }
 }
 
+class FormSwitchInput extends StatelessWidget {
+  final String label;
+  final ValueObject<bool> initialValue;
+  final void Function(ValueObject<bool> value) onChanged;
+  final bool isRequired;
+
+  const FormSwitchInput({
+    Key key,
+    @required this.label,
+    @required this.initialValue,
+    @required this.onChanged,
+    this.isRequired = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FormTextBuilder<bool>(
+      validation: SwitchValidation(),
+      builder: (context, state, onValueChanged) {
+        return FormPadding(
+          child: SwitchInput(
+            label: label,
+            onValueChanged: (value) async {
+              onValueChanged(value);
+            },
+            isError: state.maybeWhen(
+              error: (_) => true,
+              orElse: () => false,
+            ),
+            helperText: isRequired
+                ? state.isValid
+                    ? null
+                    : "Required"
+                : null,
+            isCheck: state.maybeWhen(
+              success: (value) => value as bool,
+              orElse: () => false,
+            ),
+          ),
+        );
+      },
+      initialValue: initialValue,
+      validityListener: (value, valid) {
+        onChanged(value);
+      },
+    );
+  }
+}
+
 class FormPinInput extends StatelessWidget {
   final String label;
   final Future<String> Function() getPin;
   final ValueObject<String> initialValue;
   final void Function(ValueObject<String> value) onChanged;
   final bool isRequired;
+  final bool isEnabled;
 
   const FormPinInput({
     Key key,
@@ -130,6 +180,7 @@ class FormPinInput extends StatelessWidget {
     @required this.initialValue,
     @required this.onChanged,
     this.isRequired = false,
+    this.isEnabled = true,
   }) : super(key: key);
 
   @override
@@ -144,6 +195,7 @@ class FormPinInput extends StatelessWidget {
       builder: (context, state, onValueChanged) {
         return FormPadding(
           child: SwitchInput(
+            isEnabled: isEnabled,
             label: label,
             onValueChanged: (value) async {
               if (value) {
@@ -201,12 +253,18 @@ class FormIntInput extends StatelessWidget {
     return FormTextBuilder<int>(
       validation: validation,
       builder: (context, state, onValueChanged) {
-        Log.i(state.toString());
         return FormPadding(
           child: TextInput(
             initialValue: defaultValue.toString(),
             validationState: state,
-            onValueChanged: onValueChanged,
+            onValueChanged: (input) {
+              try {
+                final pin = int.parse(input);
+                onValueChanged(pin);
+              } catch (e) {
+                onValueChanged(0);
+              }
+            },
             textInputAction: textInputAction,
             label: label,
             keyboardType: TextInputType.number,
@@ -215,7 +273,7 @@ class FormIntInput extends StatelessWidget {
           ),
         );
       },
-      initialValue: ValueObject.emptyString(defaultValue.toString()),
+      initialValue: initialValue,
       validityListener: (value, valid) {
         onChanged(value);
       },

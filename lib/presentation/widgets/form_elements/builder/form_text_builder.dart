@@ -15,7 +15,7 @@ typedef ValueListener<T> = void Function(
 typedef FormValidatorBuilder<T> = Widget Function(
   BuildContext context,
   ValueValidationState validationState,
-  ValueChanged<String> onValueChanged,
+  ValueChanged<T> onValueChanged,
 );
 
 void emptyValidator(
@@ -28,7 +28,7 @@ class FormTextBuilder<T> extends StatefulWidget {
   final FormValidatorBuilder<T> builder;
   final IValidation<dynamic, T> _validation;
   final ValueListener<ValueObject<T>> _validityListener;
-  final ValueObject<String> initialValue;
+  final ValueObject<T> initialValue;
 
   const FormTextBuilder({
     Key key,
@@ -49,7 +49,7 @@ class _FormTextBuilderState<T> extends State<FormTextBuilder<T>>
   @override
   bool get wantKeepAlive => true;
 
-  void _onValueChange(BuildContext context, String value) {
+  void _onValueChange(BuildContext context, T value) {
     context
         .read<ValueValidationBloc<T>>()
         .add(ValueValidationEvent.validate(value));
