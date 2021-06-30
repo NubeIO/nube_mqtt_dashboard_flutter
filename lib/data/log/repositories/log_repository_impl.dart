@@ -24,7 +24,7 @@ class LogRepositoryImpl extends ILogRepository {
   Stream<Either<LogStreamFailure, KtList<LogItem>>> get logStream async* {
     yield* _logDataSource.logStream
         .handleError(() => const Left(LogStreamFailure.unknown()))
-        .map((event) => Right(event.toImmutableList()));
+        .map((event) => Right(event));
   }
 
   @override

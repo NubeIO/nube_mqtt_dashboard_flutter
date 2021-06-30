@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:kt_dart/kt.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../../domain/log/log_data_source_interface.dart';
@@ -22,7 +23,8 @@ class LogDataSource extends ILogDataSource {
   }
 
   @override
-  Stream<List<LogItem>> get logStream => _logStream.stream;
+  Stream<KtList<LogItem>> get logStream =>
+      _logStream.stream.map((event) => event.toImmutableList());
 
   @override
   Future<void> clearData() async {
