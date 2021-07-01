@@ -58,13 +58,14 @@ class AlertsPage extends StatelessWidget with MessageMixin {
                     itemCount: alerts.size,
                     itemBuilder: (context, index) {
                       final alert = alerts[index];
+                      final siteName = alert.site?.name ?? "Invalid Site";
                       return ListTile(
                         leading: AlertTypeIcon(
                           text: alert.alertType,
                           priority: alert.priority,
                         ),
                         title: _AlertTitle(alert: alert),
-                        subtitle: Text(alert.subtitle),
+                        subtitle: Text("$siteName | ${alert.subtitle}"),
                       );
                     },
                   );

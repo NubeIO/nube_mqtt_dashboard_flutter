@@ -30,7 +30,7 @@ class SiteRepositoryImpl extends ISiteRepository {
   );
 
   @override
-  Future<Either<GetSiteFailure, KtList<Site>>> fetchSites() {
+  Future<Either<FetchSiteFailure, KtList<Site>>> fetchSites() {
     return futureFailureHelper(
       request: () async {
         final sites = await _siteDataSource.getSites();
@@ -42,11 +42,21 @@ class SiteRepositoryImpl extends ISiteRepository {
         return Right(sites);
       },
       failureMapper: (cases) => cases.maybeWhen(
-        connection: () => const GetSiteFailure.connection(),
-        general: (message) => GetSiteFailure.general(message),
-        orElse: () => const GetSiteFailure.server(),
+        connection: () => const FetchSiteFailure.connection(),
+        general: (message) => FetchSiteFailure.general(message),
+        orElse: () => const FetchSiteFailure.server(),
       ),
     );
+  }
+
+  @override
+  Future<Either<GetSiteFailure, Site>> getSite(String uuid) async {
+    final sites = _siteState.value.asList();
+    final site = sites.firstWhere((element) => element.uuid == uuid);
+    if (site != null) {
+      return Right(site);
+    }
+    return const Left(GetSiteFailure.notFound());
   }
 
   @override

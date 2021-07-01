@@ -180,8 +180,8 @@ class ProwdlySessionRepositoryImpl extends ISessionRepository {
   }
 
   Future<void> _fetchRequiredData() async {
-    await _siteRepository.fetchSites();
     final configResult = await _configurationRepository.fetchConnectionConfig();
+    await _siteRepository.fetchSites();
     if (configResult.isRight()) {
       final config = configResult.fold((l) => throw AssertionError(), id);
       await _mqttRepository.login(config);

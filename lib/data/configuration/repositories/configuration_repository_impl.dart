@@ -46,7 +46,7 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
       Log.i("Layout $event", tag: _TAG);
     });
 
-  final BehaviorSubject<KtList<String>> _alertState = BehaviorSubject()
+  final BehaviorSubject<KtList<SiteAlert>> _alertState = BehaviorSubject()
     ..listen((event) {
       Log.i("Alert $event", tag: _TAG);
     });
@@ -74,14 +74,19 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
         final currentConfig = await _getCurrentConfig(event);
 
         _layoutState.add(currentConfig.layoutTopic);
-        _alertState
-            .add(topicConfig.values.map((e) => e.alertTopic).toImmutableList());
+        _alertState.add(topicConfig.entries
+            .map((e) => SiteAlert(
+                  siteId: e.key,
+                  topic: e.value.alertTopic,
+                ))
+            .toImmutableList());
       }
     });
   }
 
   @override
-  Stream<KtList<String>> get alertTopicStream => _alertState.stream.distinct();
+  Stream<KtList<SiteAlert>> get alertTopicStream =>
+      _alertState.stream.distinct();
 
   @override
   Stream<Configuration> get configurationStream =>
@@ -120,7 +125,12 @@ class ConfigurationRepositoryImpl extends IConfigurationRepository {
 
         await _saveTopics(result);
 
-        final activeSite = await _siteRepository.activeSiteStream.first;
+        final activeSite = await _siteRepository.activeSiteStream.firstWhere(
+          (element) => true,
+        );
+
+        Log.d("Sites $result", tag: _TAG);
+        Log.d("Active Site $activeSite", tag: _TAG);
 
         final currentConfig = await _getCurrentConfig(activeSite);
         return Right(

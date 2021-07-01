@@ -10,6 +10,7 @@ import '../../../domain/mqtt/mqtt_repository.dart';
 import '../../../domain/notifications/entities.dart';
 import '../../../domain/notifications/notification_data_source_interface.dart';
 import '../../../domain/notifications/notification_repository_interface.dart';
+import '../../../domain/site/site_repository_interface.dart';
 import '../../../utils/logger/log.dart';
 import '../managers/alerts_data_preference.dart';
 import '../mapper/alerts.dart';
@@ -23,12 +24,14 @@ class NotificationRepositoryImpl extends INotificationRepository {
   final IMqttRepository _mqttRepository;
   final IConfigurationRepository _configurationRepository;
   final AlertsPreferenceManager _alertsPreferenceManager;
+  final ISiteRepository _siteRepository;
 
   NotificationRepositoryImpl(
     this._notificationDataSource,
     this._mqttRepository,
     this._configurationRepository,
     this._alertsPreferenceManager,
+    this._siteRepository,
   );
 
   final alertMapper = AlertMapper();
@@ -55,9 +58,9 @@ class NotificationRepositoryImpl extends INotificationRepository {
 
   @override
   Stream<Either<AlertFailure, AlertEntity>> get alertStream async* {
-    final message = _alertsPreferenceManager.message;
+    final message = _alertsPreferenceManager.alerts;
     if (message != null) {
-      final result = await _mapToAlertBuilder(message);
+      final result = await _mapToAlertBuilder(message, null);
       if (result.isRight()) {
         yield result.fold(
           (l) => throw AssertionError(),
@@ -69,17 +72,20 @@ class NotificationRepositoryImpl extends INotificationRepository {
     }
 
     yield* _configurationRepository.alertTopicStream
-        .flatMap((alertTopics) async* {
+        .flatMap((alertSiteTopics) async* {
       await _mqttRepository.connectionStream
           .firstWhere((element) => element == ServerConnectionState.CONNECTED);
 
       final List<Stream<Either<AlertFailure, AlertEntity>>> streams = [];
 
-      for (final alertTopic in alertTopics.iter) {
+      for (final alertSiteTopic in alertSiteTopics.iter) {
+        final alertTopic = alertSiteTopic.topic;
+        final alertSiteId = alertSiteTopic.siteId;
         await _mqttRepository.subscribe(alertTopic);
         final stream = _mqttRepository.getTopicMessage(alertTopic).asyncMap(
               (message) =>
-                  _mapToAlertBuilder(message).catchError(_onErrorCatch),
+                  _mapToAlertBuilderFromTopicMessage(message, alertSiteId)
+                      .catchError(_onErrorCatch),
             );
         streams.add(stream);
       }
@@ -100,7 +106,10 @@ class NotificationRepositoryImpl extends INotificationRepository {
                 (KtList<Alert> value, KtList<Alert> element) =>
                     element.toMutableList()..addAll(value),
               );
-          return Right(AlertEntity(alerts: alerts));
+          final alertEntity = AlertEntity(alerts: alerts);
+          _alertsPreferenceManager.alerts =
+              alertMapper.mapFromAlerts(alertEntity);
+          return Right(alertEntity);
         },
       );
     });
@@ -125,10 +134,32 @@ class NotificationRepositoryImpl extends INotificationRepository {
   }
 
   Future<Either<AlertFailure, AlertEntity>> _mapToAlertBuilder(
+    Alerts input,
+    @nullable String siteId,
+  ) async {
+    final List<Alert> alerts = await Stream.fromIterable(
+      input.alerts,
+    ).asyncMap((alert) async {
+      if (alert.siteId == null && siteId == null) {
+        return alertMapper.mapToAlert(alert, null);
+      }
+      final siteResult = await _siteRepository.getSite(siteId ?? alert.siteId);
+      return alertMapper.mapToAlert(alert, siteResult.fold((l) => null, id));
+    }).toList();
+
+    return Right(AlertEntity(
+      alerts: alerts.toImmutableList(),
+    ));
+  }
+
+  Future<Either<AlertFailure, AlertEntity>> _mapToAlertBuilderFromTopicMessage(
     TopicMessage message,
+    @nullable String siteId,
   ) async {
     final layout = jsonDecode(message.message) as Map<String, dynamic>;
-    return Right(alertMapper.mapToAlerts(Alerts.fromJson(layout)));
+    final input = Alerts.fromJson(layout);
+
+    return _mapToAlertBuilder(input, siteId);
   }
 
   @override

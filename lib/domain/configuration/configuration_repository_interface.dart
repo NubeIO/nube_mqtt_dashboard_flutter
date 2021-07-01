@@ -14,7 +14,7 @@ abstract class IConfigurationRepository implements IDataRepository {
 
   Stream<String> get layoutTopicStream;
 
-  Stream<KtList<String>> get alertTopicStream;
+  Stream<KtList<SiteAlert>> get alertTopicStream;
 
   Future<Either<GetConnectionFailure, Configuration>> fetchConnectionConfig();
 

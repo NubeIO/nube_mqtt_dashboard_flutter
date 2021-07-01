@@ -4,30 +4,30 @@ import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../domain/core/interfaces/managers.dart';
-import '../../../domain/mqtt/entities.dart';
-import '../../mqtt/mappers/topic_message.dart';
-import '../../mqtt/models/topic_message_dto.dart';
+import '../models/alerts.dart';
 
 @injectable
 class AlertsPreferenceManager extends IManager {
   final SharedPreferences _sharedPreferences;
-  final _topicMessageMapper = TopicMessageMapper();
 
   AlertsPreferenceManager(this._sharedPreferences);
 
-  TopicMessage get message {
-    final message = _sharedPreferences.getString(_Model.alerts.key) ?? "";
-    if (message.isEmpty) return null;
-    final map = jsonDecode(message) as Map<String, dynamic>;
-    return _topicMessageMapper.mapToTopicMesage(TopicMessageDto.fromJson(map));
+  Alerts get alerts {
+    try {
+      final config = _sharedPreferences.getString(_Model.alerts.key);
+      final map = jsonDecode(config) as Map<String, dynamic>;
+      return Alerts.fromJson(map);
+    } catch (e) {
+      return null;
+    }
   }
 
-  set message(TopicMessage message) {
-    _sharedPreferences.setString(
-      _Model.alerts.key,
-      jsonEncode(_topicMessageMapper.mapFromTopicMessage(message).toJson()),
-    );
-  }
+  set alerts(Alerts alerts) => _sharedPreferences.setString(
+        _Model.alerts.key,
+        jsonEncode(
+          alerts.toJson(),
+        ),
+      );
 
   @override
   Future<Unit> clearData() async {

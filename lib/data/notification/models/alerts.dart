@@ -19,6 +19,7 @@ abstract class AlertResponse with _$AlertResponse {
     @JsonKey(name: 'title') @required String title,
     @JsonKey(name: 'subtitle') @required String subtitle,
     @JsonKey(name: 'alert_type') @required String alertType,
+    @JsonKey(name: 'site_id') @required @nullable String siteId,
     @JsonKey(name: 'priority', unknownEnumValue: PriorityResponse.LOW)
         PriorityResponse priority,
   }) = _AlertResponse;

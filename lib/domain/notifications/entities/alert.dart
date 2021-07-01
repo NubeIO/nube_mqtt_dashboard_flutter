@@ -17,8 +17,9 @@ abstract class Alert with _$Alert {
     @required DateTime timestamp,
     @required String title,
     @required String subtitle,
-    @required String alertType,
     @required Priority priority,
+    @required String alertType,
+    Site site,
   }) = _Alert;
 }
 
